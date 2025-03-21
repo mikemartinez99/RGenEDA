@@ -78,7 +78,7 @@ Let's start by looking at the sample distances to see how our samples are cluste
 ```{r sample distances}
 
 # Set output directory
-outputDir <- c("/users/mike/Desktop/RGenEDA/img")
+outputDir <- c("/users/mike/Desktop/RGenEDA/img/")
 
 # Set colors for our metadata categories
 metaColors <- list(condition = c("untreated" = "blue",
@@ -97,4 +97,38 @@ distanceHeatmap(MAT = mat,
 
 ```
 
-![Alt text](/img/Sample_Distance_HM.tiff)
+```{r run PCA functions}
+
+# Explore variance
+variance <- plotVariance(MAT = mat,
+                         OUTPUT = outputDir,
+                         LOG = FALSE,
+                         nFeaturesDrop = NULL)
+
+# Generate PCs
+pcaRes <- generatePCs(MAT = mat,
+                      VARS = variance,
+                      NFEATURES = 2000)
+
+# Extract PC data
+pcaDF <- as.data.frame(pcaRes[["Loadings"]])
+
+# Append metadata to pcaDF
+pcaDF <- cbind(pcaDF, metadata)
+
+# Plot PCA
+```
+
+
+```{r eigencorrelations}
+
+# Use Eigencorrelations
+ecs <- eigencorr(MAT = mat,
+                 META = metadata,
+                 NUM_PCS = 4,
+                 OUTPUT = outputDir)
+
+
+
+
+```
