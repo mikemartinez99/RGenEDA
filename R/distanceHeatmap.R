@@ -1,6 +1,6 @@
 #' distanceHeatmap
 #'
-#' @description Calculate sample to sample distances using Euclidean distances. Create annotataion-rich heatmap to assess data trends.
+#' @description Calculate sample to sample distances using Euclidean distances. Create annotated heatmap to assess data trends.
 #'
 #' @importFrom pheatmap pheatmap
 #' @import scales

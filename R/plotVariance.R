@@ -3,7 +3,7 @@
 #' @description Analyze gene variance to determine thresholds for PCA. Plot gene by variance plot.
 #'
 #' @param MAT A data matrix where rows are features and columns are samples
-#' @param OUTPUT A directory path to where the output should be saved. Path needs to end in a "/"
+#' @param OUTPUT A directory path to where the output should be saved. Path must end in a "/"
 #' @param LOG Log transform variance. Default = FALSE
 #' @param nFeaturesDrop Number of top most variable features to drop. Useful if top genes are extremely variable. Default = NULL
 #'

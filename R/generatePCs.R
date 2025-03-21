@@ -4,7 +4,7 @@
 #'
 #' @param MAT A data matrix where rows are features and columns are samples
 #' @param VARS A vector of gene variances (can calculate using DACExploreR::plotVariance)
-#' @param NFEATURES Number of top features to generate principal components on
+#' @param NFEATURES Number of top features to generate principal components on.
 #'
 #' @returns A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
 #'

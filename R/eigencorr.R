@@ -1,6 +1,6 @@
 #' eigencorr
 #'
-#' @description Calculate Eigen-correlations to correlate axes of variation with principal components.For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
+#' @description Calculate Eigen-correlations to correlate axes of variation with principal components. For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
 #'
 #' @import ComplexHeatmap draw
 #' @import scales

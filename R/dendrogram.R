@@ -1,6 +1,6 @@
 #' dendrogram
 #'
-#' @description Plot sample dendrogram colored by metadata feature.
+#' @description Plot sample dendrogram colored by a single metadata feature.
 #'
 #' @importFrom dendextend color_branches
 #' @import scales
