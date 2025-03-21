@@ -5,7 +5,7 @@ This package contains functions to help explore genomic data of any type. All yo
 
 # Table of Contents
 - [Installation](#installation)
-- [Examples] (#examples)
+- [Examples](#examples)
 - [Contact](#contact)
 
 ## Installation
@@ -29,7 +29,16 @@ BiocManager::install("ComplexHeatmap")
 install.packages(c("RColorBrewer", "grid, "magick", "scales", "dendextend", "pheatmap"))
 ```
 ## Examples
-To demonstrate RGenEDA, we will utilize an example dataset of mouse mammary RNASeq. Here, we will follow the standard [DESeq2 Workflow](https://www.bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html).
+To demonstrate RGenEDA, we will utilize an example dataset of mouse mammary RNASeq. Here, we will follow the standard [DESeq2 Workflow](https://www.bioconductor.org/packages/release/bioc/vignettes/DESeq2/inst/doc/DESeq2.html). See [Introduction vignette](https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/introduction.Rmd) for more information. These are very basic examples and can be scaled accordingly.
+
+### Sample Distance heatmap
+![Alt text](img/Sample_Distance_HM.tiff)
+
+### Variable Feature Selection
+![Alt text](img/Variable_Features.tiff)
+
+### Eigenvector correlations
+![Alt text](img/EigenCorrelations.tiff)
 
 ## Contact
 Michael Martinez M.S.
