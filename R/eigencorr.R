@@ -44,20 +44,9 @@ eigencorr <- function(MAT, META, NUM_PCS = 10, OUTPUT) {
   #----- Loop through META variables and calculate correlation for each PC
   for (meta_var in colnames(META)) {
     for (pc in colnames(pcs)) {
-      if (is.numeric(META[[meta_var]])) {
-        #----- For continuous variables, use Pearson correlation and calculate p-values
-        message(paste0(meta_var, " is continuous. Using Pearson correlation to calculate p-value"))
         test <- cor.test(pcs[[pc]], META[[meta_var]], method = "pearson", use = "complete.obs")
         cor_matrix[meta_var, pc] <- test$estimate
         pval_matrix[meta_var, pc] <- test$p.value
-      } else if (is.factor(META[[meta_var]])) {
-        message(paste0(meta_var, " is categorical. Using ANOVA to calculate p-value"))
-        #----- For categorical variables, use ANOVA to calculate F-statistic and p-value
-        aov_res <- aov(pcs[[pc]] ~ META[[meta_var]])
-        summary_aov <- summary(aov_res)
-        cor_matrix[meta_var, pc] <- summary_aov[[1]][["F value"]][1]  # F-statistic
-        pval_matrix[meta_var, pc] <- summary_aov[[1]][["Pr(>F)"]][1]  # p-value
-      }
     }
   }
   #----- Remove NA
