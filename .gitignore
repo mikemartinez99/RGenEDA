@@ -4,3 +4,4 @@ DACExploreR.Rproj
 .gitattributes
 .Rbuildignore
 .DS_Store
+inst/doc

@@ -1,0 +1,100 @@
+---
+title: "Introduction"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{introduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+This vignette will show the basic use-cases for `RGenEDA` on bulk RNASeq data, however, the package can be easily used for other types of omics data as long as a counts matrix and metadata are present. 
+
+We will rely on data in the `pasilla` dataset and follow the [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
+
+```{r setup}
+# Load libraries
+library(RGenEDA)
+library(DESeq2)
+library(pasilla)
+```
+
+```{r read in the data}
+# Set path to pasilla data
+datafile <-  system.file( "extdata/pasilla_gene_counts.tsv", package="pasilla" )
+
+# Load counts
+count.table <-  read.table( datafile, header=TRUE, row.names=1, quote="", comment.char="" )
+head(count.table)
+
+```
+
+```{r set metadata}
+cond.type <-  c( "untreated", "untreated", "untreated","untreated", "treated", "treated", "treated" )
+lib.type   <-  c( "single-end", "single-end", "paired-end", "paired-end", "single-end", "paired-end", "paired-end" ) 
+
+metadata <- data.frame(condition = cond.type,
+                       library = lib.type)
+rownames(metadata) <- colnames(count.table)
+```
+
+
+```{r prepare for DESeq2}
+
+# Create a DESeq2 dataset
+dds <- DESeqDataSetFromMatrix(countData = count.table,
+                              colData = metadata,
+                              design = ~condition + library + condition:library)
+
+# Set reference levels
+dds$condition <- relevel(dds$condition, ref = "untreated")
+dds$library <- relevel(dds$library, ref = "single-end")
+
+# Pre filter
+smallestGroupSize <- 3
+keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
+dds <- dds[keep,]
+
+# Run DESeq2
+dds <- DESeq(dds)
+
+# Variance stabilizing transform
+vsd <- vst(dds)
+
+# Extract matrix
+mat <- assay(vsd)
+```
+
+Now that we successfully have a matrix and metadata, we are ready to start exploratory data analysis. 
+Let's start by looking at the sample distances to see how our samples are clustering. For `RGenEDA` it is useful to set a figure directory where all EDA plots will live. We want to visualize all possible metadata for this. 
+
+```{r sample distances}
+
+# Set output directory
+outputDir <- c("/users/mike/Desktop/RGenEDA/img")
+
+# Set colors for our metadata categories
+metaColors <- list(condition = c("untreated" = "blue",
+                                 "treated" = "red"),
+                   library = c("single-end" = "maroon",
+                               "paired-end" = "gold"))
+
+# Call the distance heatmap function
+distanceHeatmap(MAT = mat,
+                META = metadata,
+                FEATURES = c("condition", "library"),
+                PALETTES = metaColors,
+                OUTPUT = outputDir)
+
+
+
+```
+
+![Alt text](/img/Sample_Distance_HM.tiff)
