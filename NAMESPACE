@@ -2,7 +2,6 @@
 
 import(ComplexHeatmap)
 import(RColorBrewer)
-import(draw)
 import(grid)
 import(magick)
 import(scales)
