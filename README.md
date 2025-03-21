@@ -7,6 +7,7 @@ This package contains functions to help explore genomic data of any type. All yo
 - [Installation](#installation)
 - [Examples](#examples)
 - [Contact](#contact)
+- [License](#license)
 
 ## Installation
 To intall the RGenEDA package through R, run the following command:
@@ -47,4 +48,16 @@ Eigenvectors (PCs) represent individual axes of variation in data. We can correl
 Michael Martinez M.S.
 
 f007qps@dartmouth.edu
+
+## License
+This package is licensed under the **GNU General Public License v3.0 (GPL-3.0)**
+
+You are free to:
+- Share - Copy and redistribute the material in any medium or format.
+- Adapt - Modify, remix, and build upon the material for any purpose, even commercially.
+
+**Under the following terms**
+- Copyleft - If you distribute versions of this package, you must also license them under GPL-3.0
+- Attribution - You must give appropriate credit to the original authors.
+- No additional restrictions - You may not impose legal terms that prevent others from using the freedoms granted by this license.
 
