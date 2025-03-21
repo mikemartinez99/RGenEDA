@@ -73,7 +73,7 @@ eigencorr <- function(MAT, META, NUM_PCS = 10, OUTPUT) {
 
   #----- Plot heatmap
   message("Plotting heatmap...")
-  ComplexHeatmap::Heatmap(cor_matrix,
+  H <- ComplexHeatmap::Heatmap(cor_matrix,
                cluster_rows = TRUE,
                cluster_columns = FALSE,
                cell_fun = function(j, i, x, y, width, height, fill) {
@@ -89,6 +89,7 @@ eigencorr <- function(MAT, META, NUM_PCS = 10, OUTPUT) {
                column_names_gp = grid::gpar(fontsize = 20),
                column_title = "",
                row_title = "")
+  draw(H)
   dev.off()
   message("Plotting complete!")
 
