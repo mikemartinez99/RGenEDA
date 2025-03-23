@@ -7,7 +7,6 @@ This package contains functions to help explore genomic data of any type. All it
 - [Installation](#installation)
 - [Examples](#examples)
 - [Contact](#contact)
-- [License](#license)
 
 ## Installation
 
