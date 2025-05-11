@@ -22,7 +22,7 @@ To intall the RGenEDA package through R, run the following command:
 
 ```r
 library(devtools)
-devtools::install_github("mmartinez99/RGenEDA/")
+devtools::install_github("mikemartinez99/RGenEDA/")
 
 library(RGenEDA)
 
