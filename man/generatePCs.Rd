@@ -11,7 +11,7 @@ generatePCs(MAT, VARS, NFEATURES)
 
 \item{VARS}{A vector of gene variances (can calculate using DACExploreR::plotVariance)}
 
-\item{NFEATURES}{Number of top features to generate principal components on}
+\item{NFEATURES}{Number of top features to generate principal components on.}
 }
 \value{
 A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var

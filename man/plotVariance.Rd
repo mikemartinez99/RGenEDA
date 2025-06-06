@@ -9,7 +9,7 @@ plotVariance(MAT, OUTPUT, LOG = FALSE, nFeaturesDrop = NULL)
 \arguments{
 \item{MAT}{A data matrix where rows are features and columns are samples}
 
-\item{OUTPUT}{A directory path to where the output should be saved. Path needs to end in a "/"}
+\item{OUTPUT}{A directory path to where the output should be saved. Path must end in a "/"}
 
 \item{LOG}{Log transform variance. Default = FALSE}
 

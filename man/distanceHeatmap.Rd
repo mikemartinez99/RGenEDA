@@ -21,7 +21,7 @@ distanceHeatmap(MAT, META, FEATURES = c(...), PALETTES, OUTPUT)
 A distance heatmap in png format at the specified output path
 }
 \description{
-Calculate sample to sample distances using Euclidean distances. Create annotataion-rich heatmap to assess data trends.
+Calculate sample to sample distances using Euclidean distances. Create annotated heatmap to assess data trends.
 }
 \examples{
 timepoint_colors <- c("Early" = "red", "Late" = "blue")

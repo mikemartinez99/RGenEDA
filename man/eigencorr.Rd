@@ -19,7 +19,7 @@ eigencorr(MAT, META, NUM_PCS = 10, OUTPUT)
 A list consisting of 3 slots: cor_matrix which holds correlation results, pval_matrix which holds p-value results, and stars which holds significance stars for plotting
 }
 \description{
-Calculate Eigen-correlations to correlate axes of variation with principal components.For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
+Calculate Eigen-correlations to correlate axes of variation with principal components. For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
 }
 \examples{
 # Set output directory
