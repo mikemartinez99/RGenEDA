@@ -9,15 +9,6 @@ This package contains functions to help explore genomic data of any type. All it
 - [Contact](#contact)
 
 ## Installation
-
-RGenEDA calls the following dependencies:
-- ComplexHeatmap
-- RColorBrewer
-- grid
-- magick
-- scales
-- pheatmap
-
 To intall the RGenEDA package through R, run the following command:
 
 ```r
@@ -51,3 +42,6 @@ Eigenvector plots are a highly underrated diagnostic tool in exploratory data an
 Michael Martinez M.S.
 
 f007qps@dartmouth.edu
+
+### MA Plots
+

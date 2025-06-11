@@ -2,6 +2,9 @@
 
 import(ComplexHeatmap)
 import(RColorBrewer)
+import(ggblend)
+import(ggplot2)
+import(ggrepel)
 import(grid)
 import(magick)
 import(scales)
