@@ -34,7 +34,7 @@ Principal component analysis (PCA) is a dimensionality reduction technique used 
 ![Alt text](img/Variable_Features.tiff)
 
 ### Eigenvector correlations
-Eigenvector plots are a highly underrated diagnostic tool in exploratory data analysis. These plots help visualize how Eigenvectors (PCs) correlate with metadata variables to help identify which variables are driving major axes of variation in your data. If a PC strongly correlates with a variable of interest, you can confirm that your experiment is driven by the biology you are interested in, and also identify covariates affecting lesser axes of variation to help explain additional variance. 
+Eigenvector plots are a highly underrated diagnostic tool in exploratory data analysis. These plots help visualize how Eigenvectors (PCs) correlate with metadata variables to help identify which variables are driving major axes of variation in your data. If a PC strongly correlates with a variable of interest, you can confirm that your experiment is driven by the biology you are interested in, and also identify covariates affecting lesser axes of variation to help explain additional variance. This function also comes in a metagenomics (MGX) flavor and is adapter to use NMDS beta values in place of PCs. 
 
 ![Alt text](img/EigenCorrelations.tiff)
 
