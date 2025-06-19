@@ -34,10 +34,11 @@ MAplot <- function(results,
 
   #----- Set group thresholds
   denThresh <- log2FC_thresh * -1
+  numThresh <- log2FC_thresh
 
   #----- Add group column to results
   results$Group <- ifelse(results$log2FoldChange < denThresh & results$padj <= padj_thresh, paste0("Enriched in ", refLevel),
-                          ifelse(results$log2FoldChange > numThresh & results$padj <= padj_thresh, paste0("Enriched in ", num), "ns"))
+                          ifelse(results$log2FoldChange > numThresh & results$padj <= padj_thresh, paste0("Enriched in ", numerator), "ns"))
 
   #----- Filter to just rows with top 15% base mean values (for labelling)
   threshold <- quantile(results$baseMean, 0.85, na.rm = TRUE)

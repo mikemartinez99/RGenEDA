@@ -132,3 +132,19 @@ ecs <- eigencorr(MAT = mat,
 
 
 ```
+
+```{r MA plot}
+# Extract DESeq2 results
+resultsNames(dds)
+results <- as.data.frame(results(dds, name = "condition_treated_vs_untreated"))
+
+MAplot(results = results,
+       numerator = "treated",
+       refLevel = "untreated",
+       log2FC_thresh = 1,
+       padj_thresh = 0.05,
+       title = "MA_demo",
+       figDir = outputDir,
+       "MAplotDemo.png")
+
+```
