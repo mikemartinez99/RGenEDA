@@ -129,7 +129,7 @@ distanceHeatmap(MAT = mat,
 knitr::include_graphics(file.path(outputDir, "Sample_Distance_HM.tiff"))
 ```
 
-![](../img/Sample_Distance_HM.tiff)<!-- -->
+<img src="../img/Sample_Distance_HM.tiff" width="50%" />
 
 ``` r
 
@@ -186,7 +186,7 @@ eigencorr(MAT = mat,
 knitr::include_graphics(file.path(outputDir, "EigenCorrelations.tiff"))
 ```
 
-![](../img/EigenCorrelations.tiff)<!-- -->
+<img src="../img/EigenCorrelations.tiff" width="50%" />
 
 Let’s visualize the DESeq2 results as an MA plot now.
 
