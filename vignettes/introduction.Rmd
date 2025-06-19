@@ -76,7 +76,7 @@ mat <- assay(vsd)
 Now that we successfully have a matrix and metadata, we are ready to start exploratory data analysis. 
 Let's start by looking at the sample distances to see how our samples are clustering. For `RGenEDA` it is useful to set a figure directory where all EDA plots will live. We want to visualize all possible metadata for this. 
 
-```{r sample distances, fig.scale=0.5, cache = FALSE}
+```{r sample distances, fig.show='hold', out.width='50%', cache = FALSE}
 
 # Set output directory
 outputDir <- c("/users/mike/Desktop/RGenEDA/img/")
@@ -122,7 +122,7 @@ pcaDF <- cbind(pcaDF, metadata)
 ```
 
 
-```{r eigencorrelations, fig.scale=0.5}
+```{r eigencorrelations, fig.show='hold', out.width='50%', cache = FALSE}
 
 # Use Eigencorrelations
 eigencorr(MAT = mat,
