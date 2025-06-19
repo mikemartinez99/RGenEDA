@@ -1,4 +1,6 @@
 # Genomic Explotatory Data Analysis (EDA) 
+![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
+![R Version](https://img.shields.io/badge/R-4.4.3-blue)
 This package contains functions to help explore genomic data of any type. All it requires is a counts matrix containing samples and feature information (i.e., genes, microbes, functions, etc...)
 
 
