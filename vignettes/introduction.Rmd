@@ -87,7 +87,7 @@ metaColors <- list(condition = c("untreated" = "blue",
                                "paired-end" = "gold"))
 
 # Call the distance heatmap function
-distanceHeatmap(MAT = mat,
+RGenEDA::distanceHeatmap(MAT = mat,
                 META = metadata,
                 FEATURES = c("condition", "library"),
                 PALETTES = metaColors,

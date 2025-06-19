@@ -13,6 +13,7 @@
 #' @param OUTPUT A directory path to where the output should be saved. Path needs to end in a "/"
 #'
 #' @returns A distance heatmap in png format at the specified output path
+#' @export
 #'
 #' @examples timepoint_colors <- c("Early" = "red", "Late" = "blue")
 #' @examples treatment_colors <- c("Mock" = "pink", "HSV" = "green")

@@ -14,6 +14,7 @@
 #' @param OUTPUT directory path to where the output should be saved. Path needs to end in a "/"
 #'
 #' @returns A list consisting of 3 slots: cor_matrix which holds correlation results, pval_matrix which holds p-value results, and stars which holds significance stars for plotting
+#' @export
 #'
 #' @examples # Set output directory
 #' @examples outputDir <- c("/Path/to/output/")

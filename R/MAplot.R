@@ -16,6 +16,7 @@
 #' @param figName Output figure name with .png extension
 #'
 #' @returns An output figure and ggplot object
+#' @export
 
 
 MAplot <- function(results,

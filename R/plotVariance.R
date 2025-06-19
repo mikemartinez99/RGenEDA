@@ -8,6 +8,7 @@
 #' @param nFeaturesDrop Number of top most variable features to drop. Useful if top genes are extremely variable. Default = NULL
 #'
 #' @returns A vector of variances named by gene. A gene by variance plot in tiff format at the specified output location.
+#' @export
 #'
 #' @examples output_folder <- c("Path/to/outputs/")
 #' @examples # Plot variance as it
