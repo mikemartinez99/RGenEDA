@@ -193,8 +193,7 @@ Let’s visualize the DESeq2 results as an MA plot now.
 ``` r
 # Extract DESeq2 results
 resultsNames(dds)
-#> [1] "Intercept"                          "condition_treated_vs_untreated"     "library_paired.end_vs_single.end"  
-#> [4] "conditiontreated.librarypaired.end"
+#> [1] "Intercept"                          "condition_treated_vs_untreated"     "library_paired.end_vs_single.end"   "conditiontreated.librarypaired.end"
 results <- as.data.frame(results(dds, name = "condition_treated_vs_untreated"))
 
 MAplot(results = results,
