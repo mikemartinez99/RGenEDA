@@ -1,8 +1,6 @@
 Introduction
 ================
 
-# Introduction
-
 This vignette will show the basic use-cases for `RGenEDA` on bulk RNASeq
 data, however, the package can be easily used for other types of omics
 data as long as a counts matrix and metadata are present.
@@ -16,6 +14,10 @@ library(RGenEDA)
 library(DESeq2)
 library(pasilla)
 ```
+
+We first load in our data. In the case of your own data, you can use
+`read_csv`, `fread`, or your favorite table reader function to load your
+counts matrix. We will quickly explore the first few rows of the data.
 
 ``` r
 # Set path to pasilla data
@@ -33,6 +35,12 @@ head(count.table)
 #> FBgn0000018        583        761        245        310      722      299      308
 ```
 
+We need to gather the metadata associated with these samples. In the
+case of the `pasilla` dataset, we have two major variables: `cond.type`
+and `lib.type` which we will explore. It is always a good practice to
+ensure that your samples are not scrambled between your counts matrix
+and metadata table.
+
 ``` r
 cond.type <-  c( "untreated", "untreated", "untreated","untreated", "treated", "treated", "treated" )
 lib.type   <-  c( "single-end", "single-end", "paired-end", "paired-end", "single-end", "paired-end", "paired-end" ) 
@@ -41,6 +49,9 @@ metadata <- data.frame(condition = cond.type,
                        library = lib.type)
 rownames(metadata) <- colnames(count.table)
 ```
+
+Now, we can create a DESeq2 object using our counts and metadata and
+follow a the standard workflow.
 
 ``` r
 
@@ -105,7 +116,7 @@ metaColors <- list(condition = c("untreated" = "blue",
                                "paired-end" = "gold"))
 
 # Call the distance heatmap function
-RGenEDA::distanceHeatmap(MAT = mat,
+distanceHeatmap(MAT = mat,
                 META = metadata,
                 FEATURES = c("condition", "library"),
                 PALETTES = metaColors,
@@ -114,7 +125,11 @@ RGenEDA::distanceHeatmap(MAT = mat,
 #> Extracting condition as features for plotting...Extracting library as features for plotting...
 #> Saving distance heatmap to /users/mike/Desktop/RGenEDA/img/
 #> Distance heatmap successfully generated!
+
+knitr::include_graphics(file.path(outputDir, "Sample_Distance_HM.tiff"))
 ```
+
+![](../img/Sample_Distance_HM.tiff)<!-- -->
 
 ``` r
 
@@ -146,14 +161,34 @@ pcaDF <- cbind(pcaDF, metadata)
 ``` r
 
 # Use Eigencorrelations
-ecs <- eigencorr(MAT = mat,
-                 META = metadata,
-                 NUM_PCS = 4,
-                 OUTPUT = outputDir)
+eigencorr(MAT = mat,
+          META = metadata,
+          NUM_PCS = 4,
+          OUTPUT = outputDir)
 #> Output path: /users/mike/Desktop/RGenEDA/img/EigenCorrelations.tiff
 #> Plotting heatmap...
 #> Plotting complete!
+#> $cor_matrix
+#>                  PC1        PC2         PC3         PC4
+#> condition -0.9852730 -0.1626264 -0.04148961 -0.03014836
+#> library   -0.3202731  0.9305371 -0.07426545 -0.03804637
+#> 
+#> $pval_matrix
+#>                    PC1         PC2       PC3       PC4
+#> condition 5.015424e-05 0.727553126 0.9296257 0.9488418
+#> library   4.837386e-01 0.002352233 0.8742705 0.9354572
+#> 
+#> $stars
+#>           PC1   PC2  PC3 PC4
+#> condition "***" ""   ""  "" 
+#> library   ""    "**" ""  ""
+
+knitr::include_graphics(file.path(outputDir, "EigenCorrelations.tiff"))
 ```
+
+![](../img/EigenCorrelations.tiff)<!-- -->
+
+Let’s visualize the DESeq2 results as an MA plot now.
 
 ``` r
 # Extract DESeq2 results

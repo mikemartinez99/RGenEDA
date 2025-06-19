@@ -14,7 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
 This vignette will show the basic use-cases for `RGenEDA` on bulk RNASeq data, however, the package can be easily used for other types of omics data as long as a counts matrix and metadata are present. 
 
 We will rely on data in the `pasilla` dataset and follow the [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
@@ -26,6 +25,7 @@ library(DESeq2)
 library(pasilla)
 ```
 
+We first load in our data. In the case of your own data, you can use `read_csv`, `fread`, or your favorite table reader function to load your counts matrix. We will quickly explore the first few rows of the data. 
 ```{r read in the data}
 # Set path to pasilla data
 datafile <-  system.file( "extdata/pasilla_gene_counts.tsv", package="pasilla" )
@@ -36,6 +36,7 @@ head(count.table)
 
 ```
 
+We need to gather the metadata associated with these samples. In the case of the `pasilla` dataset, we have two major variables: `cond.type` and `lib.type` which we will explore. It is always a good practice to ensure that your samples are not scrambled between your counts matrix and metadata table. 
 ```{r set metadata}
 cond.type <-  c( "untreated", "untreated", "untreated","untreated", "treated", "treated", "treated" )
 lib.type   <-  c( "single-end", "single-end", "paired-end", "paired-end", "single-end", "paired-end", "paired-end" ) 
@@ -45,7 +46,7 @@ metadata <- data.frame(condition = cond.type,
 rownames(metadata) <- colnames(count.table)
 ```
 
-
+Now, we can create a DESeq2 object using our counts and metadata and follow a the standard workflow.
 ```{r prepare for DESeq2}
 
 # Create a DESeq2 dataset
@@ -87,12 +88,13 @@ metaColors <- list(condition = c("untreated" = "blue",
                                "paired-end" = "gold"))
 
 # Call the distance heatmap function
-RGenEDA::distanceHeatmap(MAT = mat,
+distanceHeatmap(MAT = mat,
                 META = metadata,
                 FEATURES = c("condition", "library"),
                 PALETTES = metaColors,
                 OUTPUT = outputDir)
 
+knitr::include_graphics(file.path(outputDir, "Sample_Distance_HM.tiff"))
 
 
 ```
@@ -123,16 +125,15 @@ pcaDF <- cbind(pcaDF, metadata)
 ```{r eigencorrelations}
 
 # Use Eigencorrelations
-ecs <- eigencorr(MAT = mat,
-                 META = metadata,
-                 NUM_PCS = 4,
-                 OUTPUT = outputDir)
+eigencorr(MAT = mat,
+          META = metadata,
+          NUM_PCS = 4,
+          OUTPUT = outputDir)
 
-
-
-
+knitr::include_graphics(file.path(outputDir, "EigenCorrelations.tiff"))
 ```
 
+Let's visualize the DESeq2 results as an MA plot now.
 ```{r MA plot}
 # Extract DESeq2 results
 resultsNames(dds)
