@@ -139,7 +139,7 @@ Let's visualize the DESeq2 results as an MA plot now.
 resultsNames(dds)
 results <- as.data.frame(results(dds, name = "condition_treated_vs_untreated"))
 
-MAplot(results = results,
+x <- MAplot(results = results,
        numerator = "treated",
        refLevel = "untreated",
        log2FC_thresh = 1,
@@ -147,5 +147,21 @@ MAplot(results = results,
        title = "MA_demo",
        figDir = outputDir,
        "MAplotDemo.png")
+
+
+
+sticker(x, package="RGenEDA", 
+        p_size=8, 
+        p_color = "black",
+        h_color = "#00703C",
+        s_y = 0.2,
+        filename="/users/mike/Desktop/RGenEDA_Sticker.svg", h_fill = "white",
+        dpi = 500)
+
+
+
+library(hexSticker)
+
+
 
 ```

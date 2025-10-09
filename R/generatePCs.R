@@ -3,7 +3,7 @@
 #' @description Generate principal component analysis data that can be used in downstream analyses.
 #'
 #' @param MAT A data matrix where rows are features and columns are samples
-#' @param VARS A vector of gene variances (can calculate using DACExploreR::plotVariance)
+#' @param VARS A vector of gene variances (can calculate using RGenEDA::plotVariance)
 #' @param NFEATURES Number of top features to generate principal components on.
 #'
 #' @returns A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
@@ -37,7 +37,7 @@ generatePCs <- function(MAT, VARS, NFEATURES) {
   # ---- Construct a data frame with PC loadings and add sample labels
   pca_res <- list()
   pca_df <- as.data.frame(pca$x)
-  pca_eigenvecs <- as.data.frame(pca$rotation[,1:2])
+  pca_eigenvecs <- as.data.frame(pca$rotation[,1:5])
   pca_res[["Loadings"]] <- pca_df
   pca_res[["Eigenvectors"]] <- pca_eigenvecs
   pca_res[["percent_var"]] <- percentVar
