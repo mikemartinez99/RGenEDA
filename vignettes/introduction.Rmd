@@ -20,9 +20,13 @@ We will rely on data in the `pasilla` dataset and follow the [deseq2 framework](
 
 ```{r setup}
 # Load libraries
-library(RGenEDA)
-library(DESeq2)
-library(pasilla)
+suppressPackageStartupMessages({
+  library(RGenEDA)
+  library(pasilla)
+  library(tidyverse)
+  library(ggplot2)
+  library(ggtext)
+})
 ```
 
 We first load in our data. In the case of your own data, you can use `read_csv`, `fread`, or your favorite table reader function to load your counts matrix. We will quickly explore the first few rows of the data. 
@@ -46,7 +50,7 @@ metadata <- data.frame(condition = cond.type,
 rownames(metadata) <- colnames(count.table)
 ```
 
-Now, we can create a DESeq2 object using our counts and metadata and follow a the standard workflow.
+Now, we can create a DESeq2 object using our counts and metadata. We pre-filter the counts data to remove lowly expressed genes and run DESeq2. We variance stabalize transform the counts to prepre for exploratory data analysis. `rlog` transformation can be used here if preferred. 
 ```{r prepare for DESeq2}
 
 # Create a DESeq2 dataset
@@ -122,18 +126,68 @@ pcaDF <- cbind(pcaDF, metadata)
 ```
 
 
+Eigencorrelations can be used to assess what metadata features are strongly correlated with major axes of variation in the data. `eigencorr` produces a list of 3, including the correlation matrix, the p-value matrix, and the significance stars such that three stars < 0.001, two stars < 0.01, and one star < 0.05. No Star indicates no significance. 
 ```{r eigencorrelations, fig.show='hold', out.width='50%', cache = FALSE}
 
 # Use Eigencorrelations
-eigencorr(MAT = mat,
+eigenRes <- eigencorr(MAT = mat,
           META = metadata,
           NUM_PCS = 4,
           OUTPUT = outputDir)
 
+eigenRes[[""]]
+
 knitr::include_graphics(file.path(outputDir, "EigenCorrelations.tiff"))
 ```
 
-Let's visualize the DESeq2 results as an MA plot now.
+After finding principal components that correlate with metadata features of interest, we can then explore the loadings for that particular principal component using the variances and pca results calculated above from `plotVariance` and `generatePCs`, respectively. We specify PC1 as the component of interest and provide the same number of features we used to calculate out principal components. This function returns a dataframe of the gene, its loading, and the percentage of variation it contributes to the particular component specified. We can use these loadings to plot figures showing the gene contributions.
+
+```{r extractloadings, fig.show='hold', cache = FALSE}
+PC1_loadings <- extractLoadings(variance = variance, 
+                                pcRes = pcaRes,
+                                component = "PC1",
+                                nfeatures = 2000)
+
+# Specify number of genes to take from top and bottom of loadings
+top_n <- 20
+df_plot <- PC1_loadings %>%
+  arrange(desc(Loading)) %>% slice(1:top_n) %>%
+  bind_rows(PC1_loadings %>% arrange(Loading) %>% slice(1:top_n)) %>%
+  mutate(Direction = ifelse(Loading > 0, "Positive", "Negative"),
+         Gene = fct_reorder(Gene, Loading))  
+
+# Plot
+ggplot(df_plot, aes(x = Gene, y = Loading, color = Loading, size = PercentVariance)) +
+  geom_point(alpha = 0.9, shape = 21, stroke = 0.8, fill = "white", show.legend = c(size = TRUE, color = FALSE)) +
+  scale_color_gradient2(low = "firebrick", mid = "white", high = "dodgerblue", midpoint = 0, guide = "none") +
+  scale_size_continuous(range = c(4, 12)) +
+  coord_flip() +
+  theme_minimal(base_size = 14) +
+  theme(
+    axis.text.y = element_text(face = "bold", size = 12, color = "#222222"),
+    axis.title = element_text(size = 14, face = "bold"),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor = element_blank(),
+    panel.grid.major.x = element_line(color = "#eeeeee"),
+    plot.title = element_markdown(face = "bold", size = 18),
+    plot.subtitle = element_markdown(size = 14),
+    legend.position = "right",
+    legend.title = element_text(face = "bold")
+  ) +
+  labs(
+    title = "<span style='color:dodgerblue'>Top Positive</span> & <span style='color:firebrick'>Negative</span> PCA Loadings",
+    subtitle = "Circle size = contribution to PC variance",
+    x = NULL,
+    y = "Loading",
+    size = "Percent Variance"
+  )
+
+
+
+
+```
+
+After our exploration, we can examine our differential expression results using an MA plot. 
 ```{r MA plot}
 # Extract DESeq2 results
 resultsNames(dds)
@@ -147,21 +201,5 @@ x <- MAplot(results = results,
        title = "MA_demo",
        figDir = outputDir,
        "MAplotDemo.png")
-
-
-
-sticker(x, package="RGenEDA", 
-        p_size=8, 
-        p_color = "black",
-        h_color = "#00703C",
-        s_y = 0.2,
-        filename="/users/mike/Desktop/RGenEDA_Sticker.svg", h_fill = "white",
-        dpi = 500)
-
-
-
-library(hexSticker)
-
-
 
 ```
