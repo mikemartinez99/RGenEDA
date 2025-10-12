@@ -21,7 +21,7 @@ library(RGenEDA)
 ![Alt text](img/examples.png)
 
 ## Use-cases
-For a full demo of the major functions of the package, see [Pasilla Dataset Demo](github.com/mikemartinez99/RGenEDA/blob/main/vignettes/introduction.md)
+For a full demo of the major functions of the package, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/introduction.md)
 
 ## Contact
 Mike Martinez M.S. 
