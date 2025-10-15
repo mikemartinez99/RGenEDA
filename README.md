@@ -4,6 +4,8 @@
 ![R Version](https://img.shields.io/badge/R-4.4.3-blue)
 
 🚧 **RGenEDA is currently undergoing development to accomodate S4 objects to greatly streamline usage. Documentation and vignettes will be updated accordingly.** 🚧
+
+
 <img src="/img/RGenEDA_HexLogo.png" width="350px" height="400px" />
 
 ## Installation
