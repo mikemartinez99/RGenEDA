@@ -9,6 +9,8 @@
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
 #' @slot DimReduction List for PCA results with `Loadings`, `Eigenvectors`, `percent_var`.
+#' @slot DEGs List container for differential expression results with two entries:
+#'   `unfiltered` (data.frame) and `filtered` (data.frame).
 #'
 #' @exportClass geneda
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
@@ -20,7 +22,8 @@ setClass(
     normalized = "matrix",
     metadata = "data.frame",
     HVGs = "character",
-    DimReduction = "list"
+    DimReduction = "list",
+    DEGs = "list"
   )
 )
 
@@ -67,6 +70,19 @@ setClass(
     }
   }
 
+  if (length(object@DEGs) > 0L) {
+    needed_degs <- c("unfiltered", "filtered")
+    if (!all(needed_degs %in% names(object@DEGs))) {
+      errors <- c(errors, "'DEGs' must contain names: unfiltered, filtered.")
+    }
+    if (!is.null(object@DEGs$unfiltered) && !is.data.frame(object@DEGs$unfiltered)) {
+      errors <- c(errors, "'DEGs$unfiltered' must be a data.frame or NULL.")
+    }
+    if (!is.null(object@DEGs$filtered) && !is.data.frame(object@DEGs$filtered)) {
+      errors <- c(errors, "'DEGs$filtered' must be a data.frame or NULL.")
+    }
+  }
+
   if (length(errors)) errors else TRUE
 }
 
@@ -102,30 +118,31 @@ GenEDA <- function(normalized,
       normalized = normalized,
       metadata = metadata,
       HVGs = character(0L),
-      DimReduction = list())
+      DimReduction = list(),
+      DEGs = list(unfiltered = NULL, filtered = NULL))
 }
 
-#' Access counts matrix
+#' Access counts matrix (avoid name clash with DESeq2::counts)
 #' @param object A `geneda` object
 #' @return Matrix or NULL
 #' @export
-counts <- function(object) {
+getCounts <- function(object) {
   object@counts
 }
 
-#' Access normalized matrix
+#' Access normalized matrix (avoid name clash with generics)
 #' @param object A `geneda` object
 #' @return Matrix
 #' @export
-normalized <- function(object) {
+getNormalized <- function(object) {
   object@normalized
 }
 
-#' Access metadata
+#' Access metadata (avoid name clash with S4 generics)
 #' @param object A `geneda` object
 #' @return data.frame
 #' @export
-metadata <- function(object) {
+getMetadata <- function(object) {
   object@metadata
 }
 
@@ -164,6 +181,60 @@ FindVariableFeatures <- function(object, nfeatures) {
   vars <- sort(vars, decreasing = TRUE)
   nfeatures <- max(1L, min(nfeatures, length(vars)))
   object@HVGs <- names(vars)[seq_len(nfeatures)]
+  validObject(object)
+  object
+}
+
+#' Access DEGs container
+#' @param object A `geneda` object
+#' @return List with `unfiltered` and `filtered` data.frames
+#' @export
+DEGs <- function(object) {
+  object@DEGs
+}
+
+#' Set unfiltered DEGs on the object
+#'
+#' @param object A `geneda` object
+#' @param deg_table A data.frame of DESeq2-like results containing at least
+#'   columns `log2FoldChange` and `padj`
+#' @return Updated `geneda` object with `DEGs$unfiltered` set and `DEGs$filtered` cleared
+#' @export
+SetDEGs <- function(object, deg_table) {
+  stopifnot(methods::is(object, "geneda"))
+  stopifnot(is.data.frame(deg_table))
+  req_cols <- c("log2FoldChange", "padj")
+  missing_cols <- setdiff(req_cols, colnames(deg_table))
+  if (length(missing_cols) > 0L) {
+    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", "))) 
+  }
+  object@DEGs$unfiltered <- deg_table
+  object@DEGs$filtered <- NULL
+  validObject(object)
+  object
+}
+
+#' Filter DEGs by padj and absolute log2FoldChange
+#'
+#' @param object A `geneda` object with `DEGs$unfiltered` set
+#' @param padj_thresh Adjusted p-value threshold (<=)
+#' @param log2FC_thresh Absolute log2 fold change threshold (>=)
+#' @return Updated `geneda` object with `DEGs$filtered` set
+#' @export
+FilterDEGs <- function(object, padj_thresh = 0.05, log2FC_thresh = 1.0) {
+  stopifnot(methods::is(object, "geneda"))
+  if (is.null(object@DEGs$unfiltered)) {
+    stop("DEGs$unfiltered is NULL. Use SetDEGs(object, deg_table) first.")
+  }
+  df <- object@DEGs$unfiltered
+  req_cols <- c("log2FoldChange", "padj")
+  missing_cols <- setdiff(req_cols, colnames(df))
+  if (length(missing_cols) > 0L) {
+    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", "))) 
+  }
+  filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
+    abs(df$log2FoldChange) >= log2FC_thresh & df$padj <= padj_thresh
+  object@DEGs$filtered <- df[filt, , drop = FALSE]
   validObject(object)
   object
 }
