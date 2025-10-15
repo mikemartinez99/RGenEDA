@@ -1,100 +1,122 @@
-#' eigencorr
+#' new_eigencorr
 #'
-#' @description Calculate Eigen-correlations to correlate axes of variation with principal components. For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
+#' @description Calculate Eigen-correlations from a `geneda` object and plot a
+#' publication-quality heatmap using ggplot2 with numeric labels and
+#' significance stars. For continuous variables, Pearson correlation is used.
+#' P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
+#' one stars, respectively.
 #'
-#' @import ComplexHeatmap
-#' @import scales
+#' Requires PCA loadings in `DimReduction(object)`; does not recompute PCA.
+#'
+#' @import ggplot2
 #' @import RColorBrewer
-#' @import magick
 #' @import grid
 #'
-#' @param MAT A data matrix where rows are features and columns are samples
-#' @param META Metadata as a dataframe consisting of the samples provided in MAT. Samples should be rows and columns are metadata features. If you only want to explore certain metadata features, create a subset of your metadata to only include columns of interest.
+#' @param object A `geneda` object containing `normalized` and `metadata`, and
+#'   optionally `DimReduction` loadings.
 #' @param NUM_PCS Number of principal components to correlate.
-#' @param OUTPUT directory path to where the output should be saved. Path needs to end in a "/"
+#' @param meta_cols Optional character vector of metadata column names to include.
+#'   Defaults to all metadata columns.
 #'
-#' @returns A list consisting of 3 slots: cor_matrix which holds correlation results, pval_matrix which holds p-value results, and stars which holds significance stars for plotting
+#' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
-#'
-#' @examples # Set output directory
-#' @examples outputDir <- c("/Path/to/output/")
-#' @examples #Subset metadata to only factor of interest
-#' @examples metaSub <- metadata[,colnames(metadata) %in% c("Timepoint", "Treatment")]
-#' @examples ecs <- eigencorr(matrix, metadata, 3, outputDir)
+new_eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
+  stopifnot(methods::is(object, "geneda"))
 
-eigencorr <- function(MAT, META, NUM_PCS = 10, OUTPUT) {
-  #----- Convert all META categories to numeric
-  for (i in colnames(META)) {
-    if (!is.numeric(META[[i]])) {
-      META[[i]] <- as.numeric(as.factor(META[[i]]))
+  MAT <- object@normalized
+  META <- object@metadata
+
+  #----- Convert all META categories to numeric (copy to avoid modifying slot)
+  META_num <- META
+  for (i in colnames(META_num)) {
+    if (!is.numeric(META_num[[i]])) {
+      META_num[[i]] <- as.numeric(as.factor(META_num[[i]]))
     }
   }
-  #----- Perform PCA on the matrix data
-  pca_res <- prcomp(t(MAT))
-  #----- Get the principal components (PCs)
-  pcs <- as.data.frame(pca_res$x[, 1:NUM_PCS])
-  #----- Ensure META rownames match those of the MAT
-  if (!all(rownames(META) == colnames(MAT))) {
-    stop("Rownames of META must match the colnames of MAT.")
+
+  #----- Optionally subset metadata columns
+  if (!is.null(meta_cols)) {
+    missing_cols <- setdiff(meta_cols, colnames(META_num))
+    if (length(missing_cols) > 0L) {
+      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", "))) 
+    }
+    META_num <- META_num[, meta_cols, drop = FALSE]
   }
+
+  #----- Ensure META rownames match those of MAT
+  if (!all(rownames(META_num) == colnames(MAT))) {
+    stop("Rownames of metadata must match the colnames of normalized matrix.")
+  }
+
+  #----- Obtain PCs from stored DimReduction (required)
+  if (!(length(object@DimReduction) > 0L && "Loadings" %in% names(object@DimReduction))) {
+    stop("DimReduction slot is empty. Please run RunPCA() before calling new_eigencorr().")
+  }
+  pcs_mat <- as.data.frame(object@DimReduction[["Loadings"]])
+  # Align PCs to metadata order if necessary
+  if (!identical(rownames(pcs_mat), rownames(META_num))) {
+    pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]
+  }
+  pcs <- pcs_mat[, seq_len(min(ncol(pcs_mat), NUM_PCS)), drop = FALSE]
+
   #----- Create empty matrices to store correlations and p-values
-  cor_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META))
-  pval_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META))
-  rownames(cor_matrix) <- rownames(pval_matrix) <- colnames(META)
+  cor_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
+  pval_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
+  rownames(cor_matrix) <- rownames(pval_matrix) <- colnames(META_num)
   colnames(cor_matrix) <- colnames(pval_matrix) <- colnames(pcs)
+
   #----- Loop through META variables and calculate correlation for each PC
-  for (meta_var in colnames(META)) {
+  for (meta_var in colnames(META_num)) {
     for (pc in colnames(pcs)) {
-        test <- cor.test(pcs[[pc]], META[[meta_var]], method = "pearson", use = "complete.obs")
-        cor_matrix[meta_var, pc] <- test$estimate
-        pval_matrix[meta_var, pc] <- test$p.value
+      test <- cor.test(pcs[[pc]], META_num[[meta_var]], method = "pearson", use = "complete.obs")
+      cor_matrix[meta_var, pc] <- test$estimate
+      pval_matrix[meta_var, pc] <- test$p.value
     }
   }
+
   #----- Remove NA
   cor_matrix <- na.omit(cor_matrix)
   pval_matrix <- na.omit(pval_matrix)
+
   #----- Create significance stars based on p-value thresholds
   stars <- ifelse(pval_matrix < 0.001, "***",
                   ifelse(pval_matrix < 0.01, "**",
                          ifelse(pval_matrix < 0.05, "*", "")))
-  #----- Set colors for the heatmap
-  heatmap_colors <- colorRampPalette(rev(brewer.pal(9, "RdBu")))(255)
-  #----- Return list
-  return_list <- list(cor_matrix = cor_matrix,
-                      pval_matrix = pval_matrix,
-                      stars = stars
-  )
 
-  #----- Generate OUTPUT file path
-  fileName <- c("EigenCorrelations.tiff")
-  message(paste0("Output path: ", paste0(OUTPUT, fileName)))
+  #----- Prepare data for ggplot (long format)
+  df <- expand.grid(Meta = rownames(cor_matrix), PC = colnames(cor_matrix), stringsAsFactors = FALSE)
+  # Element-wise matrix lookup using paired row/col indices (avoids outer product)
+  row_idx <- match(df$Meta, rownames(cor_matrix))
+  col_idx <- match(df$PC, colnames(cor_matrix))
+  df$Correlation <- cor_matrix[cbind(row_idx, col_idx)]
+  df$PValue <- pval_matrix[cbind(row_idx, col_idx)]
+  df$Stars <- stars[cbind(row_idx, col_idx)]
 
-  #----- Initialize image
-  tiff(paste0(OUTPUT, fileName), width = 10, height = 10, units = "in", res = 200)
+  #----- Set colors similar to RdBu reversed
+  heatmap_colors <- colorRampPalette(rev(RColorBrewer::brewer.pal(9, "RdBu")))(255)
 
-  #----- Plot heatmap
-  message("Plotting heatmap...")
-  H <- ComplexHeatmap::Heatmap(cor_matrix,
-               cluster_rows = TRUE,
-               cluster_columns = FALSE,
-               cell_fun = function(j, i, x, y, width, height, fill) {
-                 grid.text(sprintf("%.2f", cor_matrix[i, j]), x, y, gp = grid::gpar(fontsize = 20))
-                 if (stars[i, j] != "") {
-                   grid.text(stars[i, j], x, y + unit(5, "mm"), gp = grid::gpar(col = "black", fontsize = 24))
-                 }
-               },
-               name = "Correlation",
-               show_row_names = TRUE,
-               show_column_names = TRUE,
-               row_names_gp = grid::gpar(fontsize = 20),  # Increase row names size
-               column_names_gp = grid::gpar(fontsize = 20),
-               column_title = "",
-               row_title = "")
-  draw(H)
-  dev.off()
-  message("Plotting complete!")
+  #----- Build heatmap with labels and stars
+  p <- ggplot2::ggplot(df, aes(x = PC, y = Meta, fill = Correlation)) +
+    geom_tile(color = NA) +
+    scale_fill_gradientn(colors = heatmap_colors, limits = c(-1, 1), name = "Correlation") +
+    geom_text(aes(label = sprintf("%.2f", Correlation)), size = 4) +
+    geom_text(aes(label = Stars), nudge_y = -0.25, size = 6) +
+    theme_minimal(base_size = 16) +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
+      axis.text.y = element_text(face = "bold"),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+    )
 
-  #----- Return eigencorrelation data
-  return(return_list)
+  #----- Return eigencorrelation data and plot
+  return(list(
+    cor_matrix = cor_matrix,
+    pval_matrix = pval_matrix,
+    stars = stars,
+    plot = p
+  ))
 }
+
+
 
