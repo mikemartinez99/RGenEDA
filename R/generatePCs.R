@@ -23,7 +23,6 @@ generatePCs <- function(MAT, VARS, NFEATURES) {
   #----- Transpose the matrix
   vsd_sub <- t(vsd_sub)
   #----- Run principal component analysis
-  message(paste0("Running PCA on ", NFEATURES, " most variable features..."))
   pca <- prcomp(vsd_sub)
   #----- extract the variance explained by each PC
   percentVar <- pca$sdev^2/sum(pca$sdev^2)

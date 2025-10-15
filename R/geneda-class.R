@@ -170,32 +170,30 @@ FindVariableFeatures <- function(object, nfeatures) {
 
 #' Run PCA and store in `DimReduction`
 #'
-#' Uses `generatePCs()` under the hood. If `nfeatures` is NULL and `HVGs` are
-#' present, uses the length of `HVGs`. Otherwise uses the provided `nfeatures`.
+#' Uses `generatePCs()` under the hood.
+#' If `HVGs` are empty, selects HVGs via `FindVariableFeatures(object, nfeatures)`
+#' with default `nfeatures = 2000`. If `HVGs` are present, the PCA uses
+#' `NFEATURES = length(HVGs(object))`. This aligns the PCA feature count with the
+#' HVG selection while allowing an explicit override of `nfeatures` when empty.
 #'
 #' @param object A `geneda` object
-#' @param nfeatures Optional number of features to use for PCA
+#' @param nfeatures Number of features to use when HVGs are empty. Default = 2000
 #' @return Updated `geneda` object with `DimReduction` filled
 #' @export
-RunPCA <- function(object, nfeatures = NULL) {
+RunPCA <- function(object, nfeatures = 2000) {
   stopifnot(methods::is(object, "geneda"))
-  vars <- apply(object@normalized, 1L, stats::var, na.rm = TRUE)
-  if (is.null(names(vars))) names(vars) <- rownames(object@normalized)
-
-  if (is.null(nfeatures)) {
-    if (length(object@HVGs) > 0L) {
-      nfeatures <- length(object@HVGs)
-    } else {
-      stop("Provide 'nfeatures' or run FindVariableFeatures() first.")
-    }
+  
+  if (length(object@HVGs) == 0L){
+    message("HVG slot is empty. Running FindVariableFeatures with top 2000 genes")
+    object <- FindVariableFeatures(object, nfeatures = nfeatures)
   }
-  nfeatures <- as.integer(nfeatures)
-  nfeatures <- max(1L, min(nfeatures, length(vars)))
-
-  object@DimReduction <- generatePCs(MAT = object@normalized, VARS = vars, NFEATURES = nfeatures)
+  nFeatUse <- length(object@HVGs)
+  message(paste("Calculating principal components from top", nFeatUse, "HVGs"))
+  object@DimReduction <- generatePCs(MAT = object@normalized, object@HVGs, NFEATURES = nFeatUse)
   validObject(object)
   object
 }
+
 
 #' plotHVGVariance
 #'
