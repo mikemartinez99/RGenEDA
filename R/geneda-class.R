@@ -1,8 +1,8 @@
 #' geneda S4 class and helpers
 #'
 #' @description An S4 container for exploratory genomic data analysis.
-#' Stores optional raw counts, normalized data, sample metadata, a place for
-#' selected highly variable genes (HVGs), and a place for PCA results.
+#' Stores optional raw counts, normalized data, sample metadata,
+#' highly variable genes (HVGs), and PCA dimensionality reduction results.
 #'
 #' @slot counts Optional counts matrix (features x samples). Can be NULL.
 #' @slot normalized Normalized expression matrix (features x samples).
@@ -182,14 +182,14 @@ FindVariableFeatures <- function(object, nfeatures) {
 #' @export
 RunPCA <- function(object, nfeatures = 2000) {
   stopifnot(methods::is(object, "geneda"))
-  
+
   if (length(object@HVGs) == 0L){
     message("HVG slot is empty. Running FindVariableFeatures with top 2000 genes")
     object <- FindVariableFeatures(object, nfeatures = nfeatures)
   }
   nFeatUse <- length(object@HVGs)
   message(paste("Calculating principal components from top", nFeatUse, "HVGs"))
-  object@DimReduction <- generatePCs(MAT = object@normalized, object@HVGs, NFEATURES = nFeatUse)
+  object@DimReduction <- generatePCs(object@normalized, object@HVGs, nFeatUse)
   validObject(object)
   object
 }
@@ -228,7 +228,7 @@ RunPCA <- function(object, nfeatures = 2000) {
 #' @export
 ExtractPCA <- function(object) {
   stopifnot(methods::is(object, "geneda"))
-  
+
   if (length(object@DimReduction) == 0L) {
     message("DimReduction slot is empty. Please use RunPCA.")
   }
