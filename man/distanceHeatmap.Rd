@@ -4,29 +4,41 @@
 \alias{distanceHeatmap}
 \title{distanceHeatmap}
 \usage{
-distanceHeatmap(MAT, META, FEATURES = c(...), PALETTES, OUTPUT)
+distanceHeatmap(
+  object,
+  method = "euclidean",
+  reorder = TRUE,
+  meta_cols = NULL,
+  palettes = NULL,
+  return = c("object", "plot")
+)
 }
 \arguments{
-\item{MAT}{A data matrix where rows are features and columns are samples}
+\item{object}{A \code{geneda} object}
 
-\item{META}{Metadata as a dataframe consisting of the samples provided in MAT. Samples should be rows and columns are metadata features}
+\item{method}{Distance method for stats::dist (default "euclidean")}
 
-\item{PALETTES}{A list where each list slot is a named vector of metadata levels and colors. Each feature present in FEATURE needs to have its own list slot}
+\item{reorder}{Logical; if TRUE, reorder rows/cols by hclust on the distance
+matrix. Default TRUE}
 
-\item{OUTPUT}{A directory path to where the output should be saved. Path needs to end in a "/"}
+\item{meta_cols}{Optional character vector of metadata columns to display in
+the title/subtitle for quick reference (no annotation strips are drawn).}
 
-\item{FEATURE}{A vector of features to be included in the heatmap annotations}
+\item{palettes}{Optional named list of color vectors that can be used
+downstream (returned) if the caller wants to annotate elsewhere.}
+
+\item{return}{One of c("object", "plot"). If "plot", draws the heatmap
+immediately via grid and still returns the result list. Default "object".}
 }
 \value{
-A distance heatmap in png format at the specified output path
+A list with elements: dist_matrix, order (character vector of sample
+names), heatmap (pheatmap object), palettes (as passed through)
 }
 \description{
-Calculate sample to sample distances using Euclidean distances. Create annotated heatmap to assess data trends.
+Compute a sample-by-sample distance matrix from a \code{geneda}
+object and plot a ggplot2 heatmap. Optionally subset metadata columns and
+reorder rows/columns by hierarchical clustering.
 }
 \examples{
-timepoint_colors <- c("Early" = "red", "Late" = "blue")
-treatment_colors <- c("Mock" = "pink", "HSV" = "green")
-color_list <- list(timepoint_colors, treatment_colors)
-output_folder <- c("Path/to/outputs/")
-dendrogram(myDataMatrix, metadataDF, c("Timepoint", "Treatment"), color_list, output_folder)
+# p <- distanceHeatmap(obj)$plot
 }

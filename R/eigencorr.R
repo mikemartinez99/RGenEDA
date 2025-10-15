@@ -1,4 +1,4 @@
-#' new_eigencorr
+#' eigencorr
 #'
 #' @description Calculate Eigen-correlations from a `geneda` object and plot a
 #' publication-quality heatmap using ggplot2 with numeric labels and
@@ -20,7 +20,7 @@
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
-new_eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
+eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   MAT <- object@normalized
@@ -38,7 +38,7 @@ new_eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META_num))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", "))) 
+      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
     }
     META_num <- META_num[, meta_cols, drop = FALSE]
   }
@@ -50,7 +50,7 @@ new_eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
 
   #----- Obtain PCs from stored DimReduction (required)
   if (!(length(object@DimReduction) > 0L && "Loadings" %in% names(object@DimReduction))) {
-    stop("DimReduction slot is empty. Please run RunPCA() before calling new_eigencorr().")
+    stop("DimReduction slot is empty. Please run RunPCA() before calling eigencorr().")
   }
   pcs_mat <- as.data.frame(object@DimReduction[["Loadings"]])
   # Align PCs to metadata order if necessary

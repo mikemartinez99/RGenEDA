@@ -3,7 +3,7 @@ Title: Exploratory analyses of genomic data
 Version: 0.0.0.9000
 Authors@R: 
     person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
-Description: Helpful functions to explore sample clustering, principal components, and Eigen-correlations
+Description: Reproducible frameworks for exploratory data analysis and differential expression analyses
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8

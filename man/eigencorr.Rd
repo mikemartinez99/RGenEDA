@@ -4,27 +4,26 @@
 \alias{eigencorr}
 \title{eigencorr}
 \usage{
-eigencorr(MAT, META, NUM_PCS = 10, OUTPUT)
+eigencorr(object, NUM_PCS = 10, meta_cols = NULL)
 }
 \arguments{
-\item{MAT}{A data matrix where rows are features and columns are samples}
-
-\item{META}{Metadata as a dataframe consisting of the samples provided in MAT. Samples should be rows and columns are metadata features. If you only want to explore certain metadata features, create a subset of your metadata to only include columns of interest.}
+\item{object}{A \code{geneda} object containing \code{normalized} and \code{metadata}, and
+optionally \code{DimReduction} loadings.}
 
 \item{NUM_PCS}{Number of principal components to correlate.}
 
-\item{OUTPUT}{directory path to where the output should be saved. Path needs to end in a "/"}
+\item{meta_cols}{Optional character vector of metadata column names to include.
+Defaults to all metadata columns.}
 }
 \value{
-A list consisting of 3 slots: cor_matrix which holds correlation results, pval_matrix which holds p-value results, and stars which holds significance stars for plotting
+A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 }
 \description{
-Calculate Eigen-correlations to correlate axes of variation with principal components. For continuous variables, the function uses Pearson correlation. Pvalues follow this convention: p < 0.001, p < 0.01, p < 0.05 = three stars, two stars, one star, respectively
-}
-\examples{
-# Set output directory
-outputDir <- c("/Path/to/output/")
-#Subset metadata to only factor of interest
-metaSub <- metadata[,colnames(metadata) \%in\% c("Timepoint", "Treatment")]
-ecs <- eigencorr(matrix, metadata, 3, outputDir)
+Calculate Eigen-correlations from a \code{geneda} object and plot a
+publication-quality heatmap using ggplot2 with numeric labels and
+significance stars. For continuous variables, Pearson correlation is used.
+P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
+one stars, respectively.
+
+Requires PCA loadings in \code{DimReduction(object)}; does not recompute PCA.
 }
