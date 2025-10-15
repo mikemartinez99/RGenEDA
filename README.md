@@ -7,7 +7,6 @@
 
 
 
-Conduct exploratory data analysis on your genomic data and plot diagnostic images to assess major drivers of variation and gene expression changes with ease!
 
 <img src="/img/RGenEDA_HexLogo.png" width="350px" height="400px" />
 
