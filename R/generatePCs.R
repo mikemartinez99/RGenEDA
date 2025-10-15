@@ -2,9 +2,9 @@
 #'
 #' @description Generate principal component analysis data that can be used in downstream analyses.
 #'
-#' @param MAT A data matrix where rows are features and columns are samples
-#' @param VARS A vector of gene variances (can calculate using RGenEDA::plotVariance)
-#' @param NFEATURES Number of top features to generate principal components on.
+#' @param mat A data matrix where rows are features and columns are samples
+#' @param vars A vector of gene variances (can calculate using RGenEDA::plotVariance)
+#' @param nFeatures Number of top features to generate principal components on.
 #'
 #' @returns A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
 #' @export
@@ -13,17 +13,15 @@
 #' @examples vars <- DACExplorer::plotVariance(matrix, output_folder)
 #' @examples pcs <- plotVariance(matrix, vars, 2000)
 
-generatePCs <- function(MAT, VARS, NFEATURES) {
-  #----- Set a variable for the number of genes (features) to be used for PCA and clustering
-  var_features_n <- NFEATURES
+generatePCs <- function(mat, vars, nFeatures) {
+  var_features_n <- nFeatures
   #----- Order variance and select the rows (genes) with the most variance
-  select <- order(VARS, decreasing = TRUE)[1:var_features_n]
+  select <- order(vars, decreasing = TRUE)[1:var_features_n]
   #----- Subset vsd values for genes by top variance ranks
-  vsd_sub <- MAT[select,]
+  vsd_sub <- mat[select,]
   #----- Transpose the matrix
   vsd_sub <- t(vsd_sub)
   #----- Run principal component analysis
-  message(paste0("Running PCA on ", NFEATURES, " most variable features..."))
   pca <- prcomp(vsd_sub)
   #----- extract the variance explained by each PC
   percentVar <- pca$sdev^2/sum(pca$sdev^2)

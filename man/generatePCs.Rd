@@ -4,14 +4,14 @@
 \alias{generatePCs}
 \title{generatePCs}
 \usage{
-generatePCs(MAT, VARS, NFEATURES)
+generatePCs(mat, vars, nFeatures)
 }
 \arguments{
-\item{MAT}{A data matrix where rows are features and columns are samples}
+\item{mat}{A data matrix where rows are features and columns are samples}
 
-\item{VARS}{A vector of gene variances (can calculate using RGenEDA::plotVariance)}
+\item{vars}{A vector of gene variances (can calculate using RGenEDA::plotVariance)}
 
-\item{NFEATURES}{Number of top features to generate principal components on.}
+\item{nFeatures}{Number of top features to generate principal components on.}
 }
 \value{
 A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
