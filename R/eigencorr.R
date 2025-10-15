@@ -14,13 +14,13 @@
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
 #'   optionally `DimReduction` loadings.
-#' @param NUM_PCS Number of principal components to correlate.
+#' @param num_pcs Number of principal components to correlate.
 #' @param meta_cols Optional character vector of metadata column names to include.
 #'   Defaults to all metadata columns.
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
-eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
+eigencorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   MAT <- object@normalized
@@ -57,7 +57,7 @@ eigencorr <- function(object, NUM_PCS = 10, meta_cols = NULL) {
   if (!identical(rownames(pcs_mat), rownames(META_num))) {
     pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]
   }
-  pcs <- pcs_mat[, seq_len(min(ncol(pcs_mat), NUM_PCS)), drop = FALSE]
+  pcs <- pcs_mat[, seq_len(min(ncol(pcs_mat), num_pcs)), drop = FALSE]
 
   #----- Create empty matrices to store correlations and p-values
   cor_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))

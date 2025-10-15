@@ -206,7 +206,7 @@ SetDEGs <- function(object, deg_table) {
   req_cols <- c("log2FoldChange", "padj")
   missing_cols <- setdiff(req_cols, colnames(deg_table))
   if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", "))) 
+    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
   }
   object@DEGs$unfiltered <- deg_table
   object@DEGs$filtered <- NULL
@@ -230,7 +230,7 @@ FilterDEGs <- function(object, padj_thresh = 0.05, log2FC_thresh = 1.0) {
   req_cols <- c("log2FoldChange", "padj")
   missing_cols <- setdiff(req_cols, colnames(df))
   if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", "))) 
+    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
   }
   filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
     abs(df$log2FoldChange) >= log2FC_thresh & df$padj <= padj_thresh
@@ -334,7 +334,7 @@ ExtractPCA <- function(object) {
 plotHVGVariance <- function(object, transform = NULL, dropTopN = 0) {
   stopifnot(methods::is(object, "geneda"))
 
-  mat <- normalized(object)
+  mat <- getNormalized(object)
   vars <- apply(mat, 1L, var)
   if (is.null(names(vars))) names(vars) <- rownames(mat)
   vars <- sort(vars, decreasing = TRUE)

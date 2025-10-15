@@ -4,13 +4,13 @@
 \alias{eigencorr}
 \title{eigencorr}
 \usage{
-eigencorr(object, NUM_PCS = 10, meta_cols = NULL)
+eigencorr(object, num_pcs = 10, meta_cols = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{normalized} and \code{metadata}, and
 optionally \code{DimReduction} loadings.}
 
-\item{NUM_PCS}{Number of principal components to correlate.}
+\item{num_pcs}{Number of principal components to correlate.}
 
 \item{meta_cols}{Optional character vector of metadata column names to include.
 Defaults to all metadata columns.}
