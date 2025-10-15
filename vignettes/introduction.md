@@ -5,7 +5,8 @@ data as long as a counts matrix and metadata are present.
 We will rely on data in the `pasilla` dataset and follow the [deseq2
 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
 
-    # Load libraries
+
+    #----- Load libraries
     suppressPackageStartupMessages({
       library(RGenEDA)
       library(pasilla)
@@ -18,10 +19,11 @@ We first load in our data. In the case of your own data, you can use
 `read_csv`, `fread`, or your favorite table reader function to load your
 counts matrix. We will quickly explore the first few rows of the data.
 
-    # Set path to pasilla data
+
+    #----- Set path to pasilla data
     datafile <-  system.file( "extdata/pasilla_gene_counts.tsv", package="pasilla" )
 
-    # Load counts
+    #----- Load counts
     count.table <-  read.table( datafile, header=TRUE, row.names=1, quote="", comment.char="" )
     head(count.table)
     #>             untreated1 untreated2 untreated3 untreated4 treated1 treated2 treated3
@@ -38,12 +40,22 @@ and `lib.type` which we will explore. It is always a good practice to
 ensure that your samples are not scrambled between your counts matrix
 and metadata table.
 
+We will also set a list of color vectors for our metadata which will be
+useful in downstream functions.
+
+
+    #----- Metadata building
     cond.type <-  c( "untreated", "untreated", "untreated","untreated", "treated", "treated", "treated" )
     lib.type   <-  c( "single-end", "single-end", "paired-end", "paired-end", "single-end", "paired-end", "paired-end" ) 
+    meta <- data.frame(condition = cond.type,
+                       library = lib.type)
+    rownames(meta) <- colnames(count.table)
 
-    metadata <- data.frame(condition = cond.type,
-                           library = lib.type)
-    rownames(metadata) <- colnames(count.table)
+    #----- Set color vector list
+    colorList <- list(condition= c("untreated" = "red",
+                                    "treated" = "blue"),
+                      library = c("single-end" = "orange",
+                                   "paired-end" = "green"))
 
 Now, we can create a DESeq2 object using our counts and metadata. We
 pre-filter the counts data to remove lowly expressed genes and run
@@ -52,9 +64,9 @@ exploratory data analysis. `rlog` transformation can be used here if
 preferred.
 
 
-    # Create a DESeq2 dataset
+    #----- Create a DESeq2 dataset
     dds <- DESeqDataSetFromMatrix(countData = count.table,
-                                  colData = metadata,
+                                  colData = meta,
                                   design = ~condition + library + condition:library)
     #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
     #>   Note: levels of factors in the design contain characters other than
@@ -62,16 +74,16 @@ preferred.
     #>   only letters, numbers, and delimiters '_' or '.', as these are safe characters
     #>   for column names in R. [This is a message, not a warning or an error]
 
-    # Set reference levels
+    #----- Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
     dds$library <- relevel(dds$library, ref = "single-end")
 
-    # Pre filter
+    #----- Pre filter
     smallestGroupSize <- 3
     keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
     dds <- dds[keep,]
 
-    # Run DESeq2
+    #----- Run DESeq2
     dds <- DESeq(dds)
     #> estimating size factors
     #>   Note: levels of factors in the design contain characters other than
@@ -88,162 +100,200 @@ preferred.
     #> final dispersion estimates
     #> fitting model and testing
 
-    # Variance stabilizing transform
+    #----- Variance stabilizing transform
     vsd <- vst(dds)
 
-    # Extract matrix
+    #----- Extract matrix
     mat <- assay(vsd)
 
 Now that we successfully have a matrix and metadata, we are ready to
-start exploratory data analysis. Let’s start by looking at the sample
-distances to see how our samples are clustering. For `RGenEDA` it is
-useful to set a figure directory where all EDA plots will live. We want
-to visualize all possible metadata for this.
+start exploratory data analysis. To begin, we create a `GenEDA` object
+which requires the following slots: normalized counts, which can be
+obtained through variance stabilizing transformation as shown above, or
+`rlog` and metadata.
+
+Raw counts can also be provided. Additional slots (`HVGs`,
+`DimReduction`, and `DEGs` will be filled later.)
 
 
-    # Set output directory
-    outputDir <- c("/users/mike/Desktop/RGenEDA/img/")
+    #----- Create new GenEDA object
+    obj <- GenEDA(normalized = mat,
+                  metadata = meta,
+                  counts = as.matrix(count.table))
 
-    # Set colors for our metadata categories
-    metaColors <- list(condition = c("untreated" = "blue",
-                                     "treated" = "red"),
-                       library = c("single-end" = "maroon",
-                                   "paired-end" = "gold"))
+    #----- Visualize the object
+    obj
+    #> geneda object
+    #>   features: 8148
+    #>   samples:  7
+    #>   HVGs: 0
+    #>   counts: present
 
-    # Call the distance heatmap function
-    distanceHeatmap(MAT = mat,
-                    META = metadata,
-                    FEATURES = c("condition", "library"),
-                    PALETTES = metaColors,
-                    OUTPUT = outputDir)
-    #> Transposing data matrix...
-    #> Extracting condition as features for plotting...Extracting library as features for plotting...
-    #> Saving distance heatmap to /users/mike/Desktop/RGenEDA/img/
-    #> Distance heatmap successfully generated!
+    #----- Visualize the structure of the object
+    str(obj)
+    #> Formal class 'geneda' [package "RGenEDA"] with 6 slots
+    #>   ..@ counts      : int [1:14599, 1:7] 0 92 5 0 4664 583 0 10 0 1446 ...
+    #>   .. ..- attr(*, "dimnames")=List of 2
+    #>   .. .. ..$ : chr [1:14599] "FBgn0000003" "FBgn0000008" "FBgn0000014" "FBgn0000015" ...
+    #>   .. .. ..$ : chr [1:7] "untreated1" "untreated2" "untreated3" "untreated4" ...
+    #>   ..@ normalized  : num [1:8148, 1:7] 7.39 12.03 9.25 6.27 10.41 ...
+    #>   .. ..- attr(*, "dimnames")=List of 2
+    #>   .. .. ..$ : chr [1:8148] "FBgn0000008" "FBgn0000017" "FBgn0000018" "FBgn0000024" ...
+    #>   .. .. ..$ : chr [1:7] "untreated1" "untreated2" "untreated3" "untreated4" ...
+    #>   ..@ metadata    :'data.frame': 7 obs. of  2 variables:
+    #>   .. ..$ condition: chr [1:7] "untreated" "untreated" "untreated" "untreated" ...
+    #>   .. ..$ library  : chr [1:7] "single-end" "single-end" "paired-end" "paired-end" ...
+    #>   ..@ HVGs        : chr(0) 
+    #>   ..@ DimReduction: list()
+    #>   ..@ DEGs        :List of 2
+    #>   .. ..$ unfiltered: NULL
+    #>   .. ..$ filtered  : NULL
 
-    knitr::include_graphics(file.path(outputDir, "Sample_Distance_HM.tiff"))
+Let’s first see how our replicates compare to one another. We can
+visualize this by using Euclidean distances paired with hierarchical
+clustering. The `distanceHeatmap` function plots sample-to-sample
+distances such that darker colors are more similar and lighter colors
+are more dissimilar. This helps to assess replicate quality as well as
+metadata features that seem to drive clustering. This function returns
+either the object, or the plot itself. Any number of metadata categories
+can be passed along with the associated color vectors.
 
-<img src="../img/Sample_Distance_HM.tiff" width="50%" />
+
+    #----- Plot Eucliden distances
+    distanceHeatmap(obj,
+                    meta_cols = c("condition", "library"),
+                    palettes = colorList,
+                    return = "plot")
+    #> $dist_matrix
+    #>            untreated1 untreated2 untreated3 untreated4 treated1 treated2 treated3
+    #> untreated1    0.00000   23.79029   27.09868   23.15426 29.81576 31.50636 32.64211
+    #> untreated2   23.79029    0.00000   22.41260   22.70132 27.14208 32.20063 32.90292
+    #> untreated3   27.09868   22.41260    0.00000   16.52356 34.83473 27.50385 28.02457
+    #> untreated4   23.15426   22.70132   16.52356    0.00000 33.66466 25.48474 24.93390
+    #> treated1     29.81576   27.14208   34.83473   33.66466  0.00000 25.50747 27.12965
+    #> treated2     31.50636   32.20063   27.50385   25.48474 25.50747  0.00000 11.13938
+    #> treated3     32.64211   32.90292   28.02457   24.93390 27.12965 11.13938  0.00000
+    #> 
+    #> $order
+    #> [1] "untreated1" "untreated2" "untreated3" "untreated4" "treated1"   "treated2"   "treated3"  
+    #> 
+    #> $heatmap
+    #> 
+    #> $palettes
+    #> $palettes$condition
+    #> untreated   treated 
+    #>     "red"    "blue" 
+    #> 
+    #> $palettes$library
+    #> single-end paired-end 
+    #>   "orange"    "green"
+
+<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="50%" />
+To begin, we assess the variance profile of our data. This will give us
+an idea of how many genes are highly variable. This information will
+inform how principal components are calculated downstream. This can be
+done one of two ways: `plotHVGVariance` will plot an elbow curve for
+each gene, ranked by decreasing variance. This is a subjective way to
+pick a number of highly variable genes (HVGs). We can also use
+`FindVariableFeatures` directly by providing a number of genes to use,
+again ranked by decreasing variance. Once calculated, HVGs (gene names)
+will be stores in the `HVGs` slot of the object.
 
 
-    # Explore variance
-    variance <- plotVariance(MAT = mat,
-                             OUTPUT = outputDir,
-                             LOG = FALSE,
-                             nFeaturesDrop = NULL)
-    #> Calculating variance on 8148 x 7 matrix...
+    #----- Plot variance profile
+    plotHVGVariance(obj)
 
-    # Generate PCs
-    pcaRes <- generatePCs(MAT = mat,
-                          VARS = variance,
-                          NFEATURES = 2000)
-    #> Running PCA on 2000 most variable features...
+<img src="introduction_files/figure-markdown_strict/variance_1-1.png" width="50%" />
+Based on our plot, it appears that 2000 variable features should be
+sufficient to capture the breadth of variation in our data. We can add
+these HVGs to out object using the `FindVariableFeatures` function
+specifying the top 2000 features.
+
+
+    #----- Add HVGs to object
+    obj <- FindVariableFeatures(obj, 2000)
+
+    #----- View the HVGs
+    head(HVGs(obj))
+    #> [1] "FBgn0039155" "FBgn0029856" "FBgn0003360" "FBgn0053909" "FBgn0085787" "FBgn0025111"
+
+We can use these HVGs to calculate the principal components of our
+dataset using the `RunPCA` function. If `FindVariableFeatures` was not
+ran beforehand, `RunPCA` will calculate HVGs by default with 2000
+features. This argument can be overriden using the `nfeatures` argument.
+The PCA results will be stored in the `DimReduction` slot of the object
+as a list containing 3 elements: `$Loadings` holding the PCA loadings
+for each sample, `$Eigenvectors` holding the per-gene loadings for each
+PC, and `$percent_var` containing the percent variation explained by the
+top 5 principal components.
+
+Since we have already selected HVGs, we can run `RunPCA` on our object
+directly and grab the results.
+
+
+    #----- Calculate PCA
+    obj <- RunPCA(obj)
+    #> Calculating principal components from top 2000 HVGs
     #> Percent variations:
     #>       PC1       PC2       PC3       PC4       PC5 
     #> "45.35 %" "29.18 %"  "15.5 %"  "5.17 %"     "3 %"
 
-    # Extract PC data
-    pcaDF <- as.data.frame(pcaRes[["Loadings"]])
+    #----- Visualize the results
+    head(obj@DimReduction$Loadings)
+    #>                  PC1       PC2        PC3        PC4        PC5          PC6          PC7
+    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919 4.443147e-14
+    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838 4.412048e-14
+    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065 4.431683e-14
+    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14
+    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14
+    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14
+    head(obj@DimReduction$Eigenvectors)
+    #>                       PC1          PC2           PC3          PC4          PC5
+    #> FBgn0011764 -0.0001939999  0.011784784 -0.0002716843  0.026109530 -0.036764223
+    #> FBgn0002441 -0.0050539094 -0.005417428 -0.0025994524  0.005128475  0.017970971
+    #> FBgn0001276 -0.0037799827  0.012863950  0.0022284691 -0.053304421  0.009856952
+    #> FBgn0025864  0.0069592766 -0.034519739 -0.0074099283  0.033151524  0.009045152
+    #> FBgn0000063  0.0140917988  0.012765500 -0.0057142017 -0.007164571  0.024494828
+    #> FBgn0023507 -0.0248617605 -0.051313236 -0.0154158330  0.016058148 -0.023410164
+    head(obj@DimReduction$percent_var)
+    #>       PC1       PC2       PC3       PC4       PC5 
+    #> "45.35 %" "29.18 %"  "15.5 %"  "5.17 %"     "3 %"
 
-    # Append metadata to pcaDF
-    pcaDF <- cbind(pcaDF, metadata)
-
-    # Plot PCA
-
-Eigencorrelations can be used to assess what metadata features are
-strongly correlated with major axes of variation in the data.
-`eigencorr` produces a list of 3, including the correlation matrix, the
-p-value matrix, and the significance stars such that three stars &lt;
-0.001, two stars &lt; 0.01, and one star &lt; 0.05. No Star indicates no
-significance.
+We can access the PCA results and merge with metadata for downstream
+plotting using the utility function `ExtractPCA`. Note, a PCA plotting
+function is in the works, of which an argument `returnData` will be used
+to run this utility function under the hood. This can be used directly
+to facilitate more complex, customizable figure plotting.
 
 
-    # Use Eigencorrelations
-    eigenRes <- eigencorr(MAT = mat,
-              META = metadata,
-              NUM_PCS = 4,
-              OUTPUT = outputDir)
-    #> Output path: /users/mike/Desktop/RGenEDA/img/EigenCorrelations.tiff
-    #> Plotting heatmap...
-    #> Plotting complete!
+    #----- Extract PCA results with metadata as a dataframe
+    pcaDF <- ExtractPCA(obj)
 
-    eigenRes[[""]]
-    #> NULL
+    #----- Visualize results
+    colnames(pcaDF)
+    #> [1] "PC1"       "PC2"       "PC3"       "PC4"       "PC5"       "PC6"       "PC7"       "condition" "library"
 
-    knitr::include_graphics(file.path(outputDir, "EigenCorrelations.tiff"))
+We can then correlate principal components, which represent major axes
+of variation, with metadata features through eigenvector correlation
+plots. The function `eigencorr` uses Pearson correlations to assess
+significant correlations and plots a heatmap showing these correlations.
+By default, the principal components from the `DimReduction` slot are
+used. Any metadata features can be specified using the `meta_cols`
+argument. By default, all metadata columns will be used. This function
+returns a list of 4 elements: `cor_matrix` with the Pearson correlation
+values, `pval_matrix` holding the associated p-values, `stars` holding
+the star encodings based on significance, and `plot` (ggplot object.)
 
-<img src="../img/EigenCorrelations.tiff" width="50%" />
+Here, we will correlate our metadata with the first 5 PCs.
 
-After finding principal components that correlate with metadata features
-of interest, we can then explore the loadings for that particular
-principal component using the variances and pca results calculated above
-from `plotVariance` and `generatePCs`, respectively. We specify PC1 as
-the component of interest and provide the same number of features we
-used to calculate out principal components. This function returns a
-dataframe of the gene, its loading, and the percentage of variation it
-contributes to the particular component specified. We can use these
-loadings to plot figures showing the gene contributions.
 
-    PC1_loadings <- extractLoadings(variance = variance, 
-                                    pcRes = pcaRes,
-                                    component = "PC1",
-                                    nfeatures = 2000)
+    #----- Plot eigenvector correlations
+    ec <- eigencorr(obj,
+                    num_pcs = 5)
 
-    # Specify number of genes to take from top and bottom of loadings
-    top_n <- 20
-    df_plot <- PC1_loadings %>%
-      arrange(desc(Loading)) %>% slice(1:top_n) %>%
-      bind_rows(PC1_loadings %>% arrange(Loading) %>% slice(1:top_n)) %>%
-      mutate(Direction = ifelse(Loading > 0, "Positive", "Negative"),
-             Gene = fct_reorder(Gene, Loading))  
+    #----- Visualize the plot
+    ec$plot
 
-    # Plot
-    ggplot(df_plot, aes(x = Gene, y = Loading, color = Loading, size = PercentVariance)) +
-      geom_point(alpha = 0.9, shape = 21, stroke = 0.8, fill = "white", show.legend = c(size = TRUE, color = FALSE)) +
-      scale_color_gradient2(low = "firebrick", mid = "white", high = "dodgerblue", midpoint = 0, guide = "none") +
-      scale_size_continuous(range = c(4, 12)) +
-      coord_flip() +
-      theme_minimal(base_size = 14) +
-      theme(
-        axis.text.y = element_text(face = "bold", size = 12, color = "#222222"),
-        axis.title = element_text(size = 14, face = "bold"),
-        panel.grid.major.y = element_blank(),
-        panel.grid.minor = element_blank(),
-        panel.grid.major.x = element_line(color = "#eeeeee"),
-        plot.title = element_markdown(face = "bold", size = 18),
-        plot.subtitle = element_markdown(size = 14),
-        legend.position = "right",
-        legend.title = element_text(face = "bold")
-      ) +
-      labs(
-        title = "<span style='color:dodgerblue'>Top Positive</span> & <span style='color:firebrick'>Negative</span> PCA Loadings",
-        subtitle = "Circle size = contribution to PC variance",
-        x = NULL,
-        y = "Loading",
-        size = "Percent Variance"
-      )
+<img src="introduction_files/figure-markdown_strict/eigencorr-1.png" width="50%" />
 
-![](introduction_files/figure-markdown_strict/extractloadings-1.png)
-
-After our exploration, we can examine our differential expression
-results using an MA plot.
-
-    # Extract DESeq2 results
-    resultsNames(dds)
-    #> [1] "Intercept"                          "condition_treated_vs_untreated"     "library_paired.end_vs_single.end"  
-    #> [4] "conditiontreated.librarypaired.end"
-    results <- as.data.frame(results(dds, name = "condition_treated_vs_untreated"))
-
-    x <- MAplot(results = results,
-           numerator = "treated",
-           refLevel = "untreated",
-           log2FC_thresh = 1,
-           padj_thresh = 0.05,
-           title = "MA_demo",
-           figDir = outputDir,
-           "MAplotDemo.png")
-    #> Ignoring unknown labels:
-    #> • colour : ""
-    #> Warning: Removed 474 rows containing missing values or values outside the scale range (`geom_point()`).
-    #> Warning: Removed 84 rows containing missing values or values outside the scale range (`geom_point()`).
-    #> Plotted /users/mike/Desktop/RGenEDA/img/MAplotDemo.png
+MORE TO COME…. RGenEDA is in active development!
