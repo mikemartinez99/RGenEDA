@@ -194,6 +194,56 @@ RunPCA <- function(object, nfeatures = 2000) {
   object
 }
 
+#' Extract PCA Loadings and Metadata
+#'
+#' @description
+#' This function extracts PCA loadings stored in the `DimReduction` slot of a
+#' `geneda` object and combines them with the associated metadata. It ensures
+#' that the metadata has valid rownames and aligns the PCA loadings accordingly.
+#'
+#' @param object A `geneda` object containing PCA results in the `DimReduction` slot
+#'   and sample-level metadata in the `metadata` slot.
+#'
+#' @details
+#' The function performs several checks:
+#' - Ensures the input object is of class `geneda`.
+#' - Verifies that the `DimReduction` slot contains PCA loadings.
+#' - Confirms that the metadata has valid rownames.
+#' - Reorders the PCA loadings to match the order of metadata rows.
+#'
+#' If metadata rownames are missing or invalid, the function throws an error.
+#'
+#' @return
+#' A `data.frame` combining PCA loadings and sample metadata, where rows correspond
+#' to samples and columns include principal component loadings and metadata fields.
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage:
+#' pca_results <- ExtractPCA(my_geneda_object)
+#' head(pca_results)
+#' }
+#'
+#' @seealso [RunPCA()], [extractLoadings()]
+#' @export
+ExtractPCA <- function(object) {
+  stopifnot(methods::is(object, "geneda"))
+  
+  if (length(object@DimReduction) == 0L) {
+    message("DimReduction slot is empty. Please use RunPCA.")
+  }
+  pcaRes <- object@DimReduction[["Loadings"]]
+  meta <- object@metadata
+  if (is.null(rownames(meta)) || any(rownames(meta) == "")) {
+    stop("Metadata does not contain valid rownames. Please ensure metadata rows are named.")
+  }
+  order <- rownames(meta)
+  pcaRes <- pcaRes[order,]
+  pcaRes <- cbind(pcaRes, meta)
+  return(pcaRes)
+}
+
+
 
 #' plotHVGVariance
 #'
