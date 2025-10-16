@@ -49,9 +49,9 @@ PlotCountDist <- function(object, split_by = NULL) {
     geom_boxplot(width = 0.1, fill = "white", outlier.size = 0.5) +
     theme_minimal(base_size = 16) +
     labs(
-      x = "Sample",
+      x = "",
       y = "Normalized Count",
-      title = "Distribution of Counts Across Samples"
+      title = ""
     ) +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1),
