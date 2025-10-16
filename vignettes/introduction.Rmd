@@ -51,6 +51,7 @@ We’ll follow a simplified version of the [deseq2 framework](https://www.biocon
 - [Identify highly variable genes](#identify-highly-variable-genes)
 - [Principal component analysis](#principal-component-analysis)
 - [Extract and visualize PCA results](#extract-and-visualize-pca-results)
+- [Explore Eigen vectors of individual PCs](#explore-eigen-vectors-of-individual-pcs)
 - [Correlate PCs with metadata](#correlate-pcs-with-metadata)
 
 ## Load and inspect the data
@@ -221,9 +222,19 @@ PlotPCA(object = obj,
         shape_by = "library")
 
 ```
+## Explore Eigen vectors of individual PCs
+
+We can explore the individual Eigen vectors that comprise a particular component of interest (usually PC1 and PC2) using `extractEigen`.
+
+```{r eigenvecs, fig.show='hold', out.width='70%'}
+
+pc1_eigen <- extractEigen(object = obj,
+                          component = "PC1")
+head(pc1_eigen)
+
+```
 
 ## Correlate PCs with metadata
-
 
 To interpret principal components, we can correlate them with sample metadata using `eigencorr`.
 This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. This function returns a list of 4 elements:

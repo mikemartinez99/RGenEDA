@@ -29,6 +29,8 @@ structure, dimensionality reduction, and sample relationships.
 -   [Principal component analysis](#principal-component-analysis)
 -   [Extract and visualize PCA
     results](#extract-and-visualize-pca-results)
+-   [Explore Eigen vectors of individual
+    PCs](#explore-eigen-vectors-of-individual-pcs)
 -   [Correlate PCs with metadata](#correlate-pcs-with-metadata)
 
 ## Load and inspect the data
@@ -268,6 +270,22 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             shape_by = "library")
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
+\## Explore Eigen vectors of individual PCs
+
+We can explore the individual Eigen vectors that comprise a particular
+component of interest (usually PC1 and PC2) using `extractEigen`.
+
+
+    pc1_eigen <- extractEigen(object = obj,
+                              component = "PC1")
+    head(pc1_eigen)
+    #>          Gene   EigenVector       PctVar
+    #> 1 FBgn0011764 -0.0001939999 3.763595e-06
+    #> 2 FBgn0002441 -0.0050539094 2.554200e-03
+    #> 3 FBgn0001276 -0.0037799827 1.428827e-03
+    #> 4 FBgn0025864  0.0069592766 4.843153e-03
+    #> 5 FBgn0000063  0.0140917988 1.985788e-02
+    #> 6 FBgn0023507 -0.0248617605 6.181071e-02
 
 ## Correlate PCs with metadata
 
