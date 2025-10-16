@@ -31,10 +31,21 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
 
 ## Change-log
 
+**v0.0.0.900** *April 2025*
+  - Initial implementation (stand-alone functions)
+  - Variance calculation, PCA calculation, eigen-vector correlation, Euclidean distance calculation
+
 **v1.0.0:** *October 16th, 2025* 
 
-  - Moved functionality to `GenEDA` object (S4).
-  - Added methods for HVG calculation, PCA, count distribution, eigen correlations, ordination correlations, eigen vector analyses.
+  - Created S4 `GenEDA` object to streamline usage.
+  - Added `GenEDA` methods for HVG calculation and PCA stored as S4 slots.
+  - Added function for count distribution and eigen vector analysis
+  - Added PCA plotting function, eigen vector plotting function
+  - Updated HVG plotting function
+  - Updated eigencorrelation plotting function
+  - Return all plots as either ggplot2 objects or heatmap objects (ComplexHeatmap, Pheatmap) to allow robust customization
+  - Added unit tests
+  - Added demo to vignettes
 
 ## Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
