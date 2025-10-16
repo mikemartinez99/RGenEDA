@@ -4,9 +4,8 @@ output:
   rmarkdown::html_document:
     toc: true
     toc_depth: 3
-    toc_float:
-      collapsed: false
-      smooth_scroll: true
+    toc_float: true
+    number_sections: true
 vignette: >
   %\VignetteIndexEntry{Introduction to RGenEDA}
   %\VignetteEngine{knitr::rmarkdown}
