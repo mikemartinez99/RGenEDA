@@ -232,7 +232,7 @@ You can easily extract PCA results merged with metadata using
 `ExtractPCA`. This enables flexible downstream visualization with
 ggplot2 or other frameworks.
 
-A built-in PCA plotting function is in development.
+To quickly plot PCA results, the `PlotPCA` function can be used.
 
 
     pcaDF <- ExtractPCA(obj)
@@ -244,6 +244,16 @@ A built-in PCA plotting function is in development.
     #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14 untreated paired-end
     #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14   treated single-end
     #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14   treated paired-end
+
+    # Plot PCA
+    PlotPCA(object = obj,
+            x = 1,
+            y = 2,
+            color_by = "condition",
+            colors = c("untreated" = "red", "treated" = "blue"),
+            shape_by = "library")
+
+<img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
 
 ## Correlate PCs with metadata (Eigencorrelation)
 

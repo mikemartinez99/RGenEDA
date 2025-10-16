@@ -195,12 +195,20 @@ head(obj@DimReduction$percent_var)
 You can easily extract PCA results merged with metadata using `ExtractPCA`.
 This enables flexible downstream visualization with ggplot2 or other frameworks.
 
-A built-in PCA plotting function is in development.
+To quickly plot PCA results, the `PlotPCA` function can be used. 
 
-```{r extract-pca}
+```{r extract-pca, fig.show='hold', out.width='70%'}
 
 pcaDF <- ExtractPCA(obj)
 head(pcaDF)
+
+# Plot PCA
+PlotPCA(object = obj,
+        x = 1,
+        y = 2,
+        color_by = "condition",
+        colors = c("untreated" = "red", "treated" = "blue"),
+        shape_by = "library")
 
 ```
 
