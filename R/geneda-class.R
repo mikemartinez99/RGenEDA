@@ -74,6 +74,8 @@ setValidity("geneda", .valid_geneda)
 
 #' Construct a geneda object
 #'
+#' @import methods
+#'
 #' @param normalized Normalized expression matrix (features x samples).
 #' @param metadata Sample metadata `data.frame` with row names matching `colnames(normalized)`.
 #' @param counts Optional counts matrix (features x samples).
