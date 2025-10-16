@@ -1,6 +1,7 @@
 #' geneda S4 class and helpers
 #'
-#' @description An S4 container for exploratory genomic data analysis.
+#' @description
+#' An S4 container for exploratory genomic data analysis.
 #' Stores optional raw counts, normalized data, sample metadata,
 #' highly variable genes (HVGs), and PCA dimensionality reduction results.
 #'
@@ -10,7 +11,15 @@
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
 #' @slot DimReduction List for PCA results with `Loadings`, `Eigenvectors`, `percent_var`.
 #'
+#' @note
+#' The validity function checks that row names of `metadata` match
+#' column names of `normalized`, HVGs are present in normalized data,
+#' and DimReduction contains required entries.
+#'
+#' @name geneda-class
+#' @rdname geneda-class
 #' @exportClass geneda
+NULL
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 
 setClass(
@@ -351,7 +360,9 @@ ExtractPCA <- function(object) {
 #' @return A `ggplot` object displaying the PCA scatter plot, or a list of pca_df and plot if `return_data = TRUE`
 #' @examples
 #' \dontrun{
-#' p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition", colors = c("untreated" = "red", "treated" = "blue"), split_by = "library")
+#' p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition",
+#'      colors = c("untreated" = "red", "treated" = "blue"),
+#'      split_by = "library")
 #' p
 #' }
 #' @export

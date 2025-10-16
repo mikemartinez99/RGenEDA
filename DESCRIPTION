@@ -1,11 +1,10 @@
 Package: RGenEDA
-Title: Exploratory analyses of genomic data
+Title: Genomic exploratory data analysis in R
 Version: 1.0.0
 Authors@R: 
     person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
-Description: Reproducible frameworks for exploratory data analysis and differential expression analyses
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+Description: Provides an S4 container for exploratory genomic data analysis.
+License: GPL-3 + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
@@ -17,14 +16,16 @@ Imports:
     RColorBrewer,
     circlize,
     dplyr,
-    ggblend,
     ggplot2,
-    ggrepel,
     grid,
     scales,
     tidyr,
     vegan
 Suggests: 
+    DESeq2,
+    ggtext,
+    pasilla,
+    tidyverse,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

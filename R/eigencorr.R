@@ -11,6 +11,7 @@
 #' @import ggplot2
 #' @import RColorBrewer
 #' @import grid
+#' @importFrom stats prcomp cor.test na.omit var as.formula
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
 #'   optionally `DimReduction` loadings.

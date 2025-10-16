@@ -42,7 +42,9 @@ and provides a flexible ggplot2-based visualization interface.
 }
 \examples{
 \dontrun{
-p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition", colors = c("untreated" = "red", "treated" = "blue"), split_by = "library")
+p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition",
+     colors = c("untreated" = "red", "treated" = "blue"),
+     split_by = "library")
 p
 }
 }

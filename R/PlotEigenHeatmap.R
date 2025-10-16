@@ -35,13 +35,16 @@
 #' @import scales
 #' @import dplyr
 #' @importFrom grid gpar unit
+#' @importFrom grDevices colorRampPalette rainbow
+#' @importFrom graphics Axis
 #'
 #' @examples
 #' \dontrun{
 #' # Visualize top 25 genes for PC1 with metadata annotation
 #' ht <- PlotTopGenesHeatmap(obj, pc = "PC1", n = 25, direction = "both",
 #'                           annotate_by = c("Condition"),
-#'                           annotate_colors = list(Condition = c("untreated" = "red", "treated" = "blue")))
+#'                           annotate_colors = list(Condition =
+#'                               c("untreated" = "red", "treated" = "blue")))
 #' draw(ht)
 #' }
 #'

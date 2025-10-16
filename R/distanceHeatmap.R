@@ -7,7 +7,6 @@
 #' @import ggplot2
 #' @import scales
 #' @import RColorBrewer
-#' @importFrom pheatmap pheatmap
 #'
 #' @param object A `geneda` object
 #' @param method Distance method for stats::dist (default "euclidean")
@@ -46,7 +45,7 @@ distanceHeatmap <- function(object,
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", "))) 
+      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
     }
     META <- META[, meta_cols, drop = FALSE]
   }
