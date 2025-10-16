@@ -186,12 +186,13 @@ the `GenEDA` object
 ## Principal component analysis
 
 Using the identified HVGs, we perform PCA with `RunPCA`. This function
-stores PCA results in the DimReduction slot, including: • `$Loadings`
-(sample scores)
+stores PCA results in the DimReduction slot, including:
 
-    •   `$Eigenvectors` (gene contributions)
+• `$Loadings` (sample scores)
 
-    •   `$percent_var` (Percent variance explained per component, up to PC5)
+• `$Eigenvectors` (gene contributions)
+
+• `$percent_var` (Percent variance explained per component, up to PC5)
 
 If `FindVariableFeatures` was not ran beforehand, `RunPCA` will
 calculate HVGs by default with 2000 features. This argument can be
@@ -254,11 +255,11 @@ returns a list of 4 elements:
 
 • `$cor_matrix` (Pearson correlation values)
 
-    •   `$pval_matrix` (Associated correlation p-values)
+• `$pval_matrix` (Associated correlation p-values)
 
-    •   `$stars` (asterisk representations of p-values)
+• `$stars` (asterisk representations of p-values)
 
-    •   `$plot` (Eigencorr plot, as a `ggplot2` object)
+• `$plot` (Eigencorr plot, as a `ggplot2` object)
 
 
     ec <- eigencorr(obj, num_pcs = 5)
