@@ -1,4 +1,4 @@
-# <img src="/img/RGenEDA_HexLogo.png" width="150px" height="200px" /> Genomic Explotatory Data Analysis in R
+# Genomic Explotatory Data Analysis in R
 
 ![status](https://img.shields.io/badge/status-in--development-orange)
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
