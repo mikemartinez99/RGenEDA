@@ -9,8 +9,6 @@
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
 #' @slot DimReduction List for PCA results with `Loadings`, `Eigenvectors`, `percent_var`.
-#' @slot DEGs List container for differential expression results with two entries:
-#'   `unfiltered` (data.frame) and `filtered` (data.frame).
 #'
 #' @exportClass geneda
 setClassUnion("matrixOrNULL", c("matrix", "NULL"))
@@ -22,8 +20,7 @@ setClass(
     normalized = "matrix",
     metadata = "data.frame",
     HVGs = "character",
-    DimReduction = "list",
-    DEGs = "list"
+    DimReduction = "list"
   )
 )
 
@@ -70,19 +67,6 @@ setClass(
     }
   }
 
-  if (length(object@DEGs) > 0L) {
-    needed_degs <- c("unfiltered", "filtered")
-    if (!all(needed_degs %in% names(object@DEGs))) {
-      errors <- c(errors, "'DEGs' must contain names: unfiltered, filtered.")
-    }
-    if (!is.null(object@DEGs$unfiltered) && !is.data.frame(object@DEGs$unfiltered)) {
-      errors <- c(errors, "'DEGs$unfiltered' must be a data.frame or NULL.")
-    }
-    if (!is.null(object@DEGs$filtered) && !is.data.frame(object@DEGs$filtered)) {
-      errors <- c(errors, "'DEGs$filtered' must be a data.frame or NULL.")
-    }
-  }
-
   if (length(errors)) errors else TRUE
 }
 
@@ -118,8 +102,7 @@ GenEDA <- function(normalized,
       normalized = normalized,
       metadata = metadata,
       HVGs = character(0L),
-      DimReduction = list(),
-      DEGs = list(unfiltered = NULL, filtered = NULL))
+      DimReduction = list())
 }
 
 #' Access counts matrix (avoid name clash with DESeq2::counts)
@@ -160,158 +143,6 @@ HVGs <- function(object) {
 #' @export
 DimReduction <- function(object) {
   object@DimReduction
-}
-
-#' Find and store highly variable genes (HVGs)
-#'
-#' Computes per-feature variance on `normalized(object)`, ranks genes by
-#' decreasing variance, and stores the top `nfeatures` gene IDs into the `HVGs`
-#' slot. Returns the updated object.
-#'
-#' @param object A `geneda` object
-#' @param nfeatures Number of HVGs to store
-#' @return Updated `geneda` object
-#' @export
-FindVariableFeatures <- function(object, nfeatures) {
-  stopifnot(methods::is(object, "geneda"))
-  nfeatures <- as.integer(nfeatures)
-
-  vars <- apply(object@normalized, 1L, stats::var, na.rm = TRUE)
-  if (is.null(names(vars))) names(vars) <- rownames(object@normalized)
-  vars <- sort(vars, decreasing = TRUE)
-  nfeatures <- max(1L, min(nfeatures, length(vars)))
-  object@HVGs <- names(vars)[seq_len(nfeatures)]
-  validObject(object)
-  object
-}
-
-#' Access DEGs container
-#' @param object A `geneda` object
-#' @return List with `unfiltered` and `filtered` data.frames
-#' @export
-DEGs <- function(object) {
-  object@DEGs
-}
-
-#' Set unfiltered DEGs on the object
-#'
-#' @param object A `geneda` object
-#' @param deg_table A data.frame of DESeq2-like results containing at least
-#'   columns `log2FoldChange` and `padj`
-#' @return Updated `geneda` object with `DEGs$unfiltered` set and `DEGs$filtered` cleared
-#' @export
-SetDEGs <- function(object, deg_table) {
-  stopifnot(methods::is(object, "geneda"))
-  stopifnot(is.data.frame(deg_table))
-  req_cols <- c("log2FoldChange", "padj")
-  missing_cols <- setdiff(req_cols, colnames(deg_table))
-  if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
-  }
-  object@DEGs$unfiltered <- deg_table
-  object@DEGs$filtered <- NULL
-  validObject(object)
-  object
-}
-
-#' Filter DEGs by padj and absolute log2FoldChange
-#'
-#' @param object A `geneda` object with `DEGs$unfiltered` set
-#' @param padj_thresh Adjusted p-value threshold (<=)
-#' @param log2FC_thresh Absolute log2 fold change threshold (>=)
-#' @return Updated `geneda` object with `DEGs$filtered` set
-#' @export
-FilterDEGs <- function(object, padj_thresh = 0.05, log2FC_thresh = 1.0) {
-  stopifnot(methods::is(object, "geneda"))
-  if (is.null(object@DEGs$unfiltered)) {
-    stop("DEGs$unfiltered is NULL. Use SetDEGs(object, deg_table) first.")
-  }
-  df <- object@DEGs$unfiltered
-  req_cols <- c("log2FoldChange", "padj")
-  missing_cols <- setdiff(req_cols, colnames(df))
-  if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
-  }
-  filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
-    abs(df$log2FoldChange) >= log2FC_thresh & df$padj <= padj_thresh
-  object@DEGs$filtered <- df[filt, , drop = FALSE]
-  validObject(object)
-  object
-}
-
-#' Run PCA and store in `DimReduction`
-#'
-#' Uses `generatePCs()` under the hood.
-#' If `HVGs` are empty, selects HVGs via `FindVariableFeatures(object, nfeatures)`
-#' with default `nfeatures = 2000`. If `HVGs` are present, the PCA uses
-#' `NFEATURES = length(HVGs(object))`. This aligns the PCA feature count with the
-#' HVG selection while allowing an explicit override of `nfeatures` when empty.
-#'
-#' @param object A `geneda` object
-#' @param nfeatures Number of features to use when HVGs are empty. Default = 2000
-#' @return Updated `geneda` object with `DimReduction` filled
-#' @export
-RunPCA <- function(object, nfeatures = 2000) {
-  stopifnot(methods::is(object, "geneda"))
-
-  if (length(object@HVGs) == 0L){
-    message("HVG slot is empty. Running FindVariableFeatures with top 2000 genes")
-    object <- FindVariableFeatures(object, nfeatures = nfeatures)
-  }
-  nFeatUse <- length(object@HVGs)
-  message(paste("Calculating principal components from top", nFeatUse, "HVGs"))
-  object@DimReduction <- generatePCs(object@normalized, object@HVGs, nFeatUse)
-  validObject(object)
-  object
-}
-
-#' Extract PCA Loadings and Metadata
-#'
-#' @description
-#' This function extracts PCA loadings stored in the `DimReduction` slot of a
-#' `geneda` object and combines them with the associated metadata. It ensures
-#' that the metadata has valid rownames and aligns the PCA loadings accordingly.
-#'
-#' @param object A `geneda` object containing PCA results in the `DimReduction` slot
-#'   and sample-level metadata in the `metadata` slot.
-#'
-#' @details
-#' The function performs several checks:
-#' - Ensures the input object is of class `geneda`.
-#' - Verifies that the `DimReduction` slot contains PCA loadings.
-#' - Confirms that the metadata has valid rownames.
-#' - Reorders the PCA loadings to match the order of metadata rows.
-#'
-#' If metadata rownames are missing or invalid, the function throws an error.
-#'
-#' @return
-#' A `data.frame` combining PCA loadings and sample metadata, where rows correspond
-#' to samples and columns include principal component loadings and metadata fields.
-#'
-#' @examples
-#' \dontrun{
-#' # Example usage:
-#' pca_results <- ExtractPCA(my_geneda_object)
-#' head(pca_results)
-#' }
-#'
-#' @seealso [RunPCA()], [extractLoadings()]
-#' @export
-ExtractPCA <- function(object) {
-  stopifnot(methods::is(object, "geneda"))
-
-  if (length(object@DimReduction) == 0L) {
-    message("DimReduction slot is empty. Please use RunPCA.")
-  }
-  pcaRes <- object@DimReduction[["Loadings"]]
-  meta <- object@metadata
-  if (is.null(rownames(meta)) || any(rownames(meta) == "")) {
-    stop("Metadata does not contain valid rownames. Please ensure metadata rows are named.")
-  }
-  order <- rownames(meta)
-  pcaRes <- pcaRes[order,]
-  pcaRes <- cbind(pcaRes, meta)
-  return(pcaRes)
 }
 
 #' plotHVGVariance
@@ -399,6 +230,210 @@ plotHVGVariance <- function(object, transform = NULL, dropTopN = 0) {
     ggplot2::guides(color = ggplot2::guide_legend(override.aes = list(linetype = "solid", linewidth = 1.0)))
 
   return(p)
+}
+
+#' Find and store highly variable genes (HVGs)
+#'
+#' Computes per-feature variance on `normalized(object)`, ranks genes by
+#' decreasing variance, and stores the top `nfeatures` gene IDs into the `HVGs`
+#' slot. Returns the updated object.
+#'
+#' @param object A `geneda` object
+#' @param nfeatures Number of HVGs to store
+#' @return Updated `geneda` object
+#' @export
+FindVariableFeatures <- function(object, nfeatures) {
+  stopifnot(methods::is(object, "geneda"))
+  nfeatures <- as.integer(nfeatures)
+
+  vars <- apply(object@normalized, 1L, stats::var, na.rm = TRUE)
+  if (is.null(names(vars))) names(vars) <- rownames(object@normalized)
+  vars <- sort(vars, decreasing = TRUE)
+  nfeatures <- max(1L, min(nfeatures, length(vars)))
+  object@HVGs <- names(vars)[seq_len(nfeatures)]
+  validObject(object)
+  object
+}
+
+
+#' Run PCA and store in `DimReduction`
+#'
+#' Uses `generatePCs()` under the hood.
+#' If `HVGs` are empty, selects HVGs via `FindVariableFeatures(object, nfeatures)`
+#' with default `nfeatures = 2000`. If `HVGs` are present, the PCA uses
+#' `NFEATURES = length(HVGs(object))`. This aligns the PCA feature count with the
+#' HVG selection while allowing an explicit override of `nfeatures` when empty.
+#'
+#' @param object A `geneda` object
+#' @param nfeatures Number of features to use when HVGs are empty. Default = 2000
+#' @return Updated `geneda` object with `DimReduction` filled
+#' @export
+RunPCA <- function(object, nfeatures = 2000) {
+  stopifnot(methods::is(object, "geneda"))
+
+  if (length(object@HVGs) == 0L){
+    message("HVG slot is empty. Running FindVariableFeatures with top 2000 genes")
+    object <- FindVariableFeatures(object, nfeatures = nfeatures)
+  }
+  nFeatUse <- length(object@HVGs)
+  message(paste("Calculating principal components from top", nFeatUse, "HVGs"))
+  object@DimReduction <- generatePCs(object@normalized, object@HVGs, nFeatUse)
+  validObject(object)
+  object
+}
+
+#' Extract PCA Loadings and Metadata
+#'
+#' @description
+#' This function extracts PCA loadings stored in the `DimReduction` slot of a
+#' `geneda` object and combines them with the associated metadata. It ensures
+#' that the metadata has valid rownames and aligns the PCA loadings accordingly.
+#'
+#' @param object A `geneda` object containing PCA results in the `DimReduction` slot
+#'   and sample-level metadata in the `metadata` slot.
+#'
+#' @details
+#' The function performs several checks:
+#' - Ensures the input object is of class `geneda`.
+#' - Verifies that the `DimReduction` slot contains PCA loadings.
+#' - Confirms that the metadata has valid rownames.
+#' - Reorders the PCA loadings to match the order of metadata rows.
+#'
+#' If metadata rownames are missing or invalid, the function throws an error.
+#'
+#' @return
+#' A `data.frame` combining PCA loadings and sample metadata, where rows correspond
+#' to samples and columns include principal component loadings and metadata fields.
+#'
+#' @examples
+#' \dontrun{
+#' # Example usage:
+#' pca_results <- ExtractPCA(my_geneda_object)
+#' head(pca_results)
+#' }
+#'
+#' @seealso [RunPCA()], [extractLoadings()]
+#' @export
+ExtractPCA <- function(object) {
+  stopifnot(methods::is(object, "geneda"))
+
+  if (length(object@DimReduction) == 0L) {
+    message("DimReduction slot is empty. Please use RunPCA.")
+  }
+  pcaRes <- object@DimReduction[["Loadings"]]
+  meta <- object@metadata
+  if (is.null(rownames(meta)) || any(rownames(meta) == "")) {
+    stop("Metadata does not contain valid rownames. Please ensure metadata rows are named.")
+  }
+  order <- rownames(meta)
+  pcaRes <- pcaRes[order,]
+  pcaRes <- cbind(pcaRes, meta)
+  return(pcaRes)
+}
+
+#' Plot PCA results from a GenEDA object
+#'
+#' @description
+#' Visualize principal component analysis (PCA) results stored within a
+#' `GenEDA` object. This function extracts PCA data via \code{\link{ExtractPCA}}
+#' and provides a flexible ggplot2-based visualization interface.
+#'
+#' @param object A `GenEDA` object containing PCA results in the `DimReduction` slot.
+#' @param x Numeric or character. The principal component to plot on the x-axis (e.g., 1 or "PC1").
+#' @param y Numeric or character. The principal component to plot on the y-axis (e.g., 2 or "PC2").
+#' @param color_by Character. Column name in the metadata used to color points.
+#' @param colors Vector. Custom colors to use for plotting
+#' @param split_by Character (optional). Column name in metadata used for faceting (creates separate panels).
+#' @param shape_by Character (optional). Column name in metadata used to control point shape.
+#' @param return_data Logical (default = FALSE), whether or not to return pca dataframe for more custom plotting.
+#'
+#' @return A `ggplot` object displaying the PCA scatter plot, or a list of pca_df and plot if `return_data = TRUE`
+#' @examples
+#' \dontrun{
+#' p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition", colors = c("untreated" = "red", "treated" = "blue"), split_by = "library")
+#' p
+#' }
+#' @export
+PlotPCA <- function(object,
+                    x = 1,
+                    y = 2,
+                    color_by,
+                    colors = NULL,
+                    split_by = NULL,
+                    shape_by = NULL,
+                    return_data = FALSE) {
+
+  # Check input type
+  stopifnot(methods::is(object, "geneda"))
+
+  # Extract PCA data
+  pca_df <- ExtractPCA(object)
+
+  # Ensure components exist
+  if (is.numeric(x)) x <- paste0("PC", x)
+  if (is.numeric(y)) y <- paste0("PC", y)
+
+  if (!(x %in% colnames(pca_df))) stop(paste("Column", x, "not found in PCA data."))
+  if (!(y %in% colnames(pca_df))) stop(paste("Column", y, "not found in PCA data."))
+
+  # Retrieve variance explained
+  percent_var <- object@DimReduction$percent_var
+  xlab <- percent_var[[x]]
+  xlab <- gsub(" ", "", xlab)
+  ylab <- percent_var[[y]]
+  ylab <- gsub(" ", "", ylab)
+
+  # Check custom colors
+  if (!is.null(colors)) {
+    if (!(color_by %in% colnames(pca_df))) stop(paste("Column", color_by, "not found in PCA data."))
+    # Ensure all levels are mapped
+    unique_vals <- unique(pca_df[[color_by]])
+    if (!all(unique_vals %in% names(colors))) {
+      stop(paste0(
+        "Color vector does not include all unique values of '", color_by, "'. Missing: ",
+        paste(setdiff(unique_vals, names(colors)), collapse = ", ")
+      ))
+    }
+  }
+
+  # Construct ggplot
+  p <- ggplot(pca_df, aes_string(x = x, y = y, color = color_by)) +
+    geom_point(size = 3, alpha = 0.8) +
+    theme_classic(base_size = 16) +
+    theme(
+      axis.title = element_text(face = "bold"),
+      legend.position = "right"
+    ) +
+    labs(
+      x = paste0(x, ": ", xlab),
+      y = paste0(y, ": ", ylab),,
+      color = color_by
+    )
+
+  # Apply custom colors if provided
+  if (!is.null(colors)) {
+    p <- p + scale_color_manual(values = colors)
+  }
+
+  # Add shape mapping if specified
+  if (!is.null(shape_by)) {
+    if (!(shape_by %in% colnames(pca_df))) stop(paste("Column", shape_by, "not found in PCA data."))
+    p <- p + aes_string(shape = shape_by)
+  }
+
+  # Add faceting if requested
+  if (!is.null(split_by)) {
+    if (!(split_by %in% colnames(pca_df))) stop(paste("Column", split_by, "not found in PCA data."))
+    p <- p + facet_wrap(as.formula(paste("~", split_by))) +
+      theme(strip.text = element_text(face = "bold"))
+  }
+
+  # Return either plot or both plot + data
+  if (return_data) {
+    return(list(plot = p, data = pca_df))
+  } else {
+    return(p)
+  }
 }
 
 
