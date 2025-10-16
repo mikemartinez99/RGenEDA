@@ -272,7 +272,7 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
 ## Correlate PCs with metadata
 
 To interpret principal components, we can correlate them with sample
-metadata using eigencorr(). This function computes Pearson correlations
+metadata using `eigencorr`. This function computes Pearson correlations
 and displays them as a heatmap, helping to reveal which metadata
 features are most associated with major axes of variation. This function
 returns a list of 4 elements:
@@ -284,6 +284,9 @@ returns a list of 4 elements:
 • `$stars` (asterisk representations of p-values)
 
 • `$plot` (Eigencorr plot, as a `ggplot2` object)
+
+**Note:** `ordcorr` can be used for microbiome data as it correlates
+metadata features with NMDS beta values rather than PCs.
 
 
     ec <- eigencorr(obj, num_pcs = 5)
