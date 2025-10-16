@@ -312,7 +312,6 @@ RunPCA <- function(object, nfeatures = 2000) {
 #' head(pca_results)
 #' }
 #'
-#' @seealso [RunPCA()], [extractLoadings()]
 #' @export
 ExtractPCA <- function(object) {
   stopifnot(methods::is(object, "geneda"))
