@@ -395,6 +395,9 @@ PlotPCA <- function(object,
   ylab <- percent_var[[y]]
   ylab <- gsub(" ", "", ylab)
 
+  # Check color_by
+  if (!(color_by %in% colnames(pca_df))) stop(paste("Column", color_by, "not found in PCA data."))
+
   # Check custom colors
   if (!is.null(colors)) {
     if (!(color_by %in% colnames(pca_df))) stop(paste("Column", color_by, "not found in PCA data."))
