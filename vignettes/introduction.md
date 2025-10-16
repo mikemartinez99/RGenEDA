@@ -23,6 +23,8 @@ structure, dimensionality reduction, and sample relationships.
 -   [Define metadata](#define-metadata)
 -   [Processing and normalization](#processing-and-normalization)
 -   [Create a GenEDA object](#create-a-geneda-object)
+-   [Count distrubutions across
+    samples](#count-distributions-across-samples)
 -   [Sample Eucliden distances with hierarchical
     clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 -   [Identify highly variable genes](#identify-highly-variable-genes)
@@ -97,7 +99,8 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to
+    #> factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
@@ -134,6 +137,20 @@ be stored.
     #>   samples:  7
     #>   HVGs: 0
     #>   counts: NULL
+
+## Count distributions across samples
+
+To visualize normalized count distributions across samples, the
+`PlotCountDist` function can be used. This is a helpful way to visualize
+effectiveness of normalization, as the overall distributions should be
+similar across samples. Samples with very low or very high overall
+counts compared to others might indicate problematic samples, technical
+artifacts, or batch effect.
+
+
+    PlotCountDist(obj, split_by = "condition")
+
+<img src="introduction_files/figure-markdown_strict/count-dist-1.png" style="display: block; margin: auto;" />
 
 ## Sample Eucliden distances with hierarchical clustering
 
@@ -298,9 +315,6 @@ Heatmap values are the normalized expression values scaled and Z-scored.
                                                                 "treated" = "blue")))
 
 <img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
-
-    #grid::grid.newpage()
-    #draw(ht)
 
 ## Correlate PCs with metadata
 

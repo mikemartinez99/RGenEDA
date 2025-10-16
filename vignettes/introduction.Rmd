@@ -47,6 +47,7 @@ We’ll follow a simplified version of the [deseq2 framework](https://www.biocon
 - [Define metadata](#define-metadata)
 - [Processing and normalization](#processing-and-normalization)
 - [Create a GenEDA object](#create-a-geneda-object)
+- [Count distrubutions across samples](#count-distributions-across-samples)
 - [Sample Eucliden distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 - [Identify highly variable genes](#identify-highly-variable-genes)
 - [Principal component analysis](#principal-component-analysis)
@@ -138,6 +139,17 @@ obj <- GenEDA(
 # View object summary
 obj
 ```
+
+## Count distributions across samples
+
+To visualize normalized count distributions across samples, the `PlotCountDist` function can be used. This is a helpful way to visualize effectiveness of normalization, as the overall distributions should be similar across samples. Samples with very low or very high overall counts compared to others might indicate problematic samples, technical artifacts, or batch effect. 
+
+```{r count-dist}
+
+PlotCountDist(obj, split_by = "condition")
+
+```
+
 
 ## Sample Eucliden distances with hierarchical clustering
 
@@ -237,8 +249,6 @@ head(pc1_eigen)
 ht <- PlotEigenHeatmap(obj, "PC1", n = 5, direction = "both", annotate_by = c("condition"), 
                        annotate_colors = list(condition = c("untreated" = "red", 
                                                             "treated" = "blue")))
-#grid::grid.newpage()
-#draw(ht)
 
 ```
 
