@@ -226,11 +226,19 @@ PlotPCA(object = obj,
 
 We can explore the individual Eigen vectors that comprise a particular component of interest (usually PC1 and PC2) using `extractEigen`.
 
-```{r eigenvecs, fig.show='hold', out.width='70%'}
+Similarly, to visually explore the top Eigen vectors, the `PlotEigenHeatmap` function can be ran directly. Specifying the number of Eigen vectors and whether to show just the top, bottom, or both directions can help elucidate gene signatures driving expression. Heatmap values are the normalized expression values scaled and Z-scored.
+
+```{r eigenvecs, fig.width = 8, fig.height = 6}
 
 pc1_eigen <- extractEigen(object = obj,
                           component = "PC1")
 head(pc1_eigen)
+
+ht <- PlotEigenHeatmap(obj, "PC1", n = 5, direction = "both", annotate_by = c("condition"), 
+                       annotate_colors = list(condition = c("untreated" = "red", 
+                                                            "treated" = "blue")))
+#grid::grid.newpage()
+#draw(ht)
 
 ```
 
