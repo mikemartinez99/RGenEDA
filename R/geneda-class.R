@@ -314,8 +314,6 @@ ExtractPCA <- function(object) {
   return(pcaRes)
 }
 
-
-
 #' plotHVGVariance
 #'
 #' @description Plot variance for all genes (features) on a `geneda` object using ggplot2.
