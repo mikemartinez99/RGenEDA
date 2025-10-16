@@ -275,6 +275,12 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
 We can explore the individual Eigen vectors that comprise a particular
 component of interest (usually PC1 and PC2) using `extractEigen`.
 
+Similarly, to visually explore the top Eigen vectors, the
+`PlotEigenHeatmap` function can be ran directly. Specifying the number
+of Eigen vectors and whether to show just the top, bottom, or both
+directions can help elucidate gene signatures driving expression.
+Heatmap values are the normalized expression values scaled and Z-scored.
+
 
     pc1_eigen <- extractEigen(object = obj,
                               component = "PC1")
@@ -286,6 +292,15 @@ component of interest (usually PC1 and PC2) using `extractEigen`.
     #> 4 FBgn0025864  0.0069592766 4.843153e-03
     #> 5 FBgn0000063  0.0140917988 1.985788e-02
     #> 6 FBgn0023507 -0.0248617605 6.181071e-02
+
+    ht <- PlotEigenHeatmap(obj, "PC1", n = 5, direction = "both", annotate_by = c("condition"), 
+                           annotate_colors = list(condition = c("untreated" = "red", 
+                                                                "treated" = "blue")))
+
+<img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
+
+    #grid::grid.newpage()
+    #draw(ht)
 
 ## Correlate PCs with metadata
 
