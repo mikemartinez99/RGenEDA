@@ -1,6 +1,10 @@
 ---
 title: "Introduction to RGenEDA"
-output: rmarkdown::html_vignette
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+    toc_float: true
 vignette: >
   %\VignetteIndexEntry{Introduction to RGenEDA}
   %\VignetteEngine{knitr::rmarkdown}
