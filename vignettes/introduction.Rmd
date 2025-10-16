@@ -42,6 +42,16 @@ While this example focuses on RNA-seq, the workflow can easily be extended to pr
 
 We’ll follow a simplified version of the [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for normalization and use RGenEDA’s functionality to assess variance structure, dimensionality reduction, and sample relationships.
 
+## Table of contents
+- [Load and inspect the data](#load-and-inspect-the-data)
+- [Define metadata](#define-metadata)
+- [Processing and normalization](#processing-and-normalization)
+- [Create a GenEDA object](#create-a-geneda-object)
+- [Sample Eucliden distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+- [Identify highly variable genes](#identify-highly-variable-genes)
+- [Principal component analysis](#principal-component-analysis)
+- [Extract and visualize PCA results](#extract-and-visualize-pca-results)
+- [Correlate PCs with metadata](#correlate-pcs-with-metadata)
 
 ## Load and inspect the data
 
@@ -128,7 +138,7 @@ obj <- GenEDA(
 obj
 ```
 
-## Sample-to-sample Eucliden distances with hierarchical clustering
+## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, we can plot Euclidean distances between samples using the `distanceHeatmap` function.
 Darker colors indicate higher similarity, while lighter colors represent dissimilar samples. This provides a quick assessment of replicate quality and metadata features that drive clustering. 
@@ -145,7 +155,7 @@ distanceHeatmap(
 
 ```
 
-### Identify highly variable genes (HVGs)
+## Identify highly variable genes
 
 Next, we assess variance across all genes to identify those most variable across samples as these drive much of the biological signal. You can visualize the full variance profile for all genes profiled with `plotHVGVariance`.
 
@@ -212,7 +222,7 @@ PlotPCA(object = obj,
 
 ```
 
-## Correlate PCs with metadata (Eigencorrelation)
+## Correlate PCs with metadata
 
 
 To interpret principal components, we can correlate them with sample metadata using eigencorr().

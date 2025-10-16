@@ -17,6 +17,20 @@ framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/ins
 for normalization and use RGenEDA’s functionality to assess variance
 structure, dimensionality reduction, and sample relationships.
 
+## Table of contents
+
+-   [Load and inspect the data](#load-and-inspect-the-data)
+-   [Define metadata](#define-metadata)
+-   [Processing and normalization](#processing-and-normalization)
+-   [Create a GenEDA object](#create-a-geneda-object)
+-   [Sample Eucliden distances with hierarchical
+    clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+-   [Identify highly variable genes](#identify-highly-variable-genes)
+-   [Principal component analysis](#principal-component-analysis)
+-   [Extract and visualize PCA
+    results](#extract-and-visualize-pca-results)
+-   [Correlate PCs with metadata](#correlate-pcs-with-metadata)
+
 ## Load and inspect the data
 
 We begin by loading the `pasilla` dataset, which contains gene-level
@@ -119,7 +133,7 @@ be stored.
     #>   HVGs: 0
     #>   counts: NULL
 
-## Sample-to-sample Eucliden distances with hierarchical clustering
+## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, we can plot Euclidean distances
 between samples using the `distanceHeatmap` function. Darker colors
@@ -160,7 +174,7 @@ metadata features that drive clustering.
 
 <img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
-### Identify highly variable genes (HVGs)
+## Identify highly variable genes
 
 Next, we assess variance across all genes to identify those most
 variable across samples as these drive much of the biological signal.
@@ -255,7 +269,7 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
 
-## Correlate PCs with metadata (Eigencorrelation)
+## Correlate PCs with metadata
 
 To interpret principal components, we can correlate them with sample
 metadata using eigencorr(). This function computes Pearson correlations
