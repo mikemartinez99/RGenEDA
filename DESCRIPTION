@@ -1,5 +1,5 @@
 Package: RGenEDA
-Title: Genomic exploratory data analysis in R
+Title: Genomic Exploratory Data Analysis in R
 Version: 1.0.0
 Authors@R: 
     person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
@@ -9,7 +9,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Depends:
-    methods
+    methods,
+    R (>= 4.1.0)
 Imports:
     ComplexHeatmap,
     pheatmap,
