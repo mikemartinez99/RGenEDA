@@ -25,8 +25,7 @@ structure, dimensionality reduction, and sample relationships.
 -   [Create a GenEDA object](#create-a-geneda-object)
 -   [Count distrubutions across
     samples](#count-distributions-across-samples)
--   [Sample Eucliden distances with hierarchical
-    clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+-   [Sample Euclidean distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 -   [Identify highly variable genes](#identify-highly-variable-genes)
 -   [Principal component analysis](#principal-component-analysis)
 -   [Extract and visualize PCA
@@ -151,7 +150,7 @@ artifacts, or batch effect.
 
 <img src="introduction_files/figure-markdown_strict/count-dist-1.png" style="display: block; margin: auto;" />
 
-## Sample Eucliden distances with hierarchical clustering
+## Sample Euclidean distances with hierarchical clustering
 
 To visualize replicate similarity, we can plot Euclidean distances
 between samples using the `distanceHeatmap` function. Darker colors
@@ -286,6 +285,7 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             shape_by = "library")
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
+
 ## Explore Eigen vectors of individual PCs
 
 We can explore the individual Eigen vectors that comprise a particular
