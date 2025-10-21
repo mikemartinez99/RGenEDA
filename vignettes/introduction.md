@@ -286,7 +286,7 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             shape_by = "library")
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
-\## Explore Eigen vectors of individual PCs
+## Explore Eigen vectors of individual PCs
 
 We can explore the individual Eigen vectors that comprise a particular
 component of interest (usually PC1 and PC2) using `extractEigen`.
