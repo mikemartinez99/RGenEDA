@@ -2,7 +2,7 @@
 #'
 #' @description Calculate correlations between NMDS ordination axes (from beta
 #' diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
-#' labels and significance stars. 
+#' labels and significance stars.
 #'
 #' For continuous variables, Pearson correlation is used. P values follow this
 #' convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
@@ -21,6 +21,11 @@
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' ordcorr(obj, num_mds = 10)
+#' }
 ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   stopifnot(methods::is(object, "geneda"))
 
@@ -39,7 +44,7 @@ ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META_num))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", "))) 
+      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
     }
     META_num <- META_num[, meta_cols, drop = FALSE]
   }

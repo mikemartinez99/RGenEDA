@@ -7,6 +7,11 @@
 #'
 #' @returns A data-frame containing gene loading information and percent variation per gene
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' extractEigen(object = obj, component = "PC1")
+#'}
 extractEigen <- function(object, component) {
   stopifnot(methods::is(object, "geneda"))
 

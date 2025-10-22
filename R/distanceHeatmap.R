@@ -24,7 +24,13 @@
 #' @export
 #'
 #' @examples
-#' # p <- distanceHeatmap(obj)$plot
+#' \donttest{
+#' distanceHeatmap(
+#'     obj,
+#'     meta_cols = c("condition", "library"),
+#'     palettes = colorList,
+#'     return = "plot")
+#'     }
 distanceHeatmap <- function(object,
                             method = "euclidean",
                             reorder = TRUE,

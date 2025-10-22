@@ -25,6 +25,11 @@
 #' @import dplyr
 #' @import tidyr
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' plotCountDist(object)
+#' }
 PlotCountDist <- function(object, split_by = NULL) {
   stopifnot(methods::is(object, "geneda"))
 

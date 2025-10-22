@@ -28,3 +28,8 @@ For continuous variables, Pearson correlation is used. P values follow this
 convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
 respectively.
 }
+\examples{
+\donttest{
+ordcorr(obj, num_mds = 10)
+}
+}

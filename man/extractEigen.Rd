@@ -17,3 +17,8 @@ A data-frame containing gene loading information and percent variation per gene
 \description{
 Extract gene-level Eigen-vectors for PCs of interest and calculate percent variance.
 }
+\examples{
+\donttest{
+extractEigen(object = obj, component = "PC1")
+}
+}

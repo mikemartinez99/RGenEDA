@@ -39,8 +39,7 @@
 #' @importFrom graphics Axis
 #'
 #' @examples
-#' \dontrun{
-#' # Visualize top 25 genes for PC1 with metadata annotation
+#' \donttest{
 #' ht <- PlotTopGenesHeatmap(obj, pc = "PC1", n = 25, direction = "both",
 #'                           annotate_by = c("Condition"),
 #'                           annotate_colors = list(Condition =

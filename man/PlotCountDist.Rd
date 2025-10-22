@@ -30,4 +30,7 @@ PlotCountDist(obj)
 PlotCountDist(obj, split_by = "condition")
 }
 
+\donttest{
+plotCountDist(object)
+}
 }

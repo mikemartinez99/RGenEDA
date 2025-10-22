@@ -21,6 +21,12 @@
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' ec <- eigencorr(obj, num_pcs = 5)
+#' ec$plot
+#' }
 eigencorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
