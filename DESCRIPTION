@@ -21,7 +21,8 @@ Imports:
     grid,
     scales,
     tidyr,
-    vegan
+    vegan,
+    stats
 Suggests: 
     DESeq2,
     ggtext,

@@ -15,6 +15,7 @@
 #' @import RColorBrewer
 #' @import grid
 #' @import vegan
+#' @importFrom stats as.dist cor dist
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`.
 #' @param num_mds Number of NMDS axes to correlate. Default = 10
