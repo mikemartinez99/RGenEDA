@@ -3,7 +3,7 @@ Title: Genomic Exploratory Data Analysis
 Version: 1.0.0
 Authors@R: 
     person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
-Description: RGenEDA provides a unified and reproducible framework for performing genomic exploratory data analysis (EDA). Highly repetitive functions and analyses have been collated into an easy-to-use S4 object that produces quick results and customizable visualizations to assess variation in your data. See <https://github.com/mikemartinez99/RGenEDA>.
+Description: Provides a unified and reproducible framework for performing genomic exploratory data analysis (EDA). Highly repetitive functions and analyses have been collated into an easy-to-use S4 object that produces quick results and customizable visualizations to assess variation in your data. See <https://github.com/mikemartinez99/RGenEDA>.
 License: GPL-3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
