@@ -47,6 +47,11 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
   - Added unit tests
   - Added demo to vignettes
 
+**v1.0.1** *November 3rd, 2025*
+
+  - Modified `PlotEigenHeatmap` to use pheatmap instead of `ComplexHeatmap`
+  - Fixed bug to correctly index top genes from selected PC
+
 ## Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
 
