@@ -25,7 +25,8 @@ structure, dimensionality reduction, and sample relationships.
 -   [Create a GenEDA object](#create-a-geneda-object)
 -   [Count distrubutions across
     samples](#count-distributions-across-samples)
--   [Sample Euclidean distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+-   [Sample Eucliden distances with hierarchical
+    clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 -   [Identify highly variable genes](#identify-highly-variable-genes)
 -   [Principal component analysis](#principal-component-analysis)
 -   [Extract and visualize PCA
@@ -98,7 +99,8 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to
+    #> factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
@@ -150,7 +152,7 @@ artifacts, or batch effect.
 
 <img src="introduction_files/figure-markdown_strict/count-dist-1.png" style="display: block; margin: auto;" />
 
-## Sample Euclidean distances with hierarchical clustering
+## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, we can plot Euclidean distances
 between samples using the `distanceHeatmap` function. Darker colors
@@ -188,8 +190,6 @@ metadata features that drive clustering.
     #> $palettes$library
     #> single-end paired-end 
     #>  "#FF7F00"  "#4DAF4A"
-
-<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
 ## Identify highly variable genes
 
@@ -285,25 +285,26 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             shape_by = "library")
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
-
-## Explore Eigen vectors of individual PCs
+\## Explore Eigen vectors of individual PCs
 
 We can explore the individual Eigen vectors that comprise a particular
 component of interest (usually PC1 and PC2) using `extractEigen`.
 
+Similarly, to visually explore the top Eigen vectors, the
+`PlotEigenHeatmap` function can be ran directly. Specifying the number
+of Eigen vectors and whether to show just the top, bottom, or both
+directions can help elucidate gene signatures driving expression.
+Heatmap values are the normalized expression values scaled and Z-scored.
+
 
     pc1_eigen <- extractEigen(object = obj,
                               component = "PC1")
-    head(pc1_eigen)
-    #>          Gene   EigenVector       PctVar
-    #> 1 FBgn0011764 -0.0001939999 3.763595e-06
-    #> 2 FBgn0002441 -0.0050539094 2.554200e-03
-    #> 3 FBgn0001276 -0.0037799827 1.428827e-03
-    #> 4 FBgn0025864  0.0069592766 4.843153e-03
-    #> 5 FBgn0000063  0.0140917988 1.985788e-02
-    #> 6 FBgn0023507 -0.0248617605 6.181071e-02
 
-    
+    # Plot heatmap
+    ht <- PlotEigenHeatmap(obj, "PC1", n = 5, annotate_by = c("condition"), 
+                           annotate_colors = list(Group = c("untreated" = "red", "treated" = "blue")))
+
+    ht$heatmap
 
 ## Correlate PCs with metadata
 

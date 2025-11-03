@@ -8,57 +8,40 @@ PlotEigenHeatmap(
   object,
   pc = "PC1",
   n = 25,
-  direction = c("both", "top", "bottom"),
   annotate_by = NULL,
   annotate_colors = NULL,
-  show_row_names = TRUE
+  return = c("object", "plot")
 )
 }
 \arguments{
-\item{object}{A \code{geneda} object containing normalized expression data and
-optionally HVGs.}
+\item{object}{A \code{geneda} object containing normalized expression data and PCA in \code{DimReduction}.}
 
-\item{pc}{Character. Which principal component to visualize (default: "PC1").}
+\item{pc}{Character. Principal component to visualize (e.g., "PC1").}
 
-\item{n}{Integer. Number of genes to select from top or bottom loadings (default: 25).}
+\item{n}{Integer. Number of genes to select by absolute loading (default: 25).}
 
-\item{direction}{Character. Whether to select "top", "bottom", or "both" ends
-of the eigenvector distribution (default: "both").}
+\item{annotate_by}{Character vector of metadata column names for column annotations (optional).}
 
-\item{annotate_by}{Character vector of metadata column names to include as
-top annotations (optional).}
+\item{annotate_colors}{Named list of color vectors for metadata columns. Names should match \code{annotate_by}.}
 
-\item{annotate_colors}{Named list of color vectors for metadata annotation.
-Names should match \code{annotate_by} column names.}
-
-\item{show_row_names}{Logical. Whether to display gene names as row labels
-(default: TRUE).}
+\item{return}{One of c("object","plot"). If "plot", draws the heatmap via grid.}
 }
 \value{
-A \code{ComplexHeatmap} object representing the heatmap of top genes.
+A list with \code{topGenes} (data.frame with EigenVector and PctVar), \code{expression} (scaled matrix), and \code{heatmap} (pheatmap object)
 }
 \description{
-Generates a ComplexHeatmap of the top and/or bottom genes contributing to a
-specific principal component from a \code{geneda} object. Genes are selected based
-on their eigenvector loadings, and expression values are Z-score scaled. The
-function optionally annotates columns with metadata variables and adds a
-row annotation reflecting gene loading magnitude and percent variance.
-}
-\details{
-The function extracts loadings for the specified principal component using
-\code{extractLoadings()}. Genes are selected based on the chosen \code{direction} and
-number \code{n}. Expression values are scaled across genes for visualization.
-Row annotations indicate the magnitude and direction of gene loadings, while
-column annotations can display metadata variables. A custom size legend
-represents percent variance of each gene.
+Generates a pheatmap of the top genes contributing to a specific principal
+component from a \code{geneda} object. Genes are selected by absolute eigenvector
+loading for the chosen PC, and expression values are Z-score scaled per gene.
+Optionally annotate columns with metadata variables and add row annotations
+showing gene-level percent variance.
 }
 \examples{
-\donttest{
-ht <- PlotTopGenesHeatmap(obj, pc = "PC1", n = 25, direction = "both",
-                          annotate_by = c("Condition"),
-                          annotate_colors = list(Condition =
-                              c("untreated" = "red", "treated" = "blue")))
-draw(ht)
+\dontrun{
+res <- PlotEigenHeatmap(obj, pc = "PC1", n = 25,
+                        annotate_by = c("Condition"),
+                        annotate_colors = list(Condition = c("A" = "#1b9e77", "B" = "#d95f02")))
+grid::grid.newpage(); grid::grid.draw(res$heatmap$gtable)
 }
 
 }
