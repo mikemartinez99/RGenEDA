@@ -1,4 +1,4 @@
-# RGenEDA (v1.0.0)
+# RGenEDA (v1.0.1)
 
 ![status](https://img.shields.io/badge/status-in--development-orange)
 ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
