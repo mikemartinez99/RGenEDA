@@ -99,7 +99,8 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters,
+    #> converting to factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
@@ -147,9 +148,6 @@ some plotting functions.
            fc = 0.5)
     #> Scale for size is already present.
     #> Adding another scale for size, which will replace the existing scale.
-    #> Warning in log(x, base): NaNs produced
-    #> Warning in scale_x_continuous(trans = "log2"): log-2 transformation introduced infinite values.
-    #> Warning: Removed 1 row containing missing values or values outside the scale range (`geom_vline()`).
 
     # View object summary
     obj
@@ -214,8 +212,6 @@ metadata features that drive clustering.
     #> $palettes$library
     #> single-end paired-end 
     #>  "#FF7F00"  "#4DAF4A"
-
-<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
 ## Identify highly variable genes
 
@@ -309,13 +305,6 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             color_by = "condition",
             colors = c("untreated" = "red", "treated" = "blue"),
             shape_by = "library")
-    #> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
-    #> ℹ Please use tidy evaluation idioms with `aes()`.
-    #> ℹ See also `vignette("ggplot2-in-packages")` for more information.
-    #> ℹ The deprecated feature was likely used in the RGenEDA package.
-    #>   Please report the issue to the authors.
-    #> This warning is displayed once every 8 hours.
-    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
 \## Explore Eigen vectors of individual PCs
@@ -338,8 +327,6 @@ Heatmap values are the normalized expression values scaled and Z-scored.
                            annotate_colors = list(Group = c("untreated" = "red", "treated" = "blue")))
 
     ht$heatmap
-
-<img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
 
 ## Correlate PCs with metadata
 

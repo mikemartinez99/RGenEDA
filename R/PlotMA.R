@@ -40,6 +40,7 @@ PlotMA <- function(object, alpha, fc, title = NULL) {
 
   resPlot <- ggplot(df, aes(x = baseMean, y = log2FoldChange, fill=col, size = -log10(padj))) +
     geom_point(alpha = 0.5, shape = 21)  +
+    theme_classic() +
     scale_x_continuous(trans='log2') +
     ylab("Log2 fold change") +
     xlab("Mean normalized counts (Log2, SCT)") +
@@ -69,17 +70,14 @@ PlotMA <- function(object, alpha, fc, title = NULL) {
                      segment.size = 0.3, fill = "grey90",
                      max.overlaps = 20,
                      segment.color = 'grey50', size = 3.5) +
-    geom_vline(xintercept = fc, colour = "black", linetype="dotted") +
-    geom_vline(xintercept = -fc, colour = "black", linetype="dotted") +
+    geom_hline(yintercept = fc, colour = "black", linetype="dotted") +
+    geom_hline(yintercept = -fc, colour = "black", linetype="dotted") +
     theme(legend.key.size = unit(1, "cm"),
-          legend.background=element_blank(),
-          panel.border = element_rect(fill = NA, colour = "black", size = 0.6, linetype = "solid"),
-          panel.background = element_rect(fill = "#F0ECEA"),
           title = element_text(colour="black", size = 20),
-          axis.text.x=element_text(colour="black", size = 14, hjust = 1),
+          axis.text.x=element_text(colour="black", size = 14),
           axis.text.y=element_text(colour="black", size = 14),
-          axis.title.x=element_text(colour="black", size = 16),
-          axis.title.y=element_text(colour="black", size = 16),
+          axis.title.x=element_text(colour="black", size = 16, face = "bold"),
+          axis.title.y=element_text(colour="black", size = 16, face = "bold"),
           legend.text = element_text(colour="black", size = 14),
           legend.title = element_text(colour="black", size = 14)) +
     guides(size=guide_legend(override.aes = list(fill="black", alpha=1)))
