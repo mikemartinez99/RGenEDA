@@ -19,8 +19,3 @@ A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
 \description{
 Generate principal component analysis data that can be used in downstream analyses.
 }
-\examples{
-# Calculate variance
-vars <- DACExplorer::plotVariance(matrix, output_folder)
-pcs <- plotVariance(matrix, vars, 2000)
-}

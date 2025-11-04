@@ -11,6 +11,7 @@
 #' @import ggplot2
 #' @import RColorBrewer
 #' @import grid
+#' @importFrom stats prcomp cor.test na.omit var as.formula
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
 #'   optionally `DimReduction` loadings.
@@ -20,6 +21,12 @@
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' ec <- eigencorr(obj, num_pcs = 5)
+#' ec$plot
+#' }
 eigencorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
@@ -100,7 +107,7 @@ eigencorr <- function(object, num_pcs = 10, meta_cols = NULL) {
     geom_tile(color = NA) +
     scale_fill_gradientn(colors = heatmap_colors, limits = c(-1, 1), name = "Correlation") +
     geom_text(aes(label = sprintf("%.2f", Correlation)), size = 4) +
-    geom_text(aes(label = Stars), nudge_y = -0.25, size = 6) +
+    geom_text(aes(label = Stars), nudge_y = -0.30, size = 5) +
     theme_minimal(base_size = 16) +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),

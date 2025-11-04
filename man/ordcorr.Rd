@@ -17,7 +17,9 @@ Defaults to all metadata columns.}
 \item{distance}{Distance metric for \code{vegdist} (default "bray").}
 }
 \value{
-A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
+A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot),
+and variance explained (squared correlations between ordination distances and
+observed dissimilarities.)
 }
 \description{
 Calculate correlations between NMDS ordination axes (from beta
@@ -27,4 +29,12 @@ labels and significance stars.
 For continuous variables, Pearson correlation is used. P values follow this
 convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
 respectively.
+
+Default num_mds is 10, but function will internally set max number of NMDS
+to be n-1 where n is your number of samples.
+}
+\examples{
+\donttest{
+ordcorr(obj, num_mds = 10)
+}
 }

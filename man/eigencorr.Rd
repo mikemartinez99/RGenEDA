@@ -27,3 +27,9 @@ one stars, respectively.
 
 Requires PCA loadings in \code{DimReduction(object)}; does not recompute PCA.
 }
+\examples{
+\donttest{
+ec <- eigencorr(obj, num_pcs = 5)
+ec$plot
+}
+}

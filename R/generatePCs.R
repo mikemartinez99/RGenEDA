@@ -8,11 +8,6 @@
 #'
 #' @returns A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
 #' @export
-#'
-#' @examples # Calculate variance
-#' @examples vars <- DACExplorer::plotVariance(matrix, output_folder)
-#' @examples pcs <- plotVariance(matrix, vars, 2000)
-
 generatePCs <- function(mat, vars, nFeatures) {
   var_features_n <- nFeatures
   #----- Order variance and select the rows (genes) with the most variance

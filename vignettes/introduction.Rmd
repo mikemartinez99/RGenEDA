@@ -1,184 +1,274 @@
 ---
-title: "Introduction"
-output: rmarkdown::html_vignette
+title: "Introduction to RGenEDA"
+output:
+  rmarkdown::html_document:
 vignette: >
-  %\VignetteIndexEntry{introduction}
+  %\VignetteIndexEntry{Introduction to RGenEDA}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = FALSE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 6,
+  fig.height = 4
 )
-```
 
-This vignette will show the basic use-cases for `RGenEDA` on bulk RNASeq data, however, the package can be easily used for other types of omics data as long as a counts matrix and metadata are present. 
-
-We will rely on data in the `pasilla` dataset and follow the [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
-
-```{r setup}
-
-#----- Load libraries
 suppressPackageStartupMessages({
   library(RGenEDA)
   library(pasilla)
+  library(DESeq2)
   library(tidyverse)
   library(ggplot2)
   library(ggtext)
 })
 ```
 
-We first load in our data. In the case of your own data, you can use `read_csv`, `fread`, or your favorite table reader function to load your counts matrix. We will quickly explore the first few rows of the data. 
-```{r read in the data}
+# Overview
 
-#----- Set path to pasilla data
+`RGenEDA` is designed to provide a unified, reproducible framework for exploratory data analysis across multiple omics data types.
+
+This vignette introduces the `RGenEDA` package using bulk RNA-seq data from the pasilla dataset.
+`RGenEDA` facilitates Exploratory Data Analysis (EDA) for any omics dataset, provided a counts matrix and metadata are available.
+
+While this example focuses on RNA-seq, the workflow can easily be extended to proteomics, metabolomics, or other high-dimensional datasets.
+
+We’ll follow a simplified version of the [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) for normalization and use RGenEDA’s functionality to assess variance structure, dimensionality reduction, and sample relationships.
+
+## Table of contents
+- [Load and inspect the data](#load-and-inspect-the-data)
+- [Define metadata](#define-metadata)
+- [Processing and normalization](#processing-and-normalization)
+- [Create a GenEDA object](#create-a-geneda-object)
+- [Count distrubutions across samples](#count-distributions-across-samples)
+- [Sample Eucliden distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+- [Identify highly variable genes](#identify-highly-variable-genes)
+- [Principal component analysis](#principal-component-analysis)
+- [Extract and visualize PCA results](#extract-and-visualize-pca-results)
+- [Explore Eigen vectors of individual PCs](#explore-eigen-vectors-of-individual-pcs)
+- [Correlate PCs with metadata](#correlate-pcs-with-metadata)
+
+## Load and inspect the data
+
+We begin by loading the `pasilla` dataset, which contains gene-level RNA-seq counts for *Drosophila melanogaster*.
+For your own data, you can use `read_csv()` or `fread()` to import counts from a tabular file.
+
+```{r load-data}
 datafile <-  system.file( "extdata/pasilla_gene_counts.tsv", package="pasilla" )
-
-#----- Load counts
 count.table <-  read.table( datafile, header=TRUE, row.names=1, quote="", comment.char="" )
 head(count.table)
 
 ```
 
-We need to gather the metadata associated with these samples. In the case of the `pasilla` dataset, we have two major variables: `cond.type` and `lib.type` which we will explore. It is always a good practice to ensure that your samples are not scrambled between your counts matrix and metadata table. 
+## Define metadata
 
-We will also set a list of color vectors for our metadata which will be useful in downstream functions.
-```{r set metadata}
+Next, we define the associated sample metadata.
+In `pasilla`, samples differ by treatment (condition) and library type (single-end or paired-end).
+```{r metadata}
 
-#----- Metadata building
-cond.type <-  c( "untreated", "untreated", "untreated","untreated", "treated", "treated", "treated" )
-lib.type   <-  c( "single-end", "single-end", "paired-end", "paired-end", "single-end", "paired-end", "paired-end" ) 
-meta <- data.frame(condition = cond.type,
-                   library = lib.type)
+# Set metadata
+cond.type <- c("untreated", "untreated", "untreated", "untreated",
+               "treated", "treated", "treated")
+lib.type  <- c("single-end", "single-end", "paired-end", "paired-end",
+               "single-end", "paired-end", "paired-end")
+
+# Create metadata dataframe
+meta <- data.frame(
+  condition = cond.type,
+  library = lib.type
+)
 rownames(meta) <- colnames(count.table)
 
-#----- Set color vector list
-colorList <- list(condition= c("untreated" = "red",
-                                "treated" = "blue"),
-                  library = c("single-end" = "orange",
-                               "paired-end" = "green"))
+# Color palettes for plotting
+colorList <- list(
+  condition = c("untreated" = "#E41A1C", "treated" = "#377EB8"),
+  library   = c("single-end" = "#FF7F00", "paired-end" = "#4DAF4A")
+)
+
+head(meta)
 ```
 
-Now, we can create a DESeq2 object using our counts and metadata. We pre-filter the counts data to remove lowly expressed genes and run DESeq2. We variance stabalize transform the counts to prepre for exploratory data analysis. `rlog` transformation can be used here if preferred. 
-```{r prepare for DESeq2}
+## Processing and normalization
 
-#----- Create a DESeq2 dataset
-dds <- DESeqDataSetFromMatrix(countData = count.table,
-                              colData = meta,
-                              design = ~condition + library + condition:library)
+We next build a `DESeqDataSet` and perform variance-stabilizing transformation (VST) for downstream EDA.
+Lowly expressed genes are filtered out before running `DESeq2.`
 
-#----- Set reference levels
+```{r deseq-prep, message=FALSE}
+
+dds <- DESeqDataSetFromMatrix(
+  countData = count.table,
+  colData = meta,
+  design = ~ condition + library + condition:library
+)
+
+# Set reference levels
 dds$condition <- relevel(dds$condition, ref = "untreated")
 dds$library <- relevel(dds$library, ref = "single-end")
 
-#----- Pre filter
-smallestGroupSize <- 3
-keep <- rowSums(counts(dds) >= 10) >= smallestGroupSize
+# Prefilter: keep genes with at least 10 counts in ≥3 samples
+keep <- rowSums(counts(dds) >= 10) >= 3
 dds <- dds[keep,]
 
-#----- Run DESeq2
+# Run DESeq2
 dds <- DESeq(dds)
 
-#----- Variance stabilizing transform
+# Variance-stabilizing transform
 vsd <- vst(dds)
-
-#----- Extract matrix
 mat <- assay(vsd)
 ```
 
-Now that we successfully have a matrix and metadata, we are ready to start exploratory data analysis. 
-To begin, we create a `GenEDA` object which requires the following slots: normalized counts, which can be obtained through variance stabilizing transformation as shown above, or `rlog` and metadata.
+## Create a GenEDA object
 
-Raw counts can also be provided. Additional slots (`HVGs`, `DimReduction`, and `DEGs` will be filled later.)
+With the normalized counts and metadata prepared, we can create a `GenEDA` object.
+This object will store all components of your analysis, from normalized data and metadata (bare minimum requirements) to PCA and HVG results (downstream.) Raw counts passed to `DESeq2` can optionally be stored.
+
 
 ```{r build_genEDA, fig.show='hold', out.width='50%', cache = FALSE}
 
-#----- Create new GenEDA object
-obj <- GenEDA(normalized = mat,
-              metadata = meta,
-              counts = as.matrix(count.table))
+obj <- GenEDA(
+  normalized = mat,
+  metadata = meta)
 
-#----- Visualize the object
+# View object summary
 obj
+```
 
-#----- Visualize the structure of the object
-str(obj)
+## Count distributions across samples
+
+To visualize normalized count distributions across samples, the `PlotCountDist` function can be used. This is a helpful way to visualize effectiveness of normalization, as the overall distributions should be similar across samples. Samples with very low or very high overall counts compared to others might indicate problematic samples, technical artifacts, or batch effect. 
+
+```{r count-dist}
+
+PlotCountDist(obj, split_by = "condition")
+
 
 ```
 
-Let's first see how our replicates compare to one another. We can visualize this by using Euclidean distances paired with hierarchical clustering. The `distanceHeatmap` function plots sample-to-sample distances such that darker colors are more similar and lighter colors are more dissimilar. This helps to assess replicate quality as well as metadata features that seem to drive clustering. This function returns either the object, or the plot itself. Any number of metadata categories can be passed along with the associated color vectors. 
 
-```{r clustering, fig.show='hold', out.width='50%', cache = FALSE}
+## Sample Eucliden distances with hierarchical clustering
 
-#----- Plot Eucliden distances
-distanceHeatmap(obj,
-                meta_cols = c("condition", "library"),
-                palettes = colorList,
-                return = "plot")
+To visualize replicate similarity, we can plot Euclidean distances between samples using the `distanceHeatmap` function.
+Darker colors indicate higher similarity, while lighter colors represent dissimilar samples. This provides a quick assessment of replicate quality and metadata features that drive clustering. 
+
+```{r clustering, fig.show='hold', out.width='60%', cache = FALSE}
+
+distanceHeatmap(
+  obj,
+  meta_cols = c("condition", "library"),
+  palettes = colorList,
+  return = "plot"
+)
 
 
 ```
-To begin, we assess the variance profile of our data. This will give us an idea of how many genes are highly variable. This information will inform how principal components are calculated downstream. This can be done one of two ways: `plotHVGVariance` will plot an elbow curve for each gene, ranked by decreasing variance. This is a subjective way to pick a number of highly variable genes (HVGs). We can also use `FindVariableFeatures` directly by providing a number of genes to use, again ranked by decreasing variance. Once calculated, HVGs (gene names) will be stores in the `HVGs` slot of the object.
-```{r variance_1, fig.show='hold', out.width='50%', cache = FALSE}
+
+## Identify highly variable genes
+
+Next, we assess variance across all genes to identify those most variable across samples as these drive much of the biological signal. You can visualize the full variance profile for all genes profiled with `plotHVGVariance`.
+
+```{r hvgs-plot, fig.show='hold', out.width='60%', cache = FALSE}
 
 #----- Plot variance profile
 plotHVGVariance(obj)
 
 ```
-Based on our plot, it appears that 2000 variable features should be sufficient to capture the breadth of variation in our data. We can add these HVGs to out object using the `FindVariableFeatures` function specifying the top 2000 features.
-```{r variance_2, fig.show='hold', out.width='50%', cache = FALSE}
+
+Based on the plot, we’ll retain the top 2,000 most variable genes using `FindVariableFeatures` which stores the gene names in the HVGs slot of the `GenEDA` object
+
+```{r hvgs-find}
 
 #----- Add HVGs to object
 obj <- FindVariableFeatures(obj, 2000)
-
-#----- View the HVGs
 head(HVGs(obj))
 
 ```
 
-We can use these HVGs to calculate the principal components of our dataset using the `RunPCA` function. If `FindVariableFeatures` was not ran beforehand, `RunPCA` will calculate HVGs by default with 2000 features. This argument can be overriden using the `nfeatures` argument. The PCA results will be stored in the `DimReduction` slot of the object as a list containing 3 elements: `$Loadings` holding the PCA loadings for each sample, `$Eigenvectors` holding the per-gene loadings for each PC, and `$percent_var` containing the percent variation explained by the top 5 principal components.
+## Principal component analysis
 
-Since we have already selected HVGs, we can run `RunPCA` on our object directly and grab the results. 
+Using the identified HVGs, we perform PCA with `RunPCA`.
+This function stores PCA results in the DimReduction slot, including:
 
-```{r PCA, fig.show='hold', out.width='50%', cache = FALSE}
+•	`$Loadings` (sample scores)
+	
+•	`$Eigenvectors` (gene contributions)
+	
+•	`$percent_var` (Percent variance explained per component, up to PC5)
 
-#----- Calculate PCA
+If `FindVariableFeatures` was not ran beforehand, `RunPCA` will calculate HVGs by default with 2000 features. This argument can be overriden using the `nfeatures` argument. 
+
+```{r run-pca}
+
 obj <- RunPCA(obj)
 
-#----- Visualize the results
+# Inspect PCA outputs
 head(obj@DimReduction$Loadings)
 head(obj@DimReduction$Eigenvectors)
 head(obj@DimReduction$percent_var)
 
 ```
 
-We can access the PCA results and merge with metadata for downstream plotting using the utility function `ExtractPCA`.
-Note, a PCA plotting function is in the works, of which an argument `returnData` will be used to run this utility function under the hood.
-This can be used directly to facilitate more complex, customizable figure plotting.
+## Extract and visualize PCA results
 
-```{r PCA_2, fig.show='hold', out.width='50%', cache = FALSE}
+You can easily extract PCA results merged with metadata using `ExtractPCA`.
+This enables flexible downstream visualization with ggplot2 or other frameworks.
 
-#----- Extract PCA results with metadata as a dataframe
+To quickly plot PCA results, the `PlotPCA` function can be used. 
+
+```{r extract-pca, fig.show='hold', out.width='70%'}
+
 pcaDF <- ExtractPCA(obj)
+head(pcaDF)
 
-#----- Visualize results
-colnames(pcaDF)
+# Plot PCA
+PlotPCA(object = obj,
+        x = 1,
+        y = 2,
+        color_by = "condition",
+        colors = c("untreated" = "red", "treated" = "blue"),
+        shape_by = "library")
+
+```
+## Explore Eigen vectors of individual PCs
+
+We can explore the individual Eigen vectors that comprise a particular component of interest (usually PC1 and PC2) using `extractEigen`.
+
+Similarly, to visually explore the top Eigen vectors, the `PlotEigenHeatmap` function can be ran directly. Specifying the number of Eigen vectors and whether to show just the top, bottom, or both directions can help elucidate gene signatures driving expression. Heatmap values are the normalized expression values scaled and Z-scored.
+
+```{r eigenvecs, fig.width = 8, fig.height = 6}
+
+pc1_eigen <- extractEigen(object = obj,
+                          component = "PC1")
+
+# Plot heatmap
+ht <- PlotEigenHeatmap(obj, "PC1", n = 5, annotate_by = c("condition"), 
+                       annotate_colors = list(Group = c("untreated" = "red", "treated" = "blue")))
+
+ht$heatmap
 
 ```
 
-We can then correlate principal components, which represent major axes of variation, with metadata features through eigenvector correlation plots. The function `eigencorr` uses Pearson correlations to assess significant correlations and plots a heatmap showing these correlations. By default, the principal components from the `DimReduction` slot are used. Any metadata features can be specified using the `meta_cols` argument. By default, all metadata columns will be used. This function returns a list of 4 elements: `cor_matrix` with the Pearson correlation values, `pval_matrix` holding the associated p-values, `stars` holding the star encodings based on significance, and `plot` (ggplot object.)
+## Correlate PCs with metadata
 
-Here, we will correlate our metadata with the first 5 PCs.
+To interpret principal components, we can correlate them with sample metadata using `eigencorr`.
+This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. This function returns a list of 4 elements:
 
-```{r eigencorr, fig.show='hold', out.width='50%', cache = FALSE}
+•	`$cor_matrix` (Pearson correlation values)
+	
+•	`$pval_matrix` (Associated correlation p-values)
+	
+•	`$stars` (asterisk representations of p-values)
+	
+•	`$plot` (Eigencorr plot, as a `ggplot2` object)
 
-#----- Plot eigenvector correlations
-ec <- eigencorr(obj,
-                num_pcs = 5)
+**Note:** `ordcorr` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
 
-#----- Visualize the plot
+
+```{r eigencorr, fig.show='hold', out.width='70%'}
+
+ec <- eigencorr(obj, num_pcs = 5)
 ec$plot
 
 ```

@@ -40,5 +40,11 @@ object and plot a ggplot2 heatmap. Optionally subset metadata columns and
 reorder rows/columns by hierarchical clustering.
 }
 \examples{
-# p <- distanceHeatmap(obj)$plot
+\donttest{
+distanceHeatmap(
+    obj,
+    meta_cols = c("condition", "library"),
+    palettes = colorList,
+    return = "plot")
+    }
 }

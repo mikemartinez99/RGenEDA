@@ -2,16 +2,20 @@
 #'
 #' @description Calculate correlations between NMDS ordination axes (from beta
 #' diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
-#' labels and significance stars. 
+#' labels and significance stars.
 #'
 #' For continuous variables, Pearson correlation is used. P values follow this
 #' convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
 #' respectively.
 #'
+#' Default num_mds is 10, but function will internally set max number of NMDS
+#' to be n-1 where n is your number of samples.
+#'
 #' @import ggplot2
 #' @import RColorBrewer
 #' @import grid
 #' @import vegan
+#' @importFrom stats as.dist cor dist
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`.
 #' @param num_mds Number of NMDS axes to correlate. Default = 10
@@ -19,8 +23,15 @@
 #'   Defaults to all metadata columns.
 #' @param distance Distance metric for `vegdist` (default "bray").
 #'
-#' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
+#' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot),
+#' and variance explained (squared correlations between ordination distances and
+#' observed dissimilarities.)
 #' @export
+#'
+#' @examples
+#' \donttest{
+#' ordcorr(obj, num_mds = 10)
+#' }
 ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   stopifnot(methods::is(object, "geneda"))
 
@@ -39,7 +50,7 @@ ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META_num))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", "))) 
+      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
     }
     META_num <- META_num[, meta_cols, drop = FALSE]
   }
@@ -52,9 +63,29 @@ ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   #----- Compute distance matrix across samples (rows must be samples)
   distmat <- vegan::vegdist(t(MAT), method = distance)
 
+  #----- Adjust k if it's larger than n - 1
+  max_k <- nrow(as.matrix(distmat)) - 1
+  if (num_mds > max_k) {
+    message(sprintf("Reducing num_mds from %d to %d (max allowed for %d samples).", num_mds, max_k, max_k + 1))
+    num_mds <- max_k
+  }
+
   #----- NMDS ordination
   dte <- vegan::metaMDS(distmat, distance = distance, k = num_mds, trymax = 100, trace = FALSE)
   nmds_scores <- as.data.frame(vegan::scores(dte))
+
+  #----- Approximate variance explained by each NMDS axis
+  # Compute Euclidean distances between points in NMDS space for each k
+  coords <- as.matrix(nmds_scores)
+  original_dist <- as.dist(distmat)
+  var_explained <- numeric(ncol(coords))
+
+  for (i in seq_len(ncol(coords))) {
+    reduced_dist <- dist(coords[, seq_len(i), drop = FALSE])
+    r2 <- cor(original_dist, reduced_dist)^2
+    var_explained[i] <- ifelse(i == 1, r2, r2 - sum(var_explained[1:(i - 1)]))
+  }
+  names(var_explained) <- colnames(nmds_scores)
 
   # Align to metadata order if necessary
   if (!identical(rownames(nmds_scores), rownames(META_num))) {
@@ -101,7 +132,7 @@ ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
     geom_tile(color = NA) +
     scale_fill_gradientn(colors = heatmap_colors, limits = c(-1, 1), name = "Correlation") +
     geom_text(aes(label = sprintf("%.2f", Correlation)), size = 4) +
-    geom_text(aes(label = Stars), nudge_y = -0.25, size = 6) +
+    geom_text(aes(label = Stars), nudge_y = -0.30, size = 5) +
     theme_minimal(base_size = 16) +
     theme(
       axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
@@ -115,7 +146,8 @@ ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
     cor_matrix = cor_matrix,
     pval_matrix = pval_matrix,
     stars = stars,
-    plot = p
+    plot = p,
+    variance_explained = var_explained
   ))
 }
 
