@@ -99,8 +99,7 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to
-    #> factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
@@ -117,18 +116,40 @@ filtered out before running `DESeq2.`
     vsd <- vst(dds)
     mat <- assay(vsd)
 
+    # Extract DESeq2 results
+    res <- results(dds) |> as.data.frame()
+
 ## Create a GenEDA object
 
 With the normalized counts and metadata prepared, we can create a
 `GenEDA` object. This object will store all components of your analysis,
 from normalized data and metadata (bare minimum requirements) to PCA and
 HVG results (downstream.) Raw counts passed to `DESeq2` can optionally
-be stored.
+be stored. We can also strore differential expression results to enable
+some plotting functions.
 
 
+    # Bare-bones RGenEDA object
     obj <- GenEDA(
       normalized = mat,
       metadata = meta)
+
+    # Set DEGs and filter
+    obj <- SetDEGs(obj, res)
+    obj <- FilterDEGs(object = obj, 
+                      padj_thresh = 0.05, 
+                      log2FC_thresh = 0.5, 
+                      assayName = "Test")
+
+    # Plot MA plot of DEGs
+    PlotMA(object = obj, 
+           alpha = 0.05, 
+           fc = 0.5)
+    #> Scale for size is already present.
+    #> Adding another scale for size, which will replace the existing scale.
+    #> Warning in log(x, base): NaNs produced
+    #> Warning in scale_x_continuous(trans = "log2"): log-2 transformation introduced infinite values.
+    #> Warning: Removed 1 row containing missing values or values outside the scale range (`geom_vline()`).
 
     # View object summary
     obj
@@ -137,6 +158,9 @@ be stored.
     #>   samples:  7
     #>   HVGs: 0
     #>   counts: NULL
+    #>   DEGs: present (1 filtered: Test)
+
+<img src="introduction_files/figure-markdown_strict/build_genEDA-1.png" width="50%" style="display: block; margin: auto;" />
 
 ## Count distributions across samples
 
@@ -190,6 +214,8 @@ metadata features that drive clustering.
     #> $palettes$library
     #> single-end paired-end 
     #>  "#FF7F00"  "#4DAF4A"
+
+<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
 ## Identify highly variable genes
 
@@ -283,6 +309,13 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
             color_by = "condition",
             colors = c("untreated" = "red", "treated" = "blue"),
             shape_by = "library")
+    #> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+    #> ℹ Please use tidy evaluation idioms with `aes()`.
+    #> ℹ See also `vignette("ggplot2-in-packages")` for more information.
+    #> ℹ The deprecated feature was likely used in the RGenEDA package.
+    #>   Please report the issue to the authors.
+    #> This warning is displayed once every 8 hours.
+    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
 
 <img src="introduction_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
 \## Explore Eigen vectors of individual PCs
@@ -305,6 +338,8 @@ Heatmap values are the normalized expression values scaled and Z-scored.
                            annotate_colors = list(Group = c("untreated" = "red", "treated" = "blue")))
 
     ht$heatmap
+
+<img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
 
 ## Correlate PCs with metadata
 
