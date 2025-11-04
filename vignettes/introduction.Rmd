@@ -118,19 +118,35 @@ dds <- DESeq(dds)
 # Variance-stabilizing transform
 vsd <- vst(dds)
 mat <- assay(vsd)
+
+# Extract DESeq2 results
+res <- results(dds) |> as.data.frame()
 ```
 
 ## Create a GenEDA object
 
 With the normalized counts and metadata prepared, we can create a `GenEDA` object.
-This object will store all components of your analysis, from normalized data and metadata (bare minimum requirements) to PCA and HVG results (downstream.) Raw counts passed to `DESeq2` can optionally be stored.
+This object will store all components of your analysis, from normalized data and metadata (bare minimum requirements) to PCA and HVG results (downstream.) Raw counts passed to `DESeq2` can optionally be stored. We can also strore differential expression results to enable some plotting functions.
 
 
 ```{r build_genEDA, fig.show='hold', out.width='50%', cache = FALSE}
 
+# Bare-bones RGenEDA object
 obj <- GenEDA(
   normalized = mat,
   metadata = meta)
+
+# Set DEGs and filter
+obj <- SetDEGs(obj, res)
+obj <- FilterDEGs(object = obj, 
+                  padj_thresh = 0.05, 
+                  log2FC_thresh = 0.5, 
+                  assayName = "Test")
+
+# Plot MA plot of DEGs
+PlotMA(object = obj, 
+       alpha = 0.05, 
+       fc = 0.5)
 
 # View object summary
 obj
@@ -143,7 +159,6 @@ To visualize normalized count distributions across samples, the `PlotCountDist` 
 ```{r count-dist}
 
 PlotCountDist(obj, split_by = "condition")
-
 
 ```
 

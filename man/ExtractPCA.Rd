@@ -38,3 +38,6 @@ head(pca_results)
 }
 
 }
+\seealso{
+\code{\link[=RunPCA]{RunPCA()}}, \code{\link[=extractLoadings]{extractLoadings()}}
+}

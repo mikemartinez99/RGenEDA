@@ -4,7 +4,7 @@
 \alias{GenEDA}
 \title{Construct a geneda object}
 \usage{
-GenEDA(normalized, metadata, counts = NULL)
+GenEDA(normalized, metadata, counts = NULL, DEGs = NULL)
 }
 \arguments{
 \item{normalized}{Normalized expression matrix (features x samples).}
