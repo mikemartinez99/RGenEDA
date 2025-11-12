@@ -1,0 +1,10 @@
+.Rproj.user
+DACExploreR.Rproj
+.Rhistory
+.gitattributes
+.Rbuildignore
+.DS_Store
+inst/doc
+/doc/
+/Meta/
+RGenEDA.Rcheck
