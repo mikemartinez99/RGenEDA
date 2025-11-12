@@ -1,18 +1,18 @@
-# RGenEDA (v1.0.2)
+# RGenEDA (v1.0.2)  
+**Unified, reproducible frameworks for genomic exploratory data analyses**
 
-![status](https://img.shields.io/badge/status-in--development-orange)
-![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
-![R Version](https://img.shields.io/badge/R-4.4.3-blue)  <!-- badges: start -->
+ <!-- badges: start -->
+ ![status](https://img.shields.io/badge/status-in--development-orange)
+ ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
   [![Codecov test coverage](https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg)](https://app.codecov.io/gh/mikemartinez99/RGenEDA)
   <!-- badges: end -->
 
-**Unified, reproducible frameworks for genomic exploratory data analyses.**
 
-# Development <!-- omit in toc -->
+### Development <!-- omit in toc -->
 
 > [!IMPORTANT]
-> RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the Change Log!
+> **RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the Change Log!**
 
 --- 
 
