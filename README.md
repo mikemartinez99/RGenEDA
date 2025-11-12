@@ -1,8 +1,9 @@
-# RGenEDA (v1.0.2)  
+# RGenEDA 
+**Version 1.0.2**   
 **Unified, reproducible frameworks for genomic exploratory data analyses**
 
  <!-- badges: start -->
- ![status](https://img.shields.io/badge/status-in--development-orange)
+ ![status](https://img.shields.io/badge/status-in--development-orange) 
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
   [![Codecov test coverage](https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg)](https://app.codecov.io/gh/mikemartinez99/RGenEDA)
