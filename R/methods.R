@@ -1,14 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
 #' Show method for geneda
 #' @param object A `geneda` object
 setMethod(

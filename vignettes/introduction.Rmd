@@ -173,7 +173,7 @@ Next, we assess variance across all genes to identify those most variable across
 ```{r hvgs-plot, fig.show='hold', out.width='60%', cache = FALSE}
 
 #----- Plot variance profile
-plotHVGVariance(obj)
+PlotHVGVariance(obj)
 
 ```
 
