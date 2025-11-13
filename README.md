@@ -1,5 +1,6 @@
 # RGenEDA 
-**Unified, reproducible frameworks for genomic exploratory data analyses**
+**Clean, unified, streamlined, and reproducible frameworks for genomic exploratory data analyses**  
+
 
  <!-- badges: start -->
  ![status](https://img.shields.io/badge/status-in--development-orange) 
@@ -21,9 +22,11 @@
 ![Alt text](img/examples.png)
 
 ## Installation
-To intall the RGenEDA package through R, run the following command:
+Install the latest version from Github
 
 ```r
+install.packages("devtools") # if not already instaled
+
 library(devtools)
 devtools::install_github("mikemartinez99/RGenEDA")
 
@@ -67,7 +70,7 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
   - Fixed example blocks in roxygen headers
   - Addressed all R cmd build errors, warnings, and notes
 
-## Contact
+## 📬 Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
 
 f007qps@dartmouth.edu
