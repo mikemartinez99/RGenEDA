@@ -13,7 +13,7 @@
 ### Development <!-- omit in toc -->
 
 > [!IMPORTANT]
-> **RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the Change Log!**
+> **RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the** **[Change Log](#change-log)**
 
 --- 
 
@@ -37,32 +37,35 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
 
 ## Change-log
 
-**v0.0.0.900** *April 2025*
-  - Initial implementation (stand-alone functions)
-  - Variance calculation, PCA calculation, eigen-vector correlation, Euclidean distance calculation
+**![Version](https://img.shields.io/badge/version-0.0.0.900-blue)** **![Release](https://img.shields.io/badge/Initial-grey)**  
+*April 2025*   
+  - Implemented core, standalone functions
+    - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations
 
-**v1.0.0:** *October 16th, 2025* (Major)
+**![Version](https://img.shields.io/badge/version-1.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**  
+*October 16th, 2025* 
+  - Introduced S4 **GenEDA** object for streamlined data handling
+  - Added **methods** for HVG calculation and PCA storage within S4 slots.
+  - Added **visualization functions**
+    - PCA plots
+    - Variance plots for HVGs
+    - Eigenvector (gene-loading) plots
+  - Revamped eigencorrelation plots to only use top number of HVGs identified in HVG selection/PCA
+  - Enhanced plot output flexibility (return **ggplot2, pheatmap**, or **ComplexHeatmap** objects for full customization
+  - Added **unit tests**
+  - Added **Pasilla dataset vignette**
 
-  - Created S4 `GenEDA` object to streamline usage.
-  - Added `GenEDA` methods for HVG calculation and PCA stored as S4 slots.
-  - Added function for count distribution and eigen vector analysis
-  - Added PCA plotting function, eigen vector plotting function
-  - Updated HVG plotting function
-  - Updated eigencorrelation plotting function
-  - Return all plots as either ggplot2 objects or heatmap objects (ComplexHeatmap, Pheatmap) to allow robust customization
-  - Added unit tests
-  - Added demo to vignettes
+**![Version](https://img.shields.io/badge/version-1.0.1-blue)** **![Release](https://img.shields.io/badge/Patch-green)**    
+*November 3rd, 2025*  
+  - Rely soley on **Pheatmap** for all heatmap visualizations
+  - Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function
+  - Added optional **DEGs slot** to GenEDA object to interface with **DESeq2**
+  - Added **MA plot** functionality
 
-**v1.0.1** *November 3rd, 2025* (Minor)
-
-  - Modified `PlotEigenHeatmap` to use pheatmap instead of `ComplexHeatmap`
-  - Fixed bug to correctly index top genes from selected PC
-  - Added DEGs slot to GenEDA object and support for MA plots
-
-**v1.0.2** *November 10th, 2025* (Patch)
-
+**![Version](https://img.shields.io/badge/version-1.0.2-blue)** **![Release](https://img.shields.io/badge/Patch-green)**      
+*November 10th, 2025*  
   - Fixed example blocks in roxygen headers
-  - Addressed R cmd build errors, warnings, and notes
+  - Addressed all R cmd build errors, warnings, and notes
 
 ## Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
