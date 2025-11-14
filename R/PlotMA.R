@@ -9,18 +9,23 @@
 #' @import RColorBrewer
 #'
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
+#' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
 #' @param fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
 #' @param title Optional character vector of what plot should be titled.
 #'
 #' @returns A `ggplot2` object
 #' @export
-PlotMA <- function(object, alpha, fc, title = NULL) {
+PlotMA <- function(object, assay, alpha, fc, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
-  df <- DEGs(object, "DEG")
-  if (nrow(df) == 0) {
-    stop("No differential expression results found in object@DEGs$DEG")
+  if (!assay %in% names(object@DEGs)) {
+    stop(paste("Assay", assay, "was not found in DEGs slot!"))
+  } else {
+    df <- DEGs(object, assay)
+    if (nrow(df) == 0) {
+      stop("No differential expression results found in object@DEGs$DEG")
+    }
   }
 
   requiredCols <- c("log2FoldChange", "baseMean")

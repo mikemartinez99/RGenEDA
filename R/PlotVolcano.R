@@ -8,6 +8,7 @@
 #' @import RColorBrewer
 #'
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
+#' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
 #' @param fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
 #' @param den Denominator (reference level for comparison, num vs. den)
@@ -41,16 +42,20 @@
 #' rownames(df) <- genes
 #' obj <- SetDEGs(obj, df)
 #'
-#' PlotVolcano(obj, 0.05, 1, "Denominator Group", "Numerator Group", "Test")
+#' PlotVolcano(obj, "DEGs", 0.05, 1, "Denominator Group", "Numerator Group", "Test")
 #' }
 #' @export
 
-PlotVolcano <- function(object, alpha, fc, den, num, title = NULL) {
+PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
-  df <- DEGs(object, "DEG")
-  if (nrow(df) == 0) {
-    stop("No differential expression results found in object@DEGs$DEG")
+  if (!assay %in% names(object@DEGs)) {
+    stop(paste("Assay", assay, "was not found in DEGs slot!"))
+  } else {
+    df <- DEGs(object, assay)
+    if (nrow(df) == 0) {
+      stop("No differential expression results found in object@DEGs$DEG")
+    }
   }
 
   requiredCols <- c("log2FoldChange", "padj")

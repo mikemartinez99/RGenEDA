@@ -4,10 +4,12 @@
 \alias{PlotVolcano}
 \title{PlotVolcano}
 \usage{
-PlotVolcano(object, alpha, fc, den, num, title = NULL)
+PlotVolcano(object, assay, alpha, fc, den, num, title = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
+
+\item{assay}{The DEG slot to use for visualization}
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
@@ -51,6 +53,6 @@ df <- data.frame(
 rownames(df) <- genes
 obj <- SetDEGs(obj, df)
 
-PlotVolcano(obj, 0.05, 1, "Denominator Group", "Numerator Group", "Test")
+PlotVolcano(obj, "DEGs", 0.05, 1, "Denominator Group", "Numerator Group", "Test")
 }
 }

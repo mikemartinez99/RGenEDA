@@ -4,10 +4,12 @@
 \alias{PlotMA}
 \title{PlotMA}
 \usage{
-PlotMA(object, alpha, fc, title = NULL)
+PlotMA(object, assay, alpha, fc, title = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
+
+\item{assay}{The DEG slot to use for visualization}
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
