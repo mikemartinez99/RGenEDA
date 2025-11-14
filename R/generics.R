@@ -62,6 +62,9 @@ SetDEGs <- function(object, deg_table) {
   if (length(missing_cols) > 0L) {
     stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
   }
+  if (is.null(rownames(deg_tale))) {
+    stop("DEG table does not have genes as rownames!")
+  }
   object@DEGs$DEG <- deg_table
   validObject(object)
   object

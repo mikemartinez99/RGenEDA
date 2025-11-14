@@ -23,6 +23,11 @@ PlotMA <- function(object, alpha, fc, title = NULL) {
     stop("No differential expression results found in object@DEGs$DEG")
   }
 
+  requiredCols <- c("log2FoldChange", "baseMean")
+  if (!all(requiredCols %in% colnames(df))) {
+    stop("log2FoldChange or baseMean or both are missing from DEG table!")
+  }
+
   df$col <- NA
   df$col[df$padj < alpha & abs(df$log2FoldChange) > fc] <- "red"
   df$col[is.na(df$col)] <- "black"
