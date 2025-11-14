@@ -1,7 +1,7 @@
 ---
 title: "Introduction to RGenEDA"
 output:
-  rmarkdown::html_document:
+  rmarkdown::md_document:
 vignette: >
   %\VignetteIndexEntry{Introduction to RGenEDA}
   %\VignetteEngine{knitr::rmarkdown}
