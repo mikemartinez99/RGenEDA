@@ -52,9 +52,10 @@ DEGs <- function(object, assay) {
 #' @param object A `geneda` object
 #' @param deg_table A data.frame of DESeq2-like results containing at least
 #'   columns `log2FoldChange` and `padj`
+#' @param assay What to name the DEG slot
 #' @return Updated `geneda` object with `DEGs$DEG` set
 #' @export
-SetDEGs <- function(object, deg_table) {
+SetDEGs <- function(object, deg_table, assay) {
   stopifnot(methods::is(object, "geneda"))
   stopifnot(is.data.frame(deg_table))
   req_cols <- c("log2FoldChange", "padj")
@@ -62,10 +63,15 @@ SetDEGs <- function(object, deg_table) {
   if (length(missing_cols) > 0L) {
     stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
   }
-  if (is.null(rownames(deg_tale))) {
+  if (is.null(rownames(deg_table))) {
     stop("DEG table does not have genes as rownames!")
   }
-  object@DEGs$DEG <- deg_table
+
+  if (assay %in% names(object@DEGs)) {
+    stop(paste("Assay", assay, "already exists!"))
+  } else {
+    object@DEGs[[assay]] <- deg_table
+  }
   validObject(object)
   object
 }
