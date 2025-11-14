@@ -51,7 +51,7 @@ df <- data.frame(
  padj = padj,
  stringsAsFactors = FALSE)
 rownames(df) <- genes
-obj <- SetDEGs(obj, df)
+obj <- SetDEGs(obj, df, "DEGs")
 
 PlotVolcano(obj, "DEGs", 0.05, 1, "Denominator Group", "Numerator Group", "Test")
 }
