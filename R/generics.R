@@ -117,13 +117,10 @@ FindVariableFeatures <- function(object, nfeatures) {
 FilterDEGs <- function(object, assay, padj_thresh = 0.05, log2FC_thresh = 1.0, saveAssay) {
   stopifnot(methods::is(object, "geneda"))
   if (is.null(object@DEGs[[assay]])) {
-    stop("DEGs$DEG is NULL. Use SetDEGs(object, deg_table) first.")
+    stop(paste0("Assay", assay, "is NULL. Use SetDEGs() first."))
   }
   if (missing(saveAssay) || is.null(saveAssay) || !is.character(saveAssay) || length(saveAssay) != 1L) {
     stop("saveAssay must be a single character string.")
-  }
-  if (saveAssay == "DEG") {
-    stop("saveAssay cannot be 'DEG' (reserved for unfiltered results).")
   }
   df <- object@DEGs[[assay]]
   req_cols <- c("log2FoldChange", "padj")
