@@ -6,6 +6,7 @@
 #' @import ggplot2
 #' @import ggrepel
 #' @import RColorBrewer
+#' @importFrom stats setNames
 #'
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
@@ -54,7 +55,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
   } else {
     df <- DEGs(object, assay)
     if (nrow(df) == 0) {
-      stop("No differential expression results found in object@DEGs$DEG")
+      stop(paste("No differential expression results found in Assay", assay))
     }
   }
 
@@ -87,7 +88,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
     "firebrick",
     "steelblue3",
     "darkgrey")
-  groupColors <- setNames(colors, groupLevels)
+  groupColors <- stats::setNames(colors, groupLevels)
 
   df$gene <- rownames(df)
 
