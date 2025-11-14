@@ -70,6 +70,9 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
   - Fixed example blocks in roxygen headers
   - Addressed all R cmd build errors, warnings, and notes
 
+## Citation  
+If you use RGenEDA in your work, please cite: **DOI: dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
+
 ## 📬 Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
 
