@@ -107,7 +107,7 @@ dds <- DESeqDataSetFromMatrix(
 dds$condition <- relevel(dds$condition, ref = "untreated")
 dds$library <- relevel(dds$library, ref = "single-end")
 
-# Prefilter: keep genes with at least 10 counts in ≥3 samples
+# Prefilter: keep genes with at least 10 counts in  at least 3 samples
 keep <- rowSums(counts(dds) >= 10) >= 3
 dds <- dds[keep,]
 
