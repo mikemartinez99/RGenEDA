@@ -96,14 +96,14 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula
-    #> are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design
+    #> formula are characters, converting to factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
     dds$library <- relevel(dds$library, ref = "single-end")
 
-    # Prefilter: keep genes with at least 10 counts in ≥3 samples
+    # Prefilter: keep genes with at least 10 counts in  at least 3 samples
     keep <- rowSums(counts(dds) >= 10) >= 3
     dds <- dds[keep,]
 
@@ -190,7 +190,8 @@ the `GenEDA` object
     #----- Add HVGs to object
     obj <- FindVariableFeatures(obj, 2000)
     head(HVGs(obj))
-    #> [1] "FBgn0039155" "FBgn0029856" "FBgn0003360" "FBgn0053909" "FBgn0085787" "FBgn0025111"
+    #> [1] "FBgn0039155" "FBgn0029856" "FBgn0003360" "FBgn0053909" "FBgn0085787"
+    #> [6] "FBgn0025111"
 
 ## Principal component analysis
 
@@ -216,13 +217,20 @@ overriden using the `nfeatures` argument.
 
     # Inspect PCA outputs
     head(obj@DimReduction$Loadings)
-    #>                  PC1       PC2        PC3        PC4        PC5          PC6          PC7
-    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919 4.443147e-14
-    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838 4.412048e-14
-    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065 4.431683e-14
-    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14
-    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14
-    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14
+    #>                  PC1       PC2        PC3        PC4        PC5          PC6
+    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919
+    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838
+    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065
+    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207
+    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056
+    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372
+    #>                     PC7
+    #> untreated1 4.443147e-14
+    #> untreated2 4.412048e-14
+    #> untreated3 4.431683e-14
+    #> untreated4 4.444540e-14
+    #> treated1   4.370513e-14
+    #> treated2   4.237626e-14
     head(obj@DimReduction$Eigenvectors)
     #>                       PC1          PC2           PC3          PC4          PC5
     #> FBgn0011764 -0.0001939999  0.011784784 -0.0002716843  0.026109530 -0.036764223
@@ -246,20 +254,20 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
 
     pcaDF <- ExtractPCA(obj)
     head(pcaDF)
-    #>                  PC1       PC2        PC3        PC4        PC5          PC6          PC7
-    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919 4.443147e-14
-    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838 4.412048e-14
-    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065 4.431683e-14
-    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14
-    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14
-    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14
-    #>            condition    library
-    #> untreated1 untreated single-end
-    #> untreated2 untreated single-end
-    #> untreated3 untreated paired-end
-    #> untreated4 untreated paired-end
-    #> treated1     treated single-end
-    #> treated2     treated paired-end
+    #>                  PC1       PC2        PC3        PC4        PC5          PC6
+    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919
+    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838
+    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065
+    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207
+    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056
+    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372
+    #>                     PC7 condition    library
+    #> untreated1 4.443147e-14 untreated single-end
+    #> untreated2 4.412048e-14 untreated single-end
+    #> untreated3 4.431683e-14 untreated paired-end
+    #> untreated4 4.444540e-14 untreated paired-end
+    #> treated1   4.370513e-14   treated single-end
+    #> treated2   4.237626e-14   treated paired-end
 
     # Plot PCA
     PlotPCA(object = obj,
