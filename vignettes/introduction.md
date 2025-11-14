@@ -96,8 +96,7 @@ filtered out before running `DESeq2.`
       colData = meta,
       design = ~ condition + library + condition:library
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design
-    #> formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
 
     # Set reference levels
     dds$condition <- relevel(dds$condition, ref = "untreated")
@@ -156,7 +155,9 @@ To visualize replicate similarity, we can plot Euclidean distances
 between samples using the `distanceHeatmap` function. Darker colors
 indicate higher similarity, while lighter colors represent dissimilar
 samples. This provides a quick assessment of replicate quality and
-metadata features that drive clustering.
+metadata features that drive clustering. To save heatmaps that are
+derived from `pheatmap`, we can use the `GenSave` function, which is
+similar in function to `ggsave`.
 
 
     hm <- distanceHeatmap(
@@ -167,7 +168,7 @@ metadata features that drive clustering.
     )
     hm$heatmap
 
-<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
+    # GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
 
 ## Identify highly variable genes
 
@@ -190,8 +191,7 @@ the `GenEDA` object
     #----- Add HVGs to object
     obj <- FindVariableFeatures(obj, 2000)
     head(HVGs(obj))
-    #> [1] "FBgn0039155" "FBgn0029856" "FBgn0003360" "FBgn0053909" "FBgn0085787"
-    #> [6] "FBgn0025111"
+    #> [1] "FBgn0039155" "FBgn0029856" "FBgn0003360" "FBgn0053909" "FBgn0085787" "FBgn0025111"
 
 ## Principal component analysis
 
@@ -217,20 +217,13 @@ overriden using the `nfeatures` argument.
 
     # Inspect PCA outputs
     head(obj@DimReduction$Loadings)
-    #>                  PC1       PC2        PC3        PC4        PC5          PC6
-    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919
-    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838
-    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065
-    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207
-    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056
-    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372
-    #>                     PC7
-    #> untreated1 4.443147e-14
-    #> untreated2 4.412048e-14
-    #> untreated3 4.431683e-14
-    #> untreated4 4.444540e-14
-    #> treated1   4.370513e-14
-    #> treated2   4.237626e-14
+    #>                  PC1       PC2        PC3        PC4        PC5          PC6          PC7
+    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919 4.443147e-14
+    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838 4.412048e-14
+    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065 4.431683e-14
+    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14
+    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14
+    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14
     head(obj@DimReduction$Eigenvectors)
     #>                       PC1          PC2           PC3          PC4          PC5
     #> FBgn0011764 -0.0001939999  0.011784784 -0.0002716843  0.026109530 -0.036764223
@@ -254,20 +247,13 @@ To quickly plot PCA results, the `PlotPCA` function can be used.
 
     pcaDF <- ExtractPCA(obj)
     head(pcaDF)
-    #>                  PC1       PC2        PC3        PC4        PC5          PC6
-    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919
-    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838
-    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065
-    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207
-    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056
-    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372
-    #>                     PC7 condition    library
-    #> untreated1 4.443147e-14 untreated single-end
-    #> untreated2 4.412048e-14 untreated single-end
-    #> untreated3 4.431683e-14 untreated paired-end
-    #> untreated4 4.444540e-14 untreated paired-end
-    #> treated1   4.370513e-14   treated single-end
-    #> treated2   4.237626e-14   treated paired-end
+    #>                  PC1       PC2        PC3        PC4        PC5          PC6          PC7 condition    library
+    #> untreated1 -5.244188  3.267803 -7.3173995  0.8956240  0.6560211  0.263014919 4.443147e-14 untreated single-end
+    #> untreated2 -5.741324  4.054147  4.4148996 -1.6852478  2.2255095 -0.157432838 4.412048e-14 untreated single-end
+    #> untreated3 -5.300851 -4.045810  3.1725971  3.6410897 -0.7680523  0.555854065 4.431683e-14 untreated paired-end
+    #> untreated4 -4.404109 -4.693799 -0.6643761 -3.0558063 -2.1096526 -0.686050207 4.444540e-14 untreated paired-end
+    #> treated1    5.941176  8.466444  1.4317275  0.3751014 -2.0255952 -0.006515056 4.370513e-14   treated single-end
+    #> treated2    7.325773 -3.284794 -0.6180029  0.9908693  1.2177454 -2.128977372 4.237626e-14   treated paired-end
 
     # Plot PCA
     PlotPCA(object = obj,
@@ -300,72 +286,15 @@ normalized expression values scaled and Z-scored.
     #> 6 FBgn0023507 -0.0248617605 6.181071e-02
 
 
-    PlotEigenHeatmap(obj,
+    hm2 <- PlotEigenHeatmap(obj,
                      pc = "PC1",
                      n = 25,
                      annotate_by = "condition",
                      annotate_colors = list(condition = c("untreated" = "red", 
                                                                 "treated" = "blue")))
+    hm2$heatmap
 
-<img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
-
-    #> $topGenes
-    #>                    Gene EigenVector    PctVar
-    #> FBgn0003360 FBgn0003360 -0.24780515 6.1407392
-    #> FBgn0025111 FBgn0025111  0.21706116 4.7115549
-    #> FBgn0026562 FBgn0026562 -0.18774337 3.5247574
-    #> FBgn0000071 FBgn0000071  0.16430773 2.6997029
-    #> FBgn0001226 FBgn0001226  0.13402389 1.7962404
-    #> FBgn0003501 FBgn0003501  0.12895193 1.6628601
-    #> FBgn0023479 FBgn0023479 -0.11983389 1.4360162
-    #> FBgn0024288 FBgn0024288 -0.11828805 1.3992062
-    #> FBgn0011260 FBgn0011260  0.11292362 1.2751745
-    #> FBgn0000406 FBgn0000406 -0.11034756 1.2176584
-    #> FBgn0001224 FBgn0001224  0.10569481 1.1171393
-    #> FBgn0027279 FBgn0027279 -0.09480187 0.8987395
-    #> FBgn0016715 FBgn0016715 -0.09433320 0.8898753
-    #> FBgn0000116 FBgn0000116  0.09212341 0.8486722
-    #> FBgn0024315 FBgn0024315 -0.09159774 0.8390146
-    #> FBgn0001225 FBgn0001225  0.09134209 0.8343378
-    #> FBgn0002868 FBgn0002868 -0.08920522 0.7957571
-    #> FBgn0001137 FBgn0001137 -0.08531569 0.7278766
-    #> FBgn0023549 FBgn0023549 -0.08466929 0.7168889
-    #> FBgn0004396 FBgn0004396  0.08292638 0.6876784
-    #> FBgn0003748 FBgn0003748  0.08059367 0.6495339
-    #> FBgn0026376 FBgn0026376 -0.07749462 0.6005415
-    #> FBgn0000567 FBgn0000567 -0.07406692 0.5485909
-    #> FBgn0024984 FBgn0024984  0.07399523 0.5475294
-    #> FBgn0003137 FBgn0003137  0.07392526 0.5464943
-    #> 
-    #> $expression
-    #>             untreated1 untreated2 untreated3 untreated4  treated1  treated2  treated3
-    #> FBgn0000071   7.298675   7.616443   7.673259   7.732185  9.441005  9.591838  9.669924
-    #> FBgn0000116   8.981496   8.858281   9.142795   8.908643  9.643627 10.377361 10.178400
-    #> FBgn0000406   8.228731   9.001807   8.991604   9.316908  7.441680  7.419333  7.699209
-    #> FBgn0000567   8.656902   8.752507   8.996029   8.745890  7.992790  7.947280  7.742959
-    #> FBgn0001137   9.777190   9.415891   9.449740   9.591886  8.708348  8.399583  8.472375
-    #> FBgn0001224   8.728100   8.692523   8.618221   8.991123  9.999053  9.934651 10.158735
-    #> FBgn0001225   8.414694   8.299953   8.412998   8.632434  9.415161  9.502773  9.680591
-    #> FBgn0001226   9.154509   9.529798   9.613386   9.938920 11.001805 11.189031 11.301815
-    #> FBgn0002868   8.198075   8.021239   7.576221   7.779286  6.922341  6.760905  6.779488
-    #> FBgn0003137  11.719768  11.702291  11.819422  11.635386 12.540373 12.738203 12.575383
-    #> FBgn0003360  13.040072  12.908337  12.525933  12.662331  9.791321  9.811007  9.720418
-    #> FBgn0003501   7.401548   7.773660   7.795655   7.611522  9.189572  9.326955  9.142274
-    #> FBgn0003748   9.825406   9.764532   9.641737   9.633788 10.754013 10.710866 10.652714
-    #> FBgn0004396  10.453501  11.139993  10.889284  10.470948 12.077549 11.634709 11.655947
-    #> FBgn0011260   7.298675   7.860262   7.355831   7.245390  9.212307  8.698174  8.663440
-    #> FBgn0016715   8.106460   8.353993   8.330111   8.396878  7.031744  7.221243  7.160907
-    #> FBgn0023479  11.767226  12.268267  12.247328  12.075607 10.673837 10.684594 10.555510
-    #> FBgn0023549   8.193639   8.723803   8.760993   8.794971  7.469244  7.631016  7.625931
-    #> FBgn0024288   7.385010   7.557842   7.661529   7.600928  5.993462  6.192237  6.119027
-    #> FBgn0024315   7.857037   7.792984   7.917194   7.833633  6.726166  6.714770  6.759058
-    #> FBgn0024984   7.280619   7.219320   7.228245   7.314733  7.996406  8.215415  8.232886
-    #> FBgn0025111   8.940574   8.849470   9.048080   8.979631 11.382618 11.657189 11.704143
-    #> FBgn0026376  10.498716  11.217161  11.020944  10.684737 10.155819  9.806767  9.863900
-    #> FBgn0026562  15.644058  15.643428  16.245294  16.440073 13.165698 13.853773 13.921332
-    #> FBgn0027279  11.910754  12.039229  12.011273  11.894614 10.891415 10.799751 10.765910
-    #> 
-    #> $heatmap
+    # GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
 
 ## Correlate PCs with metadata
 
@@ -381,7 +310,8 @@ returns a list of 4 elements:
 
 • `$stars` (asterisk representations of p-values)
 
-• `$plot` (Eigencorr plot, as a `ggplot2` object)
+• `$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved
+with `ggsave`)
 
 **Note:** `ordcorr` can be used for microbiome data as it correlates
 metadata features with NMDS beta values rather than PCs.
@@ -396,23 +326,44 @@ metadata features with NMDS beta values rather than PCs.
 
 We can also explore the differentially expressed genes by appending
 these to our object. We can also quickly filter out data and save it as
-a new DEG slot with defined assay name.
+a new DEG slot.
+
+Note: multiple DEG assays can be appended to the DEGs slot by passing an
+assay name in the `SetDEGs` command (for example, raw DESeq2 results and
+Shrunk DESeq2 results.)
 
 
     res <- results(dds) |> 
       as.data.frame()
 
-    obj <- SetDEGs(obj, res)
+    obj <- SetDEGs(obj, res, "unfiltered")
     obj <- FilterDEGs(obj,
+                      assay = "unfiltered",
                       padj_thresh = 0.05,
                       log2FC_thresh = 1,
-                      assayName = "padj05_lfc1")
+                      saveAssay = "padj05_lfc1")
 
-    x <- PlotMA(obj,
-                alpha = 0.05,
-                fc = 1)
+We can plot some basic visualizations such as MA plots
+
+    PlotMA(obj,
+           assay = "unfiltered",
+           alpha = 0.05,
+           fc = 1)
     #> Scale for size is already present.
     #> Adding another scale for size, which will replace the existing scale.
-    x
 
-<img src="introduction_files/figure-markdown_strict/DEGs-1.png" width="70%" style="display: block; margin: auto;" />
+<img src="introduction_files/figure-markdown_strict/MA-1.png" width="70%" style="display: block; margin: auto;" />
+
+Or a volcano plot by specifying numerator and denominator (denominator
+is your comparison reference level).
+
+
+    PlotVolcano(obj,
+           assay = "unfiltered", 
+           alpha = 0.05,
+           fc = 1,
+           den = "untreated",
+           num = "treated",
+           title = "Example Volcano")
+
+<img src="introduction_files/figure-markdown_strict/Volcano-1.png" width="70%" style="display: block; margin: auto;" />

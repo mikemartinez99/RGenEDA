@@ -4,13 +4,15 @@
 \alias{SetDEGs}
 \title{Set unfiltered DEGs on the object}
 \usage{
-SetDEGs(object, deg_table)
+SetDEGs(object, deg_table, assay)
 }
 \arguments{
 \item{object}{A \code{geneda} object}
 
 \item{deg_table}{A data.frame of DESeq2-like results containing at least
 columns \code{log2FoldChange} and \code{padj}}
+
+\item{assay}{What to name the DEG slot}
 }
 \value{
 Updated \code{geneda} object with \code{DEGs$DEG} set

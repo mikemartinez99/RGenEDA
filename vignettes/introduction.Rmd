@@ -152,6 +152,7 @@ PlotCountDist(obj, split_by = "condition")
 
 To visualize replicate similarity, we can plot Euclidean distances between samples using the `distanceHeatmap` function.
 Darker colors indicate higher similarity, while lighter colors represent dissimilar samples. This provides a quick assessment of replicate quality and metadata features that drive clustering. 
+To save heatmaps that are derived from `pheatmap`, we can use the `GenSave` function, which is similar in function to `ggsave`.
 
 ```{r clustering, fig.show='hold', out.width='60%', cache = FALSE}
 
@@ -162,6 +163,8 @@ hm <- distanceHeatmap(
   return = "plot"
 )
 hm$heatmap
+
+# GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
 
 
 ```
@@ -245,12 +248,16 @@ pc1_eigen <- extractEigen(object = obj,
 head(pc1_eigen)
 
 
-PlotEigenHeatmap(obj,
+hm2 <- PlotEigenHeatmap(obj,
                  pc = "PC1",
                  n = 25,
                  annotate_by = "condition",
                  annotate_colors = list(condition = c("untreated" = "red", 
                                                             "treated" = "blue")))
+hm2$heatmap
+
+# GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+
 
 ```
 
@@ -265,7 +272,7 @@ This function computes Pearson correlations and displays them as a heatmap, help
 	
 •	`$stars` (asterisk representations of p-values)
 	
-•	`$plot` (Eigencorr plot, as a `ggplot2` object)
+•	`$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved with `ggsave`)
 
 **Note:** `ordcorr` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
 
@@ -279,21 +286,42 @@ ec$plot
 
 ## Explore DEGs
 
-We can also explore the differentially expressed genes by appending these to our object. We can also quickly filter out data and save it as a new DEG slot with defined assay name. 
+We can also explore the differentially expressed genes by appending these to our object. We can also quickly filter out data and save it as a new DEG slot. 
+
+Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs` command (for example, raw DESeq2 results and Shrunk DESeq2 results.)
 
 ```{r DEGs, fig.show='hold', out.width='70%'}
 
 res <- results(dds) |> 
   as.data.frame()
 
-obj <- SetDEGs(obj, res)
+obj <- SetDEGs(obj, res, "unfiltered")
 obj <- FilterDEGs(obj,
+                  assay = "unfiltered",
                   padj_thresh = 0.05,
                   log2FC_thresh = 1,
-                  assayName = "padj05_lfc1")
+                  saveAssay = "padj05_lfc1")
+```
 
-x <- PlotMA(obj,
-            alpha = 0.05,
-            fc = 1)
-x
+We can plot some basic visualizations such as MA plots
+```{r MA, fig.show='hold', out.width='70%'}
+PlotMA(obj,
+       assay = "unfiltered",
+       alpha = 0.05,
+       fc = 1)
+
+```
+
+Or a volcano plot by specifying numerator and denominator (denominator is your comparison reference level).
+
+```{r Volcano, fig.show='hold', out.width='70%'}
+
+PlotVolcano(obj,
+       assay = "unfiltered", 
+       alpha = 0.05,
+       fc = 1,
+       den = "untreated",
+       num = "treated",
+       title = "Example Volcano")
+
 ```
