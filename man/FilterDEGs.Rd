@@ -4,22 +4,24 @@
 \alias{FilterDEGs}
 \title{Filter DEGs by padj and absolute log2FoldChange}
 \usage{
-FilterDEGs(object, padj_thresh = 0.05, log2FC_thresh = 1, assayName)
+FilterDEGs(object, assay, padj_thresh = 0.05, log2FC_thresh = 1, saveAssay)
 }
 \arguments{
 \item{object}{A \code{geneda} object with \code{DEGs$DEG} set}
+
+\item{assay}{The DEG slot to filter}
 
 \item{padj_thresh}{Adjusted p-value threshold (<=)}
 
 \item{log2FC_thresh}{Absolute log2 fold change threshold (>=)}
 
-\item{assayName}{Character name for the filtered result set (e.g., "padj05_lfc1")}
+\item{saveAssay}{Character name for the filtered result set (e.g., "padj05_lfc1")}
 }
 \value{
-Updated \code{geneda} object with filtered results stored in \code{DEGs[[assayName]]}
+Updated \code{geneda} object with filtered results stored in \code{DEGs[[saveAssay]]}
 }
 \description{
 Filters the unfiltered DEGs in \code{DEGs$DEG} and stores the filtered results
-in a new named slot \code{DEGs[[assayName]]}. Multiple filtered result sets can
+in a new named slot \code{DEGs[[saveAssay]]}. Multiple filtered result sets can
 be stored with different assay names.
 }

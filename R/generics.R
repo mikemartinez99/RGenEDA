@@ -103,28 +103,29 @@ FindVariableFeatures <- function(object, nfeatures) {
 #' Filter DEGs by padj and absolute log2FoldChange
 #'
 #' Filters the unfiltered DEGs in `DEGs$DEG` and stores the filtered results
-#' in a new named slot `DEGs[[assayName]]`. Multiple filtered result sets can
+#' in a new named slot `DEGs[[saveAssay]]`. Multiple filtered result sets can
 #' be stored with different assay names.
 #'
 #' @param object A `geneda` object with `DEGs$DEG` set
+#' @param assay The DEG slot to filter
 #' @param padj_thresh Adjusted p-value threshold (<=)
 #' @param log2FC_thresh Absolute log2 fold change threshold (>=)
-#' @param assayName Character name for the filtered result set (e.g., "padj05_lfc1")
-#' @return Updated `geneda` object with filtered results stored in `DEGs[[assayName]]`
+#' @param saveAssay Character name for the filtered result set (e.g., "padj05_lfc1")
+#' @return Updated `geneda` object with filtered results stored in `DEGs[[saveAssay]]`
 #' @importFrom methods validObject
 #' @export
-FilterDEGs <- function(object, padj_thresh = 0.05, log2FC_thresh = 1.0, assayName) {
+FilterDEGs <- function(object, assay, padj_thresh = 0.05, log2FC_thresh = 1.0, saveAssay) {
   stopifnot(methods::is(object, "geneda"))
-  if (is.null(object@DEGs$DEG)) {
+  if (is.null(object@DEGs[[assay]])) {
     stop("DEGs$DEG is NULL. Use SetDEGs(object, deg_table) first.")
   }
-  if (missing(assayName) || is.null(assayName) || !is.character(assayName) || length(assayName) != 1L) {
-    stop("assayName must be a single character string.")
+  if (missing(saveAssay) || is.null(saveAssay) || !is.character(saveAssay) || length(saveAssay) != 1L) {
+    stop("saveAssay must be a single character string.")
   }
-  if (assayName == "DEG") {
-    stop("assayName cannot be 'DEG' (reserved for unfiltered results).")
+  if (saveAssay == "DEG") {
+    stop("saveAssay cannot be 'DEG' (reserved for unfiltered results).")
   }
-  df <- object@DEGs$DEG
+  df <- object@DEGs[[assay]]
   req_cols <- c("log2FoldChange", "padj")
   missing_cols <- setdiff(req_cols, colnames(df))
   if (length(missing_cols) > 0L) {
@@ -132,7 +133,7 @@ FilterDEGs <- function(object, padj_thresh = 0.05, log2FC_thresh = 1.0, assayNam
   }
   filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
     abs(df$log2FoldChange) >= log2FC_thresh & df$padj <= padj_thresh
-  object@DEGs[[assayName]] <- df[filt, , drop = FALSE]
+  object@DEGs[[saveAssay]] <- df[filt, , drop = FALSE]
   validObject(object)
   object
 }
@@ -240,6 +241,9 @@ ExtractPCA <- function(object) {
 #'
 #' @export
 GenSave <- function(pheatmap_obj, filename, width = 8, height = 6, units = "in", res = 300, ...) {
+
+  pheatmap_obj <- pheatmap_obj$heatmap
+
   # Determine file extension
   ext <- tools::file_ext(filename)
   ext <- tolower(ext)
