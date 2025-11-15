@@ -1,4 +1,4 @@
-#' eigencorr
+#' Plot Eigen-Correlation With Metadata Heatmap
 #'
 #' @description Calculate Eigen-correlations from a `geneda` object and plot a
 #' publication-quality heatmap using ggplot2 with numeric labels and
@@ -39,10 +39,10 @@
 #' obj <- RunPCA(obj)
 #'
 #' # Compute eigencorrelation plot using first 5 PCs
-#' ec <- eigencorr(obj, num_pcs = 5)
+#' ec <- PlotEigenCorr(obj, num_pcs = 5)
 #' ec$plot
 #' }
-eigencorr <- function(object, num_pcs = 10, meta_cols = NULL) {
+PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   MAT <- object@normalized

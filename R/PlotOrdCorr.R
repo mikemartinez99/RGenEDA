@@ -1,4 +1,4 @@
-#' ordcorr
+#' Plot Ordination Correlations With Metadata Heatmap
 #'
 #' @description Calculate correlations between NMDS ordination axes (from beta
 #' diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
@@ -27,7 +27,7 @@
 #' and variance explained (squared correlations between ordination distances and
 #' observed dissimilarities.)
 #' @export
-ordcorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
+PlotOrdCorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray") {
   stopifnot(methods::is(object, "geneda"))
 
   MAT <- object@normalized
