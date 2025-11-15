@@ -45,7 +45,7 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
 ## Change-log
 
 **![Version](https://img.shields.io/badge/version-0.0.0.900-blue)** **![Release](https://img.shields.io/badge/Initial-grey)**  
-*April 2025*   
+*April 2025: "The poor-man's EDA"
   - Implemented core, standalone functions
     - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations
 
