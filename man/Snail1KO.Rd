@@ -7,8 +7,8 @@
 \format{
 A list containing raw counts and metadata
 \describe{
-\item{rawCounts} {A dataframe of raw counts expression matrix}
-\item{metadata} {A dataframe of associated metadata}
+\item{rawCounts}{A dataframe of raw counts expression matrix}
+\item{metadata}{A dataframe of associated metadata}
 }
 }
 \source{
