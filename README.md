@@ -4,7 +4,7 @@
 
  <!-- badges: start -->
  ![status](https://img.shields.io/badge/status-in--development-orange) 
- ![Version](https://img.shields.io/badge/version-1.0.2-blue)
+ ![Version](https://img.shields.io/badge/version-2.0.0-blue)
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
   [![Codecov test coverage](https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg)](https://app.codecov.io/gh/mikemartinez99/RGenEDA)
@@ -15,6 +15,10 @@
 
 > [!IMPORTANT]
 > **RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the** **[Change Log](#change-log)**
+
+
+> [!WARNING]
+> **RGenEDA has updated to v2.0.0 which introduced some breaking changes. Please ensure you are using the most up-to-date version**
 
 --- 
 
@@ -46,7 +50,7 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
     - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations
 
 **![Version](https://img.shields.io/badge/version-1.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**  
-*October 16th, 2025* 
+*October 16th, 2025: "The GenEDA Object Update*
   - Introduced S4 **GenEDA** object for streamlined data handling
   - Added **methods** for HVG calculation and PCA storage within S4 slots.
   - Added **visualization functions**
@@ -69,6 +73,16 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
 *November 10th, 2025*  
   - Fixed example blocks in roxygen headers
   - Addressed all R cmd build errors, warnings, and notes
+
+**![Version](https://img.shields.io/badge/version-2.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**      
+*November 15th, 2025: "The DEG update"*  
+  - Added **assay** argument to **SetDEGs** function
+  - Added **assay** and **saveAssay** argument to **FilterDEGs** function to specify which assay to filter and what to save filtered assay as
+  - Added **assay** argument to **PlotMA** to specify which DEG slot to plot
+  - Added **PlotVolcano** function for direct volcano plotting functionality
+  - Added **FindHVDEGs** to intersect DEGs with HVGs calculated during EDA functions
+  - Added **GenSave** function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()
+  - Renamed eigencorr, ordcorr, and distanceHeatmap functions to **PlotEigenCorr**, **PlotOrdCorr**, and **PlotDistances** respectively to match other plotting function name conventions
 
 ## Citation  
 If you use RGenEDA in your work, please cite: **DOI: dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
