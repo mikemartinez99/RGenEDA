@@ -39,7 +39,8 @@ library(RGenEDA)
 ```
 
 ## Usage
-For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/introduction.md)
+For a full demo, see [Snail1 KO Dataset Demo](https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/Snail1_Vignette.md)  
+[Link to data](https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads); data described in [Matsuri et al., 2018](https://pubmed.ncbi.nlm.nih.gov/29729076/)
 
 
 ## Change-log
@@ -83,6 +84,7 @@ For a full demo, see [Pasilla Dataset Demo](https://github.com/mikemartinez99/RG
   - Added **FindHVDEGs** to intersect DEGs with HVGs calculated during EDA functions
   - Added **GenSave** function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()
   - Renamed eigencorr, ordcorr, and distanceHeatmap functions to **PlotEigenCorr**, **PlotOrdCorr**, and **PlotDistances** respectively to match other plotting function name conventions
+  - Replaced Pasilla dataset demo with **Snail1 KO dataset** from **Matsuri et al., 2018**
 
 ## Citation  
 If you use RGenEDA in your work, please cite: **DOI: dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
