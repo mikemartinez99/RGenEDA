@@ -71,7 +71,8 @@
 <div class="page-header"><h1 id="rgeneda">RGenEDA<a class="anchor" aria-label="anchor" href="#rgeneda"></a>
 </h1></div>
 <p><strong>Clean, unified, streamlined, and reproducible frameworks for genomic exploratory data analyses</strong></p>
-<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-in--development-orange" alt="status"><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"><img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a> <!-- badges: end --></p>
+<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-in--development-orange" alt="status"><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"><a href="https://mikemartinez99.github.io/RGenEDA/" class="external-link"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown documentation"></a> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a></p>
+<p><!-- badges: end --></p>
 <div class="section level3">
 <h3 id="development-">Development <!-- omit in toc -->
 <a class="anchor" aria-label="anchor" href="#development-"></a>
@@ -83,14 +84,7 @@
 <p>[!WARNING] <strong>RGenEDA has updated to v2.0.0 which introduced some breaking changes. Please ensure you are using the most up-to-date version</strong></p>
 </blockquote>
 <hr>
-<div class="float">
-<img src="img/examples.png" alt="Alt text"><div class="figcaption">Alt text</div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
-</h2>
-<p>Install the latest version from Github</p>
+<p><img src="https://raw.githubusercontent.com/mikemartinez99/RGenEDA/main/img/examples.png" alt="Alt text"> ## Installation Install the latest version from Github</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"devtools"</span><span class="op">)</span> <span class="co"># if not already instaled</span></span>
 <span></span>
@@ -102,19 +96,41 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>For a full demo, see <a href="https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/Snail1_Vignette.md" class="external-link">Snail1 KO Dataset Demo</a><br><a href="https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads" class="external-link">Link to data</a>; data described in <a href="https://pubmed.ncbi.nlm.nih.gov/29729076/" class="external-link">Matsuri et al., 2018</a></p>
+<p>For a full demo, see <a href="https://mikemartinez99.github.io/RGenEDA/articles/Snail1_Vignette.html" class="external-link">Snail1 KO Dataset Demo</a></p>
 </div>
 <div class="section level2">
 <h2 id="change-log">Change-log<a class="anchor" aria-label="anchor" href="#change-log"></a>
 </h2>
-<p><strong><img src="https://img.shields.io/badge/version-0.0.0.900-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Initial-grey" alt="Release"></strong><br><em>April 2025: “The poor-man’s EDA”</em> - Implemented core, standalone functions - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations</p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong><br><em>October 16th, 2025: “The GenEDA Object Update</em> - Introduced S4 <strong>GenEDA</strong> object for streamlined data handling - Added <strong>methods</strong> for HVG calculation and PCA storage within S4 slots. - Added <strong>visualization functions</strong> - PCA plots - Variance plots for HVGs - Eigenvector (gene-loading) plots - Revamped eigencorrelation plots to only use top number of HVGs identified in HVG selection/PCA - Enhanced plot output flexibility (return <strong>ggplot2, pheatmap</strong>, or <strong>ComplexHeatmap</strong> objects for full customization - Added <strong>unit tests</strong> - Added <strong>Pasilla dataset vignette</strong></p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 3rd, 2025</em><br>
-- Rely soley on <strong>Pheatmap</strong> for all heatmap visualizations - Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function - Added optional <strong>DEGs slot</strong> to GenEDA object to interface with <strong>DESeq2</strong> - Added <strong>MA plot</strong> functionality</p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 10th, 2025</em><br>
-- Fixed example blocks in roxygen headers - Addressed all R cmd build errors, warnings, and notes</p>
-<p><strong><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong><br><em>November 15th, 2025: “The DEG update”</em><br>
-- Added <strong>assay</strong> argument to <strong>SetDEGs</strong> function - Added <strong>assay</strong> and <strong>saveAssay</strong> argument to <strong>FilterDEGs</strong> function to specify which assay to filter and what to save filtered assay as - Added <strong>assay</strong> argument to <strong>PlotMA</strong> to specify which DEG slot to plot - Added <strong>PlotVolcano</strong> function for direct volcano plotting functionality - Added <strong>FindHVDEGs</strong> to intersect DEGs with HVGs calculated during EDA functions - Added <strong>GenSave</strong> function to save save pheatmap objects in a manner similar to ggplpot2::ggsave() - Renamed eigencorr, ordcorr, and distanceHeatmap functions to <strong>PlotEigenCorr</strong>, <strong>PlotOrdCorr</strong>, and <strong>PlotDistances</strong> respectively to match other plotting function name conventions - Replaced Pasilla dataset demo with <strong>Snail1 KO dataset</strong> from <strong>Matsuri et al., 2018</strong></p>
+<p><strong><img src="https://img.shields.io/badge/version-0.0.0.900-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Initial-grey" alt="Release"></strong> <em>April 2025: “The poor-man’s EDA”</em><br><br>
+- Implemented core, standalone functions<br><br>
+- Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong> <em>October 16th, 2025: “The GenEDA Object Update</em><br><br>
+- Introduced S4 <strong>GenEDA</strong> object for streamlined data handling<br><br>
+- Added <strong>methods</strong> for HVG calculation and PCA storage within S4 slots<br><br>
+- Added <strong>visualization functions</strong><br><br>
+- PCA plots<br><br>
+- Variance plots for HVGs<br><br>
+- Eigenvector (gene-loading) plots<br><br>
+- Revamped eigencorrelation plots to only use top number of HVGs identified in HVG selection/PCA<br><br>
+- Enhanced plot output flexibility (return <strong>ggplot2, pheatmap</strong>, or <strong>ComplexHeatmap</strong> objects for full customization<br><br>
+- Added <strong>unit tests</strong><br><br>
+- Added <strong>Pasilla dataset vignette</strong><br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 3rd, 2025</em><br> - Rely soley on <strong>Pheatmap</strong> for all heatmap visualizations<br><br>
+- Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function<br><br>
+- Added optional <strong>DEGs slot</strong> to GenEDA object to interface with <strong>DESeq2</strong><br><br>
+- Added <strong>MA plot</strong> functionality<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 10th, 2025</em><br><br>
+- Fixed example blocks in roxygen headers<br><br>
+- Addressed all R cmd build errors, warnings, and notes<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong><br><em>November 15th, 2025: “The DEG update”</em><br><br>
+- Added <strong>assay</strong> argument to <strong>SetDEGs</strong> function<br><br>
+- Added <strong>assay</strong> and <strong>saveAssay</strong> argument to <strong>FilterDEGs</strong> function to specify which assay to filter and what to save filtered assay as<br><br>
+- Added <strong>assay</strong> argument to <strong>PlotMA</strong> to specify which DEG slot to plot<br><br>
+- Added <strong>PlotVolcano</strong> function for direct volcano plotting functionality<br><br>
+- Added <strong>FindHVDEGs</strong> to intersect DEGs with HVGs calculated during EDA functions<br><br>
+- Added <strong>GenSave</strong> function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()<br><br>
+- Renamed eigencorr, ordcorr, and distanceHeatmap functions to <strong>PlotEigenCorr</strong>, <strong>PlotOrdCorr</strong>, and <strong>PlotDistances</strong> respectively to match other plotting function name conventions<br><br>
+- Replaced Pasilla dataset demo with <strong>Snail1 KO dataset</strong> from <strong>Matsuri et al., 2018</strong><br></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
