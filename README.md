@@ -40,9 +40,7 @@ library(RGenEDA)
 ```
 
 ## Usage
-For a full demo, see [Snail1 KO Dataset Demo](https://github.com/mikemartinez99/RGenEDA/blob/main/vignettes/Snail1_Vignette.md)  
-[Link to data](https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads); data described in [Matsuri et al., 2018](https://pubmed.ncbi.nlm.nih.gov/29729076/)
-
+For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/RGenEDA/articles/Snail1_Vignette.html)  
 
 ## Change-log
 
