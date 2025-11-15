@@ -51,7 +51,7 @@ test_that("PlotDistances returns plot when return='plot'", {
 
   obj <- GenEDA(normalized = mat, metadata = meta)
 
-  res <- PLotDistances(obj, return = "plot")
+  res <- PlotDistances(obj, return = "plot")
 
   expect_type(res, "list")
   expect_s3_class(res$heatmap, "pheatmap")
