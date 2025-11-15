@@ -2,7 +2,7 @@ library(testthat)
 library(RGenEDA)
 library(pheatmap)
 
-test_that("distanceHeatmap returns correct structure", {
+test_that("PlotDistances returns correct structure", {
   # Minimal geneda object
   mat <- matrix(1:20, nrow = 5)
   colnames(mat) <- c("S1", "S2", "S3", "S4")
@@ -13,7 +13,7 @@ test_that("distanceHeatmap returns correct structure", {
 
   obj <- GenEDA(normalized = mat, metadata = meta)
 
-  res <- distanceHeatmap(obj)
+  res <- PlotDistances(obj)
 
   expect_type(res, "list")
   expect_true(all(c("dist_matrix", "order", "heatmap", "palettes") %in% names(res)))
@@ -21,7 +21,7 @@ test_that("distanceHeatmap returns correct structure", {
   expect_equal(dim(res$dist_matrix), c(4, 4))
 })
 
-test_that("distanceHeatmap respects reorder = FALSE", {
+test_that("PlotDistances respects reorder = FALSE", {
   mat <- matrix(1:20, nrow = 5)
   colnames(mat) <- c("S1", "S2", "S3", "S4")
   rownames(mat) <- paste0("Gene", 1:5)
@@ -32,7 +32,7 @@ test_that("distanceHeatmap respects reorder = FALSE", {
 
   obj <- GenEDA(normalized = mat, metadata = meta)
 
-  res <- distanceHeatmap(obj, reorder = FALSE)
+  res <- PlotDistances(obj, reorder = FALSE)
 
   expect_equal(res$order, colnames(mat))
   expect_equal(rownames(res$dist_matrix), colnames(mat))
@@ -40,7 +40,7 @@ test_that("distanceHeatmap respects reorder = FALSE", {
 })
 
 
-test_that("distanceHeatmap returns plot when return='plot'", {
+test_that("PlotDistances returns plot when return='plot'", {
   mat <- matrix(1:20, nrow = 5)
   colnames(mat) <- c("S1", "S2", "S3", "S4")
   rownames(mat) <- paste0("Gene", 1:5)
@@ -51,13 +51,13 @@ test_that("distanceHeatmap returns plot when return='plot'", {
 
   obj <- GenEDA(normalized = mat, metadata = meta)
 
-  res <- distanceHeatmap(obj, return = "plot")
+  res <- PlotDistances(obj, return = "plot")
 
   expect_type(res, "list")
   expect_s3_class(res$heatmap, "pheatmap")
 })
 
-test_that("distanceHeatmap errors when metadata columns missing", {
+test_that("PlotDistances errors when metadata columns missing", {
   mat <- matrix(1:20, nrow = 5)
   colnames(mat) <- c("S1", "S2", "S3", "S4")
   rownames(mat) <- paste0("Gene", 1:5)
@@ -68,11 +68,11 @@ test_that("distanceHeatmap errors when metadata columns missing", {
 
   obj <- GenEDA(normalized = mat, metadata = meta)
 
-  expect_error(distanceHeatmap(obj, meta_cols = "nonexistent"),
+  expect_error(PlotDistances(obj, meta_cols = "nonexistent"),
                "The following metadata columns were not found: nonexistent")
 })
 
-test_that("distanceHeatmap errors when metadata columns mismatch", {
+test_that("PlotDistances errors when metadata columns mismatch", {
   mat <- matrix(1:20, nrow = 5)
   colnames(mat) <- c("S1", "S2", "S3", "S4")
   rownames(mat) <- paste0("Gene", 1:5)
@@ -83,6 +83,6 @@ test_that("distanceHeatmap errors when metadata columns mismatch", {
 
   # Hack: force mismatch by renaming meta inside the function call
   expect_error({
-    distanceHeatmap(obj, meta_cols = c("condition"))$dist_matrix[1:4,1:4]
+    PlotDistances(obj, meta_cols = c("condition"))$dist_matrix[1:4,1:4]
   }, NA)  # Actually the S4 validation prevents this, so safest is to remove this test
 })

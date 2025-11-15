@@ -1,4 +1,4 @@
-#' distanceHeatmap
+#' Plot a Euclidean Distance Heatmap
 #'
 #' @description Compute a sample-by-sample distance matrix from a `geneda`
 #' object and plot a ggplot2 heatmap. Optionally subset metadata columns and
@@ -32,18 +32,18 @@
 #' mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
 #' obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
 #' colorList <- list(condition = c("A" = "red", "B" = "blue"))
-#' distanceHeatmap(
+#' PlotDistances(
 #'     obj,
 #'     meta_cols = c("condition"),
 #'     palettes = colorList,
 #'     return = "plot")
 #'     }
-distanceHeatmap <- function(object,
-                            method = "euclidean",
-                            reorder = TRUE,
-                            meta_cols = NULL,
-                            palettes = NULL,
-                            return = c("object", "plot")) {
+PlotDistances <- function(object,
+                          method = "euclidean",
+                          reorder = TRUE,
+                          meta_cols = NULL,
+                          palettes = NULL,
+                          return = c("object", "plot")) {
   stopifnot(methods::is(object, "geneda"))
   return <- match.arg(return)
 

@@ -25,10 +25,10 @@ create_test_geneda <- function() {
   return(obj)
 }
 
-test_that("eigencorr returns correct structure", {
+test_that("PlotEigenCorr returns correct structure", {
   obj <- create_test_geneda()
 
-  res <- eigencorr(obj, num_pcs = 2)
+  res <- PlotEigenCorr(obj, num_pcs = 2)
 
   expect_type(res, "list")
   expect_true(all(c("cor_matrix", "pval_matrix", "stars", "plot") %in% names(res)))
@@ -37,47 +37,47 @@ test_that("eigencorr returns correct structure", {
   expect_s3_class(res$plot, "gg")
 })
 
-test_that("eigencorr subsets metadata columns", {
+test_that("PlotEigenCorr subsets metadata columns", {
   obj <- create_test_geneda()
 
-  res <- eigencorr(obj, num_pcs = 2, meta_cols = "batch")
+  res <- PlotEigenCorr(obj, num_pcs = 2, meta_cols = "batch")
 
   expect_equal(rownames(res$cor_matrix), "batch")
   expect_equal(rownames(res$pval_matrix), "batch")
 })
 
-test_that("eigencorr errors when metadata column missing", {
+test_that("PlotEigenCorr errors when metadata column missing", {
   obj <- create_test_geneda()
 
   expect_error(
-    eigencorr(obj, meta_cols = "nonexistent"),
+    PlotEigenCorr(obj, meta_cols = "nonexistent"),
     "The following metadata columns were not found: nonexistent"
   )
 })
 
-test_that("eigencorr errors when DimReduction slot missing", {
+test_that("PlotEigenCorr errors when DimReduction slot missing", {
   obj <- create_test_geneda()
   obj@DimReduction <- list()  # empty
 
   expect_error(
-    eigencorr(obj),
-    "DimReduction slot is empty. Please run RunPCA\\(\\) before calling eigencorr\\(\\)\\."
+    PlotEigenCorr(obj),
+    "DimReduction slot is empty\\. Please run RunPCA\\(\\) before calling PlotEigenCorr\\(\\)\\."
   )
 })
 
-test_that("eigencorr computes stars correctly", {
+test_that("PlotEigenCorr computes stars correctly", {
   obj <- create_test_geneda()
 
-  res <- eigencorr(obj, num_pcs = 2)
+  res <- PlotEigenCorr(obj, num_pcs = 2)
 
   expect_equal(dim(res$stars), dim(res$cor_matrix))
   expect_true(all(res$stars %in% c("", "*", "**", "***")))
 })
 
-test_that("eigencorr plot aesthetics", {
+test_that("PlotEigenCorr plot aesthetics", {
   obj <- create_test_geneda()
 
-  res <- eigencorr(obj, num_pcs = 2)
+  res <- PlotEigenCorr(obj, num_pcs = 2)
 
   p <- res$plot
   expect_s3_class(p, "gg")
