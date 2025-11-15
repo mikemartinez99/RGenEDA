@@ -1,0 +1,6 @@
+pandoc: 3.8.2.1
+pkgdown: 2.1.3
+pkgdown_sha: ~
+articles:
+  Snail1_Vignette: Snail1_Vignette.html
+last_built: 2025-11-15T19:57Z
