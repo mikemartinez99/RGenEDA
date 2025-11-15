@@ -136,8 +136,11 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
     guides(size=guide_legend(override.aes = list(fill="black", alpha=1)))
 
   if (!is.null(title)) {
-    resPlot + ggtitle(title)
+    resPlot <- resPlot + ggtitle(title)
+    return(resPlot)
+  } else {
+    return(resPlot)
   }
 
-  return(resPlot)
+
 }
