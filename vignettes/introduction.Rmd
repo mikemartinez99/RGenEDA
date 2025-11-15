@@ -150,13 +150,13 @@ PlotCountDist(obj, split_by = "condition")
 
 ## Sample Eucliden distances with hierarchical clustering
 
-To visualize replicate similarity, we can plot Euclidean distances between samples using the `distanceHeatmap` function.
+To visualize replicate similarity, we can plot Euclidean distances between samples using the `PlotDistances` function.
 Darker colors indicate higher similarity, while lighter colors represent dissimilar samples. This provides a quick assessment of replicate quality and metadata features that drive clustering. 
 To save heatmaps that are derived from `pheatmap`, we can use the `GenSave` function, which is similar in function to `ggsave`.
 
 ```{r clustering, fig.show='hold', out.width='60%', cache = FALSE}
 
-hm <- distanceHeatmap(
+hm <- PlotDistances(
   obj,
   meta_cols = c("condition", "library"),
   palettes = colorList,
@@ -263,7 +263,7 @@ hm2$heatmap
 
 ## Correlate PCs with metadata
 
-To interpret principal components, we can correlate them with sample metadata using `eigencorr`.
+To interpret principal components, we can correlate them with sample metadata using `PlotEigenCorr`.
 This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. This function returns a list of 4 elements:
 
 •	`$cor_matrix` (Pearson correlation values)
@@ -274,12 +274,12 @@ This function computes Pearson correlations and displays them as a heatmap, help
 	
 •	`$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved with `ggsave`)
 
-**Note:** `ordcorr` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
+**Note:** `PlotOrdCorr` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
 
 
 ```{r eigencorr, fig.show='hold', out.width='70%'}
 
-ec <- eigencorr(obj, num_pcs = 5)
+ec <- PlotEigenCorr(obj, num_pcs = 5)
 ec$plot
 
 ```
@@ -323,5 +323,17 @@ PlotVolcano(obj,
        den = "untreated",
        num = "treated",
        title = "Example Volcano")
+
+```
+
+To explore whether a differentially expressed gene (DEG) is also a highly variable gene (HVG), the intersect of these two vectors can be taken to obtain highly variable DEGs (hvDEGs), which can be useful for applications such as gene-set variation analysis (GSVA). To obtain this, the `FindHVDEGs` function can be used. The direction of fold change to intersect with HVGs can be either `positive`, or `negative`, which returns a vector of genes, or `both` which contains a list with `$positive`, `$negative`, and `$both` slots.
+
+```{r hvDEGs, fig.show='hold', out.width='70%'}
+
+FindHVDEGs(obj, 
+           assay = "padj05_lfc1",
+           direction = "negative")
+
+
 
 ```

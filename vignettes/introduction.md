@@ -152,7 +152,7 @@ artifacts, or batch effect.
 ## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, we can plot Euclidean distances
-between samples using the `distanceHeatmap` function. Darker colors
+between samples using the `PlotDistances` function. Darker colors
 indicate higher similarity, while lighter colors represent dissimilar
 samples. This provides a quick assessment of replicate quality and
 metadata features that drive clustering. To save heatmaps that are
@@ -160,7 +160,7 @@ derived from `pheatmap`, we can use the `GenSave` function, which is
 similar in function to `ggsave`.
 
 
-    hm <- distanceHeatmap(
+    hm <- PlotDistances(
       obj,
       meta_cols = c("condition", "library"),
       palettes = colorList,
@@ -169,6 +169,8 @@ similar in function to `ggsave`.
     hm$heatmap
 
     # GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+
+<img src="introduction_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
 ## Identify highly variable genes
 
@@ -294,15 +296,18 @@ normalized expression values scaled and Z-scored.
                                                                 "treated" = "blue")))
     hm2$heatmap
 
+<img src="introduction_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
+
+
     # GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
 
 ## Correlate PCs with metadata
 
 To interpret principal components, we can correlate them with sample
-metadata using `eigencorr`. This function computes Pearson correlations
-and displays them as a heatmap, helping to reveal which metadata
-features are most associated with major axes of variation. This function
-returns a list of 4 elements:
+metadata using `PlotEigenCorr`. This function computes Pearson
+correlations and displays them as a heatmap, helping to reveal which
+metadata features are most associated with major axes of variation. This
+function returns a list of 4 elements:
 
 • `$cor_matrix` (Pearson correlation values)
 
@@ -313,11 +318,11 @@ returns a list of 4 elements:
 • `$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved
 with `ggsave`)
 
-**Note:** `ordcorr` can be used for microbiome data as it correlates
+**Note:** `PlotOrdCorr` can be used for microbiome data as it correlates
 metadata features with NMDS beta values rather than PCs.
 
 
-    ec <- eigencorr(obj, num_pcs = 5)
+    ec <- PlotEigenCorr(obj, num_pcs = 5)
     ec$plot
 
 <img src="introduction_files/figure-markdown_strict/eigencorr-1.png" width="70%" style="display: block; margin: auto;" />
@@ -367,3 +372,19 @@ is your comparison reference level).
            title = "Example Volcano")
 
 <img src="introduction_files/figure-markdown_strict/Volcano-1.png" width="70%" style="display: block; margin: auto;" />
+
+To explore whether a differentially expressed gene (DEG) is also a
+highly variable gene (HVG), the intersect of these two vectors can be
+taken to obtain highly variable DEGs (hvDEGs), which can be useful for
+applications such as gene-set variation analysis (GSVA). To obtain this,
+the `FindHVDEGs` function can be used. The direction of fold change to
+intersect with HVGs can be either `positive`, or `negative`, which
+returns a vector of genes, or `both` which contains a list with
+`$positive`, `$negative`, and `$both` slots.
+
+
+    FindHVDEGs(obj, 
+               assay = "padj05_lfc1",
+               direction = "negative")
+    #> 1 -log2FC hvDEG found.
+    #> [1] "FBgn0085787"
