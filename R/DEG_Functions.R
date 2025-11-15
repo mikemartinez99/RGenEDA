@@ -44,7 +44,7 @@ SetDEGs <- function(object, deg_table, assay) {
 FilterDEGs <- function(object, assay, padj_thresh = 0.05, log2FC_thresh = 1.0, saveAssay) {
   stopifnot(methods::is(object, "geneda"))
   if (is.null(object@DEGs[[assay]])) {
-    stop(paste0("Assay", assay, "is NULL. Use SetDEGs() first."))
+    stop(paste("Assay", assay, "is NULL. Use SetDEGs() first."))
   }
   if (missing(saveAssay) || is.null(saveAssay) || !is.character(saveAssay) || length(saveAssay) != 1L) {
     stop("saveAssay must be a single character string.")
@@ -80,7 +80,7 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 
   # Access DEGs
   if (is.null(object@DEGs[[assay]])) {
-    stop(paste0("Assay", assay, "is NULL. Use SetDEGs() or FilterDEGs() first!"))
+    stop(paste("Assay", assay, "is NULL. Use SetDEGs() or FilterDEGs() first!"))
   } else {
     degDF <- DEGs(object, assay)
     degDF$Gene <- rownames(degDF)
@@ -123,7 +123,7 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
     return(list(
       positive = posInt,
       negative = negInt,
-      both = c(positive, negative)
+      both = c(posInt, negInt)
     ))
 
   }
