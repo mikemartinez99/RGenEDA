@@ -1,0 +1,338 @@
+---
+title: "RGenEDA Tutorial"
+output:
+  rmarkdown::html_document:
+vignette: >
+  %\VignetteIndexEntry{Introduction to RGenEDA}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.align = "center",
+  fig.width = 6,
+  fig.height = 4
+)
+
+suppressPackageStartupMessages({
+  library(RGenEDA)
+  library(pasilla)
+  library(DESeq2)
+  library(tidyverse)
+  library(ggplot2)
+  library(ggtext)
+})
+```
+
+# Overview
+
+`RGenEDA` is designed to provide a streamlined, unified and reproducible framework for exploratory data analysis across multiple omics data types. This vignette introduces the key components of the `RGenEDA` package using bulk RNA-seq data from the paper [Genomewide binding of transcription factor Snail1 in triple-negative breast cancer cell](https://pubmed.ncbi.nlm.nih.gov/29729076/) (Maturi, et al. 2018). Raw counts and metadata were obtained from [The Gene Expression Atlas](https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads) under ENA:ERP019920, E-MTAB-5244.
+
+The data has be pre-wrangled but the standard [deseq2 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html) will be applied here to demonstrate the functionality of `RGenEDA`.
+
+The paper explores epithelial cell line HS578T. The authors have introduced a knock-out of the Snail1 transcription factor and compare these with wild-type (WT) HS578T cells.
+
+## Table of contents
+- [Load and inspect the data](#load-and-inspect-the-data)
+- [Define metadata](#define-metadata)
+- [Processing and normalization](#processing-and-normalization)
+- [Create a GenEDA object](#create-a-geneda-object)
+- [Count distrubutions across samples](#count-distributions-across-samples)
+- [Sample Eucliden distances with hierarchical clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+- [Identify highly variable genes](#identify-highly-variable-genes)
+- [Principal component analysis](#principal-component-analysis)
+- [Extract and visualize PCA results](#extract-and-visualize-pca-results)
+- [Explore Eigen vectors of individual PCs](#explore-eigen-vectors-of-individual-pcs)
+- [Correlate PCs with metadata](#correlate-pcs-with-metadata)
+- [Explore DEGs](#explore-degs)
+
+## Load and inspect the data
+
+Data has been included in this package for your convenience. It can be easily accessed using the following commands.
+Here, we have one key variable of interest (Genotype) for simplicity sake (though your experiment may have many. `RGenEDA` can handle any number of covariates.)
+
+```{r load-data}
+
+# Load the counts and metadata and extract
+data("Snail1KO")
+counts <- Snail1KO[["rawCounts"]]
+metadata <- Snail1KO[["metadata"]]
+
+# Sanity check
+head(counts)[1:6, 1:6]
+head(metadata)
+
+```
+
+It is helpful to establish color palettes early on in an exploratory analysis to keep figures consistent. `RGenEDA` uses the list of named vectors convention for creating color vectors for plotting functions. 
+
+```{r color vectors}
+
+# Color palettes for plotting
+colorList <- list(
+  Genotype = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3"))
+
+```
+
+## Processing and normalization
+
+The standard DESeq2 workflow can now be applied. The end goal is to obtain normalized counts and differential expression results. 
+Lowly expressed genes are filtered out before running `DESeq2.`
+
+```{r deseq-prep, message=FALSE}
+
+# Ensure tables are not scrambled
+all(colnames(counts) == rownames(metadata))
+
+dds <- DESeqDataSetFromMatrix(
+  countData = counts,
+  colData = metadata,
+  design = ~ Genotype
+)
+
+# Set reference levels
+dds$Genotype <- relevel(dds$Genotype, ref = "WT")
+
+# Pre-filter: keep genes with at least 10 counts in  at least 3 samples
+keep <- rowSums(counts(dds) >= 10) >= 3
+dds <- dds[keep,]
+
+# Run DESeq2
+dds <- DESeq(dds)
+
+# Rlog transform the data and extract normalized matrix
+rld <- rlog(dds)
+mat <- assay(rld)
+
+```
+
+## Create a GenEDA object
+
+With the normalized counts and metadata prepared, a `GenEDA` object can be initialized.
+This object will store all components of your analysis, starting with normalized data and metadata (bare minimum requirements).
+
+```{r build_genEDA, fig.show='hold', out.width='50%', cache = FALSE}
+
+# Factor metadata
+metadata$Genotype <- factor(metadata$Genotype, levels = c("WT", "Snai1_KO"))
+
+# Initialize GenEDA object with normalized counts and metadata
+obj <- GenEDA(
+  normalized = mat,
+  metadata = metadata)
+
+# View object summary
+obj
+```
+
+You will see that the object also contains slots for Highly Variable Genes (HVGs), DimReduction (PCA, etc..) and Differentially Expressed Genes (DEGs). These will be populated shortly with `RGenEDA`
+
+## Count distributions across samples
+
+To visualize normalized count distributions across samples, the `PlotCountDist()` function can be used. This is a quick and helpful way to visualize effectiveness of normalization, as the overall distributions should be similar across samples. Samples with very low or very high overall counts compared to others might indicate problematic samples, technical artifacts, or batch effect. This function returns a `ggplot2` object to facilitate any additional customization.  
+
+```{r count-dist}
+
+PlotCountDist(obj, split_by = "Genotype")
+
+```
+## Sample Eucliden distances with hierarchical clustering
+
+To visualize replicate similarity, Euclidean distances between samples can be calculated and plotted as a `pheatmap` heatmap using the `PlotDistances()` function.
+Darker colors indicate higher similarity, while lighter colors represent dissimilar samples. This provides a quick assessment of replicate quality and metadata features that drive clustering.
+To save `pheatmap` objects within `RGenEDA`, we can use the `GenSave()` function, which is similar in function to `ggsave()`.
+
+```{r clustering, fig.show='hold', out.width='60%', cache = FALSE}
+
+hm <- PlotDistances(
+  obj,
+  meta_cols = c("Genotype"),
+  palettes = colorList,
+  return = "plot"
+)
+hm$heatmap
+
+# GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+
+
+```
+## Identify highly variable genes
+
+Next, genes are ranked by decreasing variance to find highly variable genes (HVGs) which most-likely drive biological differences. The full variance profile curve for all genes profiled with `plotHVGVariance()` as a means to pick a meaningful number of HVGs to retain for calculating principal components in the next section. 
+
+```{r hvgs-plot, fig.show='hold', out.width='60%', cache = FALSE}
+
+#----- Plot variance profile
+PlotHVGVariance(obj)
+
+```
+Based on the curve, 2,000 genes seems sufficient in capturing the majority of variation. These genes can be extracted and retained in the HVGs slot with `FindVariableFeatures()` 
+
+
+```{r hvgs-find}
+
+#----- Add HVGs to object
+obj <- FindVariableFeatures(obj, 2000)
+
+#== Access HVGs (2 methods)
+# 1: Accessor function
+head(HVGs(obj))
+
+# 2: Call the slot directly
+#head(obj@HVGs)
+
+```
+
+## Principal component analysis
+
+Using the identified HVGs, principal components can be calculated using `RunPCA()`
+This function stores PCA results in the DimReduction slot, including:
+
+•	`$Loadings` (sample scores)
+	
+•	`$Eigenvectors` (gene contributions)
+	
+•	`$percent_var` (Percent variance explained per component, up to PC5)
+
+If `FindVariableFeatures()` was not ran beforehand, `RunPCA` will calculate HVGs by default with 2000 features. This argument can be overriden directly using the `nfeatures` argument. 
+
+```{r run-pca}
+
+obj <- RunPCA(obj)
+
+# DimReductions can be accessed with accessor function
+# head(DimReduction(obj))
+
+# Inspect PCA outputs
+head(obj@DimReduction$Loadings)
+head(obj@DimReduction$Eigenvectors)
+head(obj@DimReduction$percent_var)
+
+```
+
+## Extract and visualize PCA results
+
+PCA results merged with metadata can easily be extracted using `ExtractPCA()` which enables flexible plotting. For convenience, `PlotPCA()` allows a quick visualization which can also be further customized with `ggplot2`.
+
+```{r extract-pca, fig.show='hold', out.width='70%'}
+
+pcaDF <- ExtractPCA(obj)
+head(pcaDF)
+
+# Plot PCA
+PlotPCA(object = obj,
+        x = 1,
+        y = 2,
+        color_by = "Genotype",
+        colors = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3"))
+
+```
+
+## Explore Eigen vectors of individual PCs
+
+The individual Eigenvectors (genes) that comprise a particular component of interest can be extracted and their Z-scaled normalized expression visualized as a heatmap annotated by the percent variation explained using `extractEigen()` and `PlotEigenHeatmap()`. This can again identify sample-to-sample differences.
+
+```{r eigenvecs, fig.width = 8, fig.height = 6}
+
+pc1_eigen <- extractEigen(object = obj,
+                          component = "PC1")
+head(pc1_eigen)
+
+
+hm2 <- PlotEigenHeatmap(obj,
+                 pc = "PC1",
+                 n = 25,
+                 annotate_by = "Genotype",
+                 annotate_colors = colorList)
+hm2$heatmap
+
+# GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+
+
+```
+## Correlate PCs with metadata
+
+To interpret principal components, individual PCs can be correlated with sample metadata using `PlotEigenCorr()`.
+This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. This function returns a list of 4 elements:
+
+•	`$cor_matrix` (Pearson correlation values)
+	
+•	`$pval_matrix` (Associated correlation p-values)
+	
+•	`$stars` (asterisk representations of p-values)
+	
+•	`$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved with `ggsave`)
+
+**Note:** `PlotOrdCorr()` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
+
+
+```{r eigencorr, fig.show='hold', out.width='70%'}
+
+ec <- PlotEigenCorr(obj, num_pcs = 5)
+ec$plot
+
+```
+## Explore DEGs
+
+Differentially expressed genes can now be stored in the `RGenEDA` object. `RGenEDA` was designed to directly work with DEG tables derived from `DESeq2` and contain the column names "baseMean", "log2FoldChange" and "padj". DEG tables from other packages can be used with some minor dataframe manipulation.
+
+Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs()` command (for example, raw DESeq2 results and Shrunk DESeq2 results.)
+
+DEG assays can be filterd and directly saved as a new assay in the DEGs slot using `FilterDEGs()`
+
+```{r DEGs, fig.show='hold', out.width='70%'}
+
+res <- results(dds) |> 
+  as.data.frame()
+
+# Set a new DEG assay
+obj <- SetDEGs(object = obj, 
+               deg_table = res,
+               assay = "unfiltered")
+
+# Filter the DEG assay and save as a new one
+obj <- FilterDEGs(object = obj,
+                  assay = "unfiltered",
+                  padj_thresh = 0.05,
+                  log2FC_thresh = 1,
+                  saveAssay = "padj05_lfc1")
+
+# Grab results with accessor function
+nrow(DEGs(object = obj, assay = "unfiltered"))
+nrow(DEGs(object = obj, assay = "padj05_lfc1"))
+```
+Basic DEG visualizations plots such as MA plots and volcano plots can be plotted using `PlotMA()` and `PlotVolcano()`
+"Num" and "Den" arguments refer to numerator level and denominator level (reference level of experiment, in our case, "WT")
+```{r MA, fig.show='hold', out.width='70%'}
+PlotMA(obj,
+       assay = "unfiltered",
+       alpha = 0.05,
+       fc = 1)
+
+```
+
+Or a volcano plot by specifying numerator and denominator (denominator is your comparison reference level).
+
+```{r Volcano, fig.show='hold', out.width='70%'}
+
+PlotVolcano(obj,
+       assay = "unfiltered", 
+       alpha = 0.05,
+       fc = 1,
+       den = "WT",
+       num = "Snai1_KO",
+       title = "Example Volcano")
+
+```
+To explore whether a differentially expressed gene (DEG) is also a highly variable gene (HVG), the intersect of these two vectors can be taken to obtain highly variable DEGs (hvDEGs), which can be useful for applications such as gene-set variation analysis (GSVA). To obtain this, the `FindHVDEGs()` function can be used. The direction of fold change to intersect with HVGs can be either "positive", or "negative", which returns a vector of genes, or "both" which contains a list with `$positive`, `$negative`, and `$both` slots.
+
+```{r hvDEGs, fig.show='hold', out.width='70%'}
+
+FindHVDEGs(obj, 
+           assay = "padj05_lfc1",
+           direction = "negative")
+
+```

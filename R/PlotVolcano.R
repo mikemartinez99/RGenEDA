@@ -95,6 +95,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
   cap_pos_xvalue <- max(abs(df$log2FoldChange)) + 0.4
   cap_neg_xvalue <- cap_pos_xvalue/-1
 
+  df <- na.omit(df)
   resPlot <- ggplot(df, aes(x = log2FoldChange, y = -log10(padj), fill = Group)) +
     geom_point(alpha = 0.5, shape = 21)  +
     theme_classic(base_size = 16) +
