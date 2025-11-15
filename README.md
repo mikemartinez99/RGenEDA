@@ -26,6 +26,8 @@
 
 
 ![Alt text](https://raw.githubusercontent.com/mikemartinez99/RGenEDA/main/img/examples.png)
+
+
 ## Installation
 Install the latest version from Github
 
