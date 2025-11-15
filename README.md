@@ -44,13 +44,13 @@ For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/R
 
 ## Change-log
 
-**![Version](https://img.shields.io/badge/version-0.0.0.900-blue)** **![Release](https://img.shields.io/badge/Initial-grey)**  
-*April 2025: "The poor-man's EDA"*  
-  - Implemented core, standalone functions  
-    - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations
+**![Version](https://img.shields.io/badge/version-0.0.0.900-blue)** **![Release](https://img.shields.io/badge/Initial-grey)**
+*April 2025: "The poor-man's EDA"*<br>  
+  - Implemented core, standalone functions<br>  
+    - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations<br>
 
-**![Version](https://img.shields.io/badge/version-1.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**  
-*October 16th, 2025: "The GenEDA Object Update*  
+**![Version](https://img.shields.io/badge/version-1.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**
+*October 16th, 2025: "The GenEDA Object Update*<br>  
   - Introduced S4 **GenEDA** object for streamlined data handling<br>    
   - Added **methods** for HVG calculation and PCA storage within S4 slots<br>    
   - Added **visualization functions**<br>    
@@ -62,20 +62,20 @@ For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/R
   - Added **unit tests**<br>    
   - Added **Pasilla dataset vignette**<br>  
 
-**![Version](https://img.shields.io/badge/version-1.0.1-blue)** **![Release](https://img.shields.io/badge/Patch-green)**    
-*November 3rd, 2025*  
+**![Version](https://img.shields.io/badge/version-1.0.1-blue)** **![Release](https://img.shields.io/badge/Patch-green)**   
+*November 3rd, 2025*<br> 
   - Rely soley on **Pheatmap** for all heatmap visualizations<br>  
   - Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function<br>    
   - Added optional **DEGs slot** to GenEDA object to interface with **DESeq2**<br>   
   - Added **MA plot** functionality<br>  
 
 **![Version](https://img.shields.io/badge/version-1.0.2-blue)** **![Release](https://img.shields.io/badge/Patch-green)**      
-*November 10th, 2025*  
+*November 10th, 2025*<br>  
   - Fixed example blocks in roxygen headers<br>    
   - Addressed all R cmd build errors, warnings, and notes<br>  
 
-**![Version](https://img.shields.io/badge/version-2.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**      
-*November 15th, 2025: "The DEG update"*  
+**![Version](https://img.shields.io/badge/version-2.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**  
+*November 15th, 2025: "The DEG update"*<br>  
   - Added **assay** argument to **SetDEGs** function<br>  
   - Added **assay** and **saveAssay** argument to **FilterDEGs** function to specify which assay to filter and what to save filtered assay as<br>    
   - Added **assay** argument to **PlotMA** to specify which DEG slot to plot<br>    
