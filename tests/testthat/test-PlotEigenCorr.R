@@ -61,7 +61,7 @@ test_that("PlotEigenCorr errors when DimReduction slot missing", {
 
   expect_error(
     PlotEigenCorr(obj),
-    "DimReduction slot is empty. Please run RunPCA\\(\\) before calling PlotEigenCorr\\(\\)\\."
+    "DimReduction slot is empty\\. Please run RunPCA\\(\\) before calling PlotEigenCorr\\(\\)\\."
   )
 })
 
