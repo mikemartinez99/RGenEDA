@@ -160,6 +160,7 @@ hm$heatmap
 
 ```
 
+
 ## Identify highly variable genes
 
 Next, genes are ranked by decreasing variance to find highly variable genes (HVGs) which most-likely drive biological differences. The full variance profile curve for all genes profiled with `plotHVGVariance()` as a means to pick a meaningful number of HVGs to retain for calculating principal components in the next section. 
