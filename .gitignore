@@ -1,7 +1,6 @@
 .Rproj.user
 DACExploreR.Rproj
 .Rhistory
-.gitattributes
 .DS_Store
 inst/doc
 /doc/
