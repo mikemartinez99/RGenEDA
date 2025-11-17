@@ -66,7 +66,7 @@ test_that("FilterDEGs filters DEGs correctly", {
   obj <- SetDEGs(obj, dummy_deg, "DEG")
 
   # Happy path
-  filtered_obj <- FilterDEGs(obj, assay = "DEG", padj_thresh = 0.5, log2FC_thresh = 0.5, saveAssay = "filtered")
+  filtered_obj <- FilterDEGs(obj, assay = "DEG", padj_thresh = 0.5, l2fc = 0.5, saveAssay = "filtered")
   expect_true("filtered" %in% names(filtered_obj@DEGs))
   expect_true(all(abs(filtered_obj@DEGs$filtered$log2FoldChange) >= 0.5))
   expect_true(all(filtered_obj@DEGs$filtered$padj <= 0.5))
