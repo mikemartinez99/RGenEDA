@@ -22,8 +22,6 @@ highly variable genes (HVGs), and PCA dimensionality reduction results.
 
 \item{\code{DimReduction}}{List for PCA results with \code{Loadings}, \code{Eigenvectors}, \code{percent_var}.}
 
-\item{\code{DEGs}}{List container for differential expression results. Contains \code{DEG}
-(data.frame) for unfiltered results, and optionally named slots for filtered
-results (e.g., \code{DEGs$assay1}, \code{DEGs$assay2}).}
+\item{\code{DEGs}}{List container for differential expression results.}
 }}
 
