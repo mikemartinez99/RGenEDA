@@ -221,7 +221,7 @@ metadata (bare minimum requirements).</p>
 <span><span class="co">#&gt;   HVGs: 0</span></span>
 <span><span class="co">#&gt;   DimReduction: 0</span></span>
 <span><span class="co">#&gt;   counts: NULL</span></span>
-<span><span class="co">#&gt;   DEGs: NULL</span></span></code></pre></div>
+<span><span class="co">#&gt;   DEGs: DEG</span></span></code></pre></div>
 <p>You will see that the object also contains slots for Highly Variable
 Genes (HVGs), DimReduction (PCA, etc..) and Differentially Expressed
 Genes (DEGs). These will be populated shortly with
@@ -446,8 +446,11 @@ rather than PCs.</p>
 <span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
 <span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
 <span><span class="va">ec</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
-<p><img src="Snail1_Vignette_files/figure-html/eigencorr-1.png" width="70%" style="display: block; margin: auto;">
-## Explore DEGs</p>
+<p><img src="Snail1_Vignette_files/figure-html/eigencorr-1.png" width="70%" style="display: block; margin: auto;"></p>
+</div>
+<div class="section level3">
+<h3 id="explore-degs">Explore DEGs<a class="anchor" aria-label="anchor" href="#explore-degs"></a>
+</h3>
 <p>Differentially expressed genes can now be stored in the
 <code>RGenEDA</code> object. <code>RGenEDA</code> was designed to
 directly work with DEG tables derived from <code>DESeq2</code> and
@@ -457,8 +460,9 @@ manipulation.</p>
 <p>Note: multiple DEG assays can be appended to the DEGs slot by passing
 an assay name in the <code><a href="../reference/SetDEGs.html">SetDEGs()</a></code> command (for example, raw
 DESeq2 results and Shrunk DESeq2 results.)</p>
-<p>DEG assays can be filterd and directly saved as a new assay in the
-DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></code></p>
+<p>To get a quick diagnosis of the differential expression results, a
+histogram of un-corrected pvalues can be plotted using
+<code><a href="../reference/PlotPValHist.html">PlotPValHist()</a></code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -469,10 +473,33 @@ DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></c
 <span>               deg_table <span class="op">=</span> <span class="va">res</span>,</span>
 <span>               assay <span class="op">=</span> <span class="st">"unfiltered"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># P value histogram</span></span>
+<span><span class="fu"><a href="../reference/PlotPValHist.html">PlotPValHist</a></span><span class="op">(</span><span class="va">obj</span>, </span>
+<span>             assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
+<span>             alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Snail1_Vignette_files/figure-html/PValHist-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p>To quickly summarize the DEG results with different thresholds, run
+<code>SummarizeDEGs</code>(). This function can take multiple assays if
+needed and outputs results in a tabular format.</p>
+<p>DEG assays can be filtered and directly saved as a new assay in the
+DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></code></p>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># Summarize DEGs</span></span>
+<span><span class="fu"><a href="../reference/SummarizeDEGs.html">SummarizeDEGs</a></span><span class="op">(</span><span class="va">obj</span>,</span>
+<span>              alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>              lfc1 <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>              lfc2 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt;                               DEG unfiltered</span></span>
+<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &gt;1 (Up)      0        656</span></span>
+<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &lt;-1 (Down)   0        542</span></span>
+<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &gt;2 (Up)      0        228</span></span>
+<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &lt;-2 (Down)   0        181</span></span>
+<span></span>
 <span><span class="co"># Filter the DEG assay and save as a new one</span></span>
 <span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterDEGs.html">FilterDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>                  assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
-<span>                  padj_thresh <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>                  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>                  log2FC_thresh <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>                  saveAssay <span class="op">=</span> <span class="st">"padj05_lfc1"</span><span class="op">)</span></span>
 <span></span>
@@ -485,11 +512,11 @@ DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></c
 be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> and <code><a href="../reference/PlotVolcano.html">PlotVolcano()</a></code>
 “Num” and “Den” arguments refer to numerator level and denominator level
 (reference level of experiment, in our case, “WT”)</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/PlotMA.html">PlotMA</a></span><span class="op">(</span><span class="va">obj</span>,</span>
 <span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
 <span>       alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>       fc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span>       l2fc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span></span>
@@ -508,12 +535,12 @@ be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> an
 <p><img src="Snail1_Vignette_files/figure-html/MA-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>Or a volcano plot by specifying numerator and denominator
 (denominator is your comparison reference level).</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/PlotVolcano.html">PlotVolcano</a></span><span class="op">(</span><span class="va">obj</span>,</span>
 <span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>, </span>
 <span>       alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>       fc <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>       l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>       den <span class="op">=</span> <span class="st">"WT"</span>,</span>
 <span>       num <span class="op">=</span> <span class="st">"Snai1_KO"</span>,</span>
 <span>       title <span class="op">=</span> <span class="st">"Example Volcano"</span><span class="op">)</span></span>
@@ -521,8 +548,13 @@ be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> an
 <span><span class="co">#&gt; increasing max.overlaps</span></span>
 <span><span class="co">#&gt; Warning: ggrepel: 538 unlabeled data points (too many overlaps). Consider</span></span>
 <span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre></div>
-<p><img src="Snail1_Vignette_files/figure-html/Volcano-1.png" width="70%" style="display: block; margin: auto;">
-To explore whether a differentially expressed gene (DEG) is also a
+<p><img src="Snail1_Vignette_files/figure-html/Volcano-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p>To get a glance at everything at once, we can plot a differential
+expression dashboard with <code><a href="../reference/DEDashboard.html">DEDashboard()</a></code></p>
+<pre><code><span><span class="co">#&gt; Scale for <span style="color: #00BB00;">size</span> is already present.</span></span>
+<span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">size</span>, which will replace the existing scale.</span></span></code></pre>
+<p><img src="Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png" width="2400" style="display: block; margin: auto;"></p>
+<p>To explore whether a differentially expressed gene (DEG) is also a
 highly variable gene (HVG), the intersect of these two vectors can be
 taken to obtain highly variable DEGs (hvDEGs), which can be useful for
 applications such as gene-set variation analysis (GSVA). To obtain this,
@@ -531,7 +563,7 @@ fold change to intersect with HVGs can be either “positive”, or
 “negative”, which returns a vector of genes, or “both” which contains a
 list with <code>$positive</code>, <code>$negative</code>, and
 <code>$both</code> slots.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/FindHVDEGs.html">FindHVDEGs</a></span><span class="op">(</span><span class="va">obj</span>, </span>
 <span>           assay <span class="op">=</span> <span class="st">"padj05_lfc1"</span>,</span>

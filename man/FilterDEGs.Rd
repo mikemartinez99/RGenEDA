@@ -4,14 +4,14 @@
 \alias{FilterDEGs}
 \title{Filter DEGs by padj and absolute log2FoldChange}
 \usage{
-FilterDEGs(object, assay, padj_thresh = 0.05, log2FC_thresh = 1, saveAssay)
+FilterDEGs(object, assay, alpha = 0.05, log2FC_thresh = 1, saveAssay)
 }
 \arguments{
 \item{object}{A \code{geneda} object with \code{DEGs$DEG} set}
 
 \item{assay}{The DEG slot to filter}
 
-\item{padj_thresh}{Adjusted p-value threshold (<=)}
+\item{alpha}{Adjusted p-value threshold (<=)}
 
 \item{log2FC_thresh}{Absolute log2 fold change threshold (>=)}
 

@@ -4,6 +4,7 @@
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/reference/DEDashboard.html</loc></url>
 <url><loc>/reference/DEGs.html</loc></url>
 <url><loc>/reference/DimReduction.html</loc></url>
 <url><loc>/reference/ExtractPCA.html</loc></url>
@@ -21,10 +22,13 @@
 <url><loc>/reference/PlotMA.html</loc></url>
 <url><loc>/reference/PlotOrdCorr.html</loc></url>
 <url><loc>/reference/PlotPCA.html</loc></url>
+<url><loc>/reference/PlotPValHist.html</loc></url>
+<url><loc>/reference/PlotPValueHistogram.html</loc></url>
 <url><loc>/reference/PlotVolcano.html</loc></url>
 <url><loc>/reference/RunPCA.html</loc></url>
 <url><loc>/reference/SetDEGs.html</loc></url>
 <url><loc>/reference/Snail1KO.html</loc></url>
+<url><loc>/reference/SummarizeDEGs.html</loc></url>
 <url><loc>/reference/extractEigen.html</loc></url>
 <url><loc>/reference/geneda-class.html</loc></url>
 <url><loc>/reference/generatePCs.html</loc></url>

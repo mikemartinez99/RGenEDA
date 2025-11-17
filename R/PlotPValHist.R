@@ -1,4 +1,4 @@
-#' PlotPValueHistogram
+#' PlotPValHist
 #'
 #' @description Generate a p-value histogram from a DEG table inside a `geneda` object.
 #' This function uses raw p-values only and highlights p-values below a given
@@ -13,7 +13,7 @@
 #'
 #' @return A ggplot2 object
 #' @export
-PlotPValueHistogram <- function(object, assay, bins = 40, alpha = 0.05, title = NULL) {
+PlotPValHist <- function(object, assay, bins = 40, alpha = 0.05, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   #----- Pull DEG table
@@ -36,18 +36,33 @@ PlotPValueHistogram <- function(object, assay, bins = 40, alpha = 0.05, title = 
                        paste0("p >= ", alpha))
 
   #----- Set GenEDA-style colors
-  group1 <- paste0("p < ", alpha)
-  group2 <- paste0("p >= ", alpha)
-  groupColors <- c(
-    "firebrick3",
-    "darkgrey"
-  )
+  groupColors <- c("firebrick3", "darkgrey")
+
+  #----- Precompute bins
+  breaks <- seq(0, 1, length.out = bins + 1)
+  df$bin <- cut(df$pvalue, breaks = breaks, include.lowest = TRUE, right = TRUE)
+
+  bin_counts <- df |>
+    dplyr::group_by(bin, p_group) |>
+    dplyr::summarise(count = n(), .groups = "drop")
+
+  # Compute midpoint of each bin for plotting
+  bin_levels <- levels(df$bin)
+  bin_mid <- sapply(bin_levels, function(x) {
+    edges <- as.numeric(unlist(strsplit(gsub("\\[|\\]|\\(|\\)", "", x), ",")))
+    mean(edges)
+  })
+  names(bin_mid) <- bin_levels
+  bin_counts$mid <- bin_mid[as.character(bin_counts$bin)]
+
+  #----- Cap y-axis at max count + 15
+  ymax <- max(bin_counts$count) + 15
 
   #----- Plot
-  plt <- ggplot(df, aes(x = pvalue, fill = p_group)) +
-    geom_histogram(bins = bins, color = "black", alpha = 0.85) +
-    theme_classic(base_size = 16) +
+  plt <- ggplot(bin_counts, aes(x = mid, y = count, fill = p_group)) +
+    geom_col(color = "black", alpha = 0.85) +
     scale_fill_manual(values = groupColors) +
+    theme_classic(base_size = 16) +
     xlab("Raw p-value") +
     ylab("Count") +
     theme(
@@ -59,7 +74,8 @@ PlotPValueHistogram <- function(object, assay, bins = 40, alpha = 0.05, title = 
       legend.text = element_text(colour="black", size = 14),
       title = element_text(colour="black", size = 20)
     ) +
-    scale_x_continuous(limits = c(0, 1))
+    scale_x_continuous(limits = c(0, 1)) +
+    coord_cartesian(ylim = c(0, ymax))
 
   if (!is.null(title)) {
     plt <- plt + ggtitle(title)

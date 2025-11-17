@@ -11,12 +11,12 @@
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
-#' @param fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
+#' @param l2fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
 #' @param title Optional character vector of what plot should be titled.
 #'
 #' @returns A `ggplot2` object
 #' @export
-PlotMA <- function(object, assay, alpha, fc, title = NULL) {
+PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   if (!assay %in% names(object@DEGs)) {
@@ -34,7 +34,7 @@ PlotMA <- function(object, assay, alpha, fc, title = NULL) {
   }
 
   df$col <- NA
-  df$col[df$padj < alpha & abs(df$log2FoldChange) > fc] <- "red"
+  df$col[df$padj < alpha & abs(df$log2FoldChange) > l2fc] <- "red"
   df$col[is.na(df$col)] <- "black"
 
   df$gene <- rownames(df)
@@ -53,10 +53,10 @@ PlotMA <- function(object, assay, alpha, fc, title = NULL) {
     scale_size(range = c(1, 12)) +
     scale_fill_manual(name = " ",
                       values = c("black", "indianred"),
-                      labels = c("Not. sig.", paste0("Adj. P<0.05 & |LFC| > ", fc))) +
+                      labels = c("Not. sig.", paste0("Adj. P<0.05 & |LFC| > ", l2fc))) +
     scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
     ylim(cap_neg_yvalue, cap_pos_yvalue) +
-    geom_label_repel(data = subset(df, log2FoldChange > fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange > l2fc & padj < alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = 0.04,
@@ -65,7 +65,7 @@ PlotMA <- function(object, assay, alpha, fc, title = NULL) {
                      max.overlaps = 20,
                      segment.size = 0.3, fill = "grey90",
                      segment.color = 'grey50', size = 3.5) +
-    geom_label_repel(data = subset(df, log2FoldChange < -fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange < -l2fc & padj < alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = -0.04,
@@ -74,8 +74,8 @@ PlotMA <- function(object, assay, alpha, fc, title = NULL) {
                      segment.size = 0.3, fill = "grey90",
                      max.overlaps = 20,
                      segment.color = 'grey50', size = 3.5) +
-    geom_hline(yintercept = fc, colour = "black", linetype="dotted") +
-    geom_hline(yintercept = -fc, colour = "black", linetype="dotted") +
+    geom_hline(yintercept = l2fc, colour = "black", linetype="dotted") +
+    geom_hline(yintercept = -l2fc, colour = "black", linetype="dotted") +
     theme(legend.key.size = unit(1, "cm"),
           title = element_text(colour="black", size = 20),
           axis.text.x=element_text(colour="black", size = 14),

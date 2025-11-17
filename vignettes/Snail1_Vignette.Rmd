@@ -277,15 +277,17 @@ ec <- PlotEigenCorr(obj, num_pcs = 5)
 ec$plot
 
 ```
+
+
 ## Explore DEGs
 
 Differentially expressed genes can now be stored in the `RGenEDA` object. `RGenEDA` was designed to directly work with DEG tables derived from `DESeq2` and contain the column names "baseMean", "log2FoldChange" and "padj". DEG tables from other packages can be used with some minor dataframe manipulation.
 
-Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs()` command (for example, raw DESeq2 results and Shrunk DESeq2 results.)
+Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs()` command (for example, raw DESeq2 results and Shrunk DESeq2 results.) 
 
-DEG assays can be filterd and directly saved as a new assay in the DEGs slot using `FilterDEGs()`
+To get a quick diagnosis of the differential expression results, a histogram of un-corrected pvalues can be plotted using `PlotPValHist()`. 
 
-```{r DEGs, fig.show='hold', out.width='70%'}
+```{r PValHist, fig.show='hold', out.width='70%'}
 
 res <- results(dds) |> 
   as.data.frame()
@@ -295,10 +297,28 @@ obj <- SetDEGs(object = obj,
                deg_table = res,
                assay = "unfiltered")
 
+# P value histogram
+PlotPValHist(obj, 
+             assay = "unfiltered",
+             alpha = 0.05)
+```
+
+To quickly summarize the DEG results with different thresholds, run `SummarizeDEGs`(). This function can take multiple assays if needed and outputs results in a tabular format.
+
+DEG assays can be filtered and directly saved as a new assay in the DEGs slot using `FilterDEGs()`
+
+```{r DEGs , fig.show='hold', out.width='70%'}
+
+# Summarize DEGs
+SummarizeDEGs(obj,
+              alpha = 0.05,
+              lfc1 = 1,
+              lfc2 = 2)
+
 # Filter the DEG assay and save as a new one
 obj <- FilterDEGs(object = obj,
                   assay = "unfiltered",
-                  padj_thresh = 0.05,
+                  alpha = 0.05,
                   log2FC_thresh = 1,
                   saveAssay = "padj05_lfc1")
 
@@ -306,13 +326,16 @@ obj <- FilterDEGs(object = obj,
 nrow(DEGs(object = obj, assay = "unfiltered"))
 nrow(DEGs(object = obj, assay = "padj05_lfc1"))
 ```
+
+
 Basic DEG visualizations plots such as MA plots and volcano plots can be plotted using `PlotMA()` and `PlotVolcano()`
 "Num" and "Den" arguments refer to numerator level and denominator level (reference level of experiment, in our case, "WT")
+
 ```{r MA, fig.show='hold', out.width='70%'}
 PlotMA(obj,
        assay = "unfiltered",
        alpha = 0.05,
-       fc = 1)
+       l2fc = 1)
 
 ```
 
@@ -323,12 +346,25 @@ Or a volcano plot by specifying numerator and denominator (denominator is your c
 PlotVolcano(obj,
        assay = "unfiltered", 
        alpha = 0.05,
-       fc = 1,
+       l2fc = 1,
        den = "WT",
        num = "Snai1_KO",
        title = "Example Volcano")
 
 ```
+
+To get a glance at everything at once, we can plot a differential expression dashboard with `DEDashboard()`
+```{r test, echo=FALSE}
+
+DB <- DEDashboard(obj,
+                  assay = "unfiltered", 
+                  alpha = 0.05, l2fc = 1,
+                  num = "Snai1_KO", 
+                  den = "WT")
+knitr::include_graphics("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png")
+```
+
+
 To explore whether a differentially expressed gene (DEG) is also a highly variable gene (HVG), the intersect of these two vectors can be taken to obtain highly variable DEGs (hvDEGs), which can be useful for applications such as gene-set variation analysis (GSVA). To obtain this, the `FindHVDEGs()` function can be used. The direction of fold change to intersect with HVGs can be either "positive", or "negative", which returns a vector of genes, or "both" which contains a list with `$positive`, `$negative`, and `$both` slots.
 
 ```{r hvDEGs, fig.show='hold', out.width='70%'}
