@@ -36,12 +36,12 @@ SetDEGs <- function(object, deg_table, assay) {
 #' @param object A `geneda` object with `DEGs$DEG` set
 #' @param assay The DEG slot to filter
 #' @param alpha Adjusted p-value threshold (<=)
-#' @param log2FC_thresh Absolute log2 fold change threshold (>=)
+#' @param l2fc Absolute log2 fold change threshold (>=)
 #' @param saveAssay Character name for the filtered result set (e.g., "padj05_lfc1")
 #' @return Updated `geneda` object with filtered results stored in `DEGs[[saveAssay]]`
 #' @importFrom methods validObject
 #' @export
-FilterDEGs <- function(object, assay, alpha = 0.05, log2FC_thresh = 1.0, saveAssay) {
+FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
   stopifnot(methods::is(object, "geneda"))
   if (is.null(object@DEGs[[assay]])) {
     stop(paste("Assay", assay, "is NULL. Use SetDEGs() first."))
@@ -56,7 +56,7 @@ FilterDEGs <- function(object, assay, alpha = 0.05, log2FC_thresh = 1.0, saveAss
     stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
   }
   filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
-    abs(df$log2FoldChange) >= log2FC_thresh & df$padj <= alpha
+    abs(df$log2FoldChange) >= l2fc & df$padj <= alpha
   object@DEGs[[saveAssay]] <- df[filt, , drop = FALSE]
   validObject(object)
   object

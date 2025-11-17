@@ -73,7 +73,7 @@ test_that("PlotVolcano correctly assigns Groups", {
   rownames(df) <- paste0("Gene", 1:5)
   obj <- SetDEGs(obj, df, "DEG")
 
-  p <- PlotVolcano(obj, "DEG", alpha = 0.05, fc = 1, "Den", "Num")
+  p <- PlotVolcano(obj, "DEG", alpha = 0.05, l2fc = 1, "Den", "Num")
 
   groups <- p$data$Group
   expect_true(all(groups %in% c("Upregulated in Den",
