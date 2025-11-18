@@ -361,6 +361,7 @@ DB <- DEDashboard(obj,
                   alpha = 0.05, l2fc = 1,
                   num = "Snai1_KO", 
                   den = "WT")
+ggsave(paste0("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png"))
 knitr::include_graphics("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png")
 ```
 
