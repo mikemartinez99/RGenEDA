@@ -354,15 +354,17 @@ PlotVolcano(obj,
 ```
 
 To get a glance at everything at once, we can plot a differential expression dashboard with `DEDashboard()`
-```{r test, echo=FALSE}
+```{r test, echo=FALSE, fig.width=16, fig.height=14}
 
 DB <- DEDashboard(obj,
-                  assay = "unfiltered", 
-                  alpha = 0.05, l2fc = 1,
-                  num = "Snai1_KO", 
-                  den = "WT")
-ggsave(paste0("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png"))
-knitr::include_graphics("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png")
+            assay = "unfiltered", 
+            alpha = 0.05, l2fc = 1,
+            num = "Snai1_KO", 
+            den = "WT")
+
+DB
+
+#knitr::include_graphics("Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png")
 ```
 
 
