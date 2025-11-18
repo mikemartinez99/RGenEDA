@@ -402,7 +402,7 @@ slot using `FilterDEGs()`
     obj <- FilterDEGs(object = obj,
                       assay = "unfiltered",
                       alpha = 0.05,
-                      log2FC_thresh = 1,
+                      l2fc = 1,
                       saveAssay = "padj05_lfc1")
 
     # Grab results with accessor function
