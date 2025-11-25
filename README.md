@@ -88,7 +88,7 @@ For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/R
   - Replaced Pasilla dataset demo with **Snail1 KO dataset** from **Matsuri et al., 2018**<br>  
 
 ## Citation  
-If you use RGenEDA in your work, please cite: **DOI: dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
+If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
 
 ## 📬 Contact
 Mike Martinez M.S. - Dartmouth Genomic Data Science Core
