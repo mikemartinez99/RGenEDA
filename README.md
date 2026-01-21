@@ -85,7 +85,14 @@ For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/R
   - Added **FindHVDEGs** to intersect DEGs with HVGs calculated during EDA functions<br>    
   - Added **GenSave** function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()<br>    
   - Renamed eigencorr, ordcorr, and distanceHeatmap functions to **PlotEigenCorr**, **PlotOrdCorr**, and **PlotDistances** respectively to match other plotting function name conventions<br>    
-  - Replaced Pasilla dataset demo with **Snail1 KO dataset** from **Matsuri et al., 2018**<br>  
+  - Replaced Pasilla dataset demo with **Snail1 KO dataset** from **Matsuri et al., 2018**<br>
+
+**![Version](https://img.shields.io/badge/version-2.0.1-blue)** **![Release](https://img.shields.io/badge/Patch-green)**      
+*January 21st, 2026*<br>  
+  - Added in **PlotScree** function<br>
+  - Updated PCA utilities to dynamically generate PCs up until PC10
+  - Renamed the **DimReduction$Loadings** slot to **DimReduction$Scores** to more accurately reflect the information contained in this slot
+  - Added Scree Plot to vignette<br>  
 
 ## Citation  
 If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
