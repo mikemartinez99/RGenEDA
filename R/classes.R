@@ -11,7 +11,7 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @slot normalized Normalized expression matrix (features x samples).
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
-#' @slot DimReduction List for PCA results with `Loadings`, `Eigenvectors`, `percent_var`.
+#' @slot DimReduction List for PCA results with `Scores`, `Eigenvectors`, `percent_var`.
 #' @slot DEGs List container for differential expression results.
 #'
 #' @exportClass geneda
@@ -66,7 +66,7 @@ setClass(
     }
   }
   if (length(object@DimReduction) > 0L) {
-    needed_pcs <- c("Loadings", "Eigenvectors", "percent_var")
+    needed_pcs <- c("Scores", "Eigenvectors", "percent_var")
     if (!all(needed_pcs %in% names(object@DimReduction))) {
       errors <- c(errors, "'DimReduction' must contain names: Loadings, Eigenvectors, percent_var.")
     }

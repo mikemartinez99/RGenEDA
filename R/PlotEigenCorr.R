@@ -71,10 +71,10 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   }
 
   #----- Obtain PCs from stored DimReduction (required)
-  if (!(length(object@DimReduction) > 0L && "Loadings" %in% names(object@DimReduction))) {
+  if (!(length(object@DimReduction) > 0L && "Scores" %in% names(object@DimReduction))) {
     stop("DimReduction slot is empty. Please run RunPCA() before calling PlotEigenCorr().")
   }
-  pcs_mat <- as.data.frame(object@DimReduction[["Loadings"]])
+  pcs_mat <- as.data.frame(object@DimReduction[["Scores"]])
   # Align PCs to metadata order if necessary
   if (!identical(rownames(pcs_mat), rownames(META_num))) {
     pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]

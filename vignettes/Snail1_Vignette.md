@@ -213,7 +213,7 @@ Using the identified HVGs, principal components can be calculated using
 `RunPCA()` This function stores PCA results in the DimReduction slot,
 including:
 
-• `$Loadings` (sample scores)
+• `$Scores` (sample scores)
 
 • `$Eigenvectors` (gene contributions)
 
@@ -227,14 +227,14 @@ overriden directly using the `nfeatures` argument.
     obj <- RunPCA(obj)
     #> Calculating principal components from top 2000 HVGs
     #> Percent variations:
-    #>       PC1       PC2       PC3       PC4       PC5 
-    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"
+    #>       PC1       PC2       PC3       PC4       PC5       PC6 
+    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"
 
     # DimReductions can be accessed with accessor function
     # head(DimReduction(obj))
 
     # Inspect PCA outputs
-    head(obj@DimReduction$Loadings)
+    head(obj@DimReduction$Scores)
     #>                  PC1       PC2       PC3        PC4        PC5          PC6
     #> ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14
     #> ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14
@@ -243,16 +243,22 @@ overriden directly using the `nfeatures` argument.
     #> ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14
     #> ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14
     head(obj@DimReduction$Eigenvectors)
-    #>                  PC1         PC2           PC3          PC4          PC5
-    #> CENPI    0.003588589 -0.02172881 -0.0196200153 -0.015192540 -0.005752305
-    #> TULP3    0.021586498 -0.02096203  0.0134327078 -0.016091133  0.033236356
-    #> MAP3K14  0.021846399  0.04358180 -0.0447224066 -0.022827314 -0.064475180
-    #> AP3D1    0.026800954  0.02836574 -0.0380992712 -0.006296689  0.006278297
-    #> DIP2B   -0.002712758 -0.01559409 -0.0310157471 -0.028917713  0.008953505
-    #> TAZ      0.003357044  0.01302154 -0.0009023767 -0.003193418 -0.005208482
+    #>                  PC1         PC2           PC3          PC4          PC5          PC6
+    #> CENPI    0.003588589 -0.02172881 -0.0196200153 -0.015192540 -0.005752305  0.028620033
+    #> TULP3    0.021586498 -0.02096203  0.0134327078 -0.016091133  0.033236356  0.029272845
+    #> MAP3K14  0.021846399  0.04358180 -0.0447224066 -0.022827314 -0.064475180 -0.007776757
+    #> AP3D1    0.026800954  0.02836574 -0.0380992712 -0.006296689  0.006278297  0.052602611
+    #> DIP2B   -0.002712758 -0.01559409 -0.0310157471 -0.028917713  0.008953505 -0.023714858
+    #> TAZ      0.003357044  0.01302154 -0.0009023767 -0.003193418 -0.005208482  0.028888142
     head(obj@DimReduction$percent_var)
-    #>       PC1       PC2       PC3       PC4       PC5 
-    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"
+    #>       PC1       PC2       PC3       PC4       PC5       PC6 
+    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"
+
+
+    # Visualize a scree plot
+    PlotScree(obj)
+
+<img src="Snail1_Vignette_files/figure-markdown_strict/run-pca-1.png" style="display: block; margin: auto;" />
 
 ## Extract and visualize PCA results
 
@@ -429,12 +435,6 @@ experiment, in our case, “WT”)
            assay = "unfiltered",
            alpha = 0.05,
            l2fc = 1)
-    #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    #> ℹ Please use `linewidth` instead.
-    #> ℹ The deprecated feature was likely used in the RGenEDA package.
-    #>   Please report the issue to the authors.
-    #> This warning is displayed once every 8 hours.
-    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
     #> Scale for size is already present.
     #> Adding another scale for size, which will replace the existing scale.
     #> Warning: Removed 5 rows containing missing values or values outside the scale range

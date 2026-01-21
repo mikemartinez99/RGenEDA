@@ -20,7 +20,7 @@ highly variable genes (HVGs), and PCA dimensionality reduction results.
 
 \item{\code{HVGs}}{Character vector of selected highly variable gene IDs (row names).}
 
-\item{\code{DimReduction}}{List for PCA results with \code{Loadings}, \code{Eigenvectors}, \code{percent_var}.}
+\item{\code{DimReduction}}{List for PCA results with \code{Scores}, \code{Eigenvectors}, \code{percent_var}.}
 
 \item{\code{DEGs}}{List container for differential expression results.}
 }}

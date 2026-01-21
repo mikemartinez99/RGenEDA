@@ -28,7 +28,7 @@ PlotScree <- function(object) {
   #----- Plot
   scree <- ggplot(pcVars, aes(x = PC, y = Variance)) +
     geom_point(shape = 21, color = "black", fill = "steelblue", size = 3, stroke = 0.5) +
-    geom_line(aes(group = 1), color = "steelblue", size = 1) +
+    geom_line(aes(group = 1), color = "steelblue", linewidth = 1) +
     theme_bw(base_size = 16) +
     theme(axis.title = element_text(face = "bold"),
           axis.text.x = element_text(face = "bold", angle = 45, hjust = 1),

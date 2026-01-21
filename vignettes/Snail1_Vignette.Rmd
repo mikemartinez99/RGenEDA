@@ -195,7 +195,7 @@ head(HVGs(obj))
 Using the identified HVGs, principal components can be calculated using `RunPCA()`
 This function stores PCA results in the DimReduction slot, including:
 
-•	`$Loadings` (sample scores)
+•	`$Scores` (sample scores)
 	
 •	`$Eigenvectors` (gene contributions)
 	
@@ -211,10 +211,13 @@ obj <- RunPCA(obj)
 # head(DimReduction(obj))
 
 # Inspect PCA outputs
-head(obj@DimReduction$Loadings)
+head(obj@DimReduction$Scores)
 head(obj@DimReduction$Eigenvectors)
 head(obj@DimReduction$percent_var)
 
+
+# Visualize a scree plot
+PlotScree(obj)
 ```
 
 ## Extract and visualize PCA results
