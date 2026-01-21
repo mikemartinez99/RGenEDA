@@ -8,7 +8,7 @@ PlotEigenCorr(object, num_pcs = 10, meta_cols = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{normalized} and \code{metadata}, and
-optionally \code{DimReduction} loadings.}
+optionally \code{DimReduction} scores.}
 
 \item{num_pcs}{Number of principal components to correlate.}
 
@@ -25,7 +25,7 @@ significance stars. For continuous variables, Pearson correlation is used.
 P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
 one stars, respectively.
 
-Requires PCA loadings in \code{DimReduction(object)}; does not recompute PCA.
+Requires PCA scores in \code{DimReduction(object)}; does not recompute PCA.
 }
 \examples{
 \donttest{

@@ -18,9 +18,9 @@ create_test_geneda <- function() {
   obj <- GenEDA(normalized = mat, metadata = meta)
 
   # add DimReduction slot after creation
-  loadings <- data.frame(PC1 = 1:4, PC2 = c(2,1,4,3))
-  rownames(loadings) <- colnames(mat)
-  obj@DimReduction <- list(Loadings = loadings)
+  scores <- data.frame(PC1 = 1:4, PC2 = c(2,1,4,3))
+  rownames(scores) <- colnames(mat)
+  obj@DimReduction <- list(Scores = scores)
 
   return(obj)
 }

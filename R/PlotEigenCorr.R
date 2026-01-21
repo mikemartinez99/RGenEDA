@@ -6,7 +6,7 @@
 #' P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
 #' one stars, respectively.
 #'
-#' Requires PCA loadings in `DimReduction(object)`; does not recompute PCA.
+#' Requires PCA scores in `DimReduction(object)`; does not recompute PCA.
 #'
 #' @import ggplot2
 #' @import RColorBrewer
@@ -14,7 +14,7 @@
 #' @importFrom stats prcomp cor.test na.omit var as.formula
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
-#'   optionally `DimReduction` loadings.
+#'   optionally `DimReduction` scores.
 #' @param num_pcs Number of principal components to correlate.
 #' @param meta_cols Optional character vector of metadata column names to include.
 #'   Defaults to all metadata columns.
