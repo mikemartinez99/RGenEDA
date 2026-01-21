@@ -139,6 +139,8 @@ To visualize normalized count distributions across samples, the `PlotCountDist()
 PlotCountDist(obj, split_by = "Genotype")
 
 ```
+
+
 ## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, Euclidean distances between samples can be calculated and plotted as a `pheatmap` heatmap using the `PlotDistances()` function.

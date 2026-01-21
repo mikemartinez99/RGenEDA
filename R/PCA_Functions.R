@@ -39,16 +39,17 @@ generatePCs <- function(mat, vars, nFeatures) {
   pca <- prcomp(vsd_sub)
 
   percentVar <- pca$sdev^2/sum(pca$sdev^2)
-  percentVar <- percentVar[1:5]
+  percentVar <- percentVar[1:10]
 
   message("Percent variations:")
   percentVar <- paste(round(percentVar*100,2), "%", sep = " ")
-  names(percentVar) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
+  names(percentVar) <- c("PC1", "PC2", "PC3", "PC4", "PC5",
+                         "PC6", "PC7", "PC8", "PC9", "PC10")
   print(percentVar)
 
   pca_res <- list()
   pca_df <- as.data.frame(pca$x)
-  pca_eigenvecs <- as.data.frame(pca$rotation[,1:5])
+  pca_eigenvecs <- as.data.frame(pca$rotation[,1:10])
   pca_res[["Loadings"]] <- pca_df
   pca_res[["Eigenvectors"]] <- pca_eigenvecs
   pca_res[["percent_var"]] <- percentVar

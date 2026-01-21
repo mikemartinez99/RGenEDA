@@ -20,22 +20,22 @@ these with wild-type (WT) HS578T cells.
 
 ## Table of contents
 
--   [Load and inspect the data](#load-and-inspect-the-data)
--   [Define metadata](#define-metadata)
--   [Processing and normalization](#processing-and-normalization)
--   [Create a GenEDA object](#create-a-geneda-object)
--   [Count distrubutions across
-    samples](#count-distributions-across-samples)
--   [Sample Eucliden distances with hierarchical
-    clustering](#sample-euclidean-distances-with-hierarchical-clustering)
--   [Identify highly variable genes](#identify-highly-variable-genes)
--   [Principal component analysis](#principal-component-analysis)
--   [Extract and visualize PCA
-    results](#extract-and-visualize-pca-results)
--   [Explore Eigen vectors of individual
-    PCs](#explore-eigen-vectors-of-individual-pcs)
--   [Correlate PCs with metadata](#correlate-pcs-with-metadata)
--   [Explore DEGs](#explore-degs)
+- [Load and inspect the data](#load-and-inspect-the-data)
+- [Define metadata](#define-metadata)
+- [Processing and normalization](#processing-and-normalization)
+- [Create a GenEDA object](#create-a-geneda-object)
+- [Count distrubutions across
+  samples](#count-distributions-across-samples)
+- [Sample Eucliden distances with hierarchical
+  clustering](#sample-euclidean-distances-with-hierarchical-clustering)
+- [Identify highly variable genes](#identify-highly-variable-genes)
+- [Principal component analysis](#principal-component-analysis)
+- [Extract and visualize PCA
+  results](#extract-and-visualize-pca-results)
+- [Explore Eigen vectors of individual
+  PCs](#explore-eigen-vectors-of-individual-pcs)
+- [Correlate PCs with metadata](#correlate-pcs-with-metadata)
+- [Explore DEGs](#explore-degs)
 
 ## Load and inspect the data
 
@@ -94,7 +94,8 @@ expressed genes are filtered out before running `DESeq2.`
       colData = metadata,
       design = ~ Genotype
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design
+    #> formula are characters, converting to factors
 
     # Set reference levels
     dds$Genotype <- relevel(dds$Genotype, ref = "WT")
@@ -153,7 +154,8 @@ samples, technical artifacts, or batch effect. This function returns a
     PlotCountDist(obj, split_by = "Genotype")
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/count-dist-1.png" style="display: block; margin: auto;" />
-\## Sample Eucliden distances with hierarchical clustering
+
+## Sample Eucliden distances with hierarchical clustering
 
 To visualize replicate similarity, Euclidean distances between samples
 can be calculated and plotted as a `pheatmap` heatmap using the
@@ -262,13 +264,20 @@ customized with `ggplot2`.
 
     pcaDF <- ExtractPCA(obj)
     head(pcaDF)
-    #>                  PC1       PC2       PC3        PC4        PC5          PC6     Sample          Disease Genotype        CellLine_CellType
-    #> ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14 ERR1736465 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14 ERR1736466 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14 ERR1736467 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14 ERR1736468 breast carcinoma Snai1_KO HS578T - epithelial cell
-    #> ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14 ERR1736469 breast carcinoma Snai1_KO HS578T - epithelial cell
-    #> ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14 ERR1736470 breast carcinoma Snai1_KO HS578T - epithelial cell
+    #>                  PC1       PC2       PC3        PC4        PC5          PC6
+    #> ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14
+    #> ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14
+    #> ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14
+    #> ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14
+    #> ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14
+    #> ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14
+    #>                Sample          Disease Genotype        CellLine_CellType
+    #> ERR1736465 ERR1736465 breast carcinoma       WT HS578T - epithelial cell
+    #> ERR1736466 ERR1736466 breast carcinoma       WT HS578T - epithelial cell
+    #> ERR1736467 ERR1736467 breast carcinoma       WT HS578T - epithelial cell
+    #> ERR1736468 ERR1736468 breast carcinoma Snai1_KO HS578T - epithelial cell
+    #> ERR1736469 ERR1736469 breast carcinoma Snai1_KO HS578T - epithelial cell
+    #> ERR1736470 ERR1736470 breast carcinoma Snai1_KO HS578T - epithelial cell
 
     # Plot PCA
     PlotPCA(object = obj,
@@ -420,11 +429,20 @@ experiment, in our case, “WT”)
            assay = "unfiltered",
            alpha = 0.05,
            l2fc = 1)
+    #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    #> ℹ Please use `linewidth` instead.
+    #> ℹ The deprecated feature was likely used in the RGenEDA package.
+    #>   Please report the issue to the authors.
+    #> This warning is displayed once every 8 hours.
+    #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was generated.
     #> Scale for size is already present.
     #> Adding another scale for size, which will replace the existing scale.
-    #> Warning: Removed 5 rows containing missing values or values outside the scale range (`geom_point()`).
-    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-    #> Warning: ggrepel: 542 unlabeled data points (too many overlaps). Consider increasing max.overlaps
+    #> Warning: Removed 5 rows containing missing values or values outside the scale range
+    #> (`geom_point()`).
+    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
+    #> Warning: ggrepel: 542 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/MA-1.png" width="70%" style="display: block; margin: auto;" />
 
@@ -439,8 +457,10 @@ is your comparison reference level).
            den = "WT",
            num = "Snai1_KO",
            title = "Example Volcano")
-    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-    #> Warning: ggrepel: 538 unlabeled data points (too many overlaps). Consider increasing max.overlaps
+    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
+    #> Warning: ggrepel: 538 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/Volcano-1.png" width="70%" style="display: block; margin: auto;" />
 
@@ -449,8 +469,18 @@ expression dashboard with `DEDashboard()`
 
     #> Scale for size is already present.
     #> Adding another scale for size, which will replace the existing scale.
+    #> Warning: Removed 5 rows containing missing values or values outside the scale range
+    #> (`geom_point()`).
+    #> Warning: ggrepel: 640 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
+    #> Warning: ggrepel: 530 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
+    #> Warning: ggrepel: 643 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
+    #> Warning: ggrepel: 527 unlabeled data points (too many overlaps). Consider increasing
+    #> max.overlaps
 
-<img src="Snail1_Vignette_files/figure-markdown_strict/dashboard_example.png" width="4800" style="display: block; margin: auto;" />
+<img src="Snail1_Vignette_files/figure-markdown_strict/test-1.png" style="display: block; margin: auto;" />
 
 To explore whether a differentially expressed gene (DEG) is also a
 highly variable gene (HVG), the intersect of these two vectors can be
@@ -466,40 +496,70 @@ returns a vector of genes, or “both” which contains a list with
                assay = "padj05_lfc1",
                direction = "negative")
     #> 332 -log2FC hvDEGs found.
-    #>   [1] "CAMKK1"       "ACSM3"        "TMEM98"       "DLX6"         "MAP3K9"       "PRSS21"       "FUZ"          "CEP68"        "ERCC1"       
-    #>  [10] "BID"          "ABCC2"        "DEF6"         "LRRC7"        "VCAN"         "SPATA7"       "CAPG"         "MPC1"         "GUCY1B1"     
-    #>  [19] "EYA2"         "ANKRD44"      "PRKCQ"        "MTHFD2"       "TRO"          "NAV3"         "MAST4"        "GAL"          "CLTCL1"      
-    #>  [28] "DGCR2"        "MGAT4A"       "VASH1"        "ST6GAL1"      "ZNF532"       "TUBE1"        "MLH1"         "ARHGEF1"      "SLC1A3"      
-    #>  [37] "OPHN1"        "CARMIL1"      "IGSF9B"       "CXCL2"        "MMP2"         "TESC"         "DLL3"         "DSP"          "SYDE2"       
-    #>  [46] "PCSK5"        "TRMT2A"       "SMARCB1"      "PPM1F"        "SRRD"         "SEPTIN3"      "SYNGR1"       "PCK2"         "BMP7"        
-    #>  [55] "ISM1"         "TRIB3"        "FERMT1"       "ZNF516"       "KLHL4"        "CPPED1"       "FZD3"         "JPH1"         "GDAP1"       
-    #>  [64] "TUBB4A"       "FCGRT"        "NOVA2"        "OLFM2"        "TIMM50"       "DMAC2"        "CARD8"        "TMEM59L"      "SCN1B"       
-    #>  [73] "CADM4"        "PTN"          "GIMAP2"       "TRIM14"       "KANK1"        "COL1A1"       "CLEC2B"       "PARP11"       "VDR"         
-    #>  [82] "ADGRD1"       "PHC1"         "SOBP"         "PHACTR2"      "SEMA5A"       "GHR"          "PCDHB5"       "PCDHB6"       "CDH6"        
-    #>  [91] "SLC12A7"      "EHHADH"       "PODXL2"       "ARHGEF26"     "EFEMP1"       "IL18R1"       "ID2"          "NOL10"        "SLC25A12"    
-    #> [100] "SDC1"         "ORC4"         "PAPPA2"       "RHOU"         "CTH"          "AGMAT"        "ADGRL2"       "IFT46"        "MREG"        
-    #> [109] "UBE3D"        "TGIF2"        "ABCG2"        "LGALSL"       "BCL11A"       "PCDHB12"      "RDH10"        "PDZRN3"       "KIAA1549"    
-    #> [118] "BAZ2B"        "PFKFB2"       "DAW1"         "PTGIS"        "SNAI1"        "ZNF576"       "BMP4"         "EML2"         "TMX4"        
-    #> [127] "ID1"          "SSX1"         "GNAZ"         "PODXL"        "CHAC1"        "KIF1A"        "AFDN"         "ZNF227"       "THOC6"       
-    #> [136] "PER2"         "TTC9"         "PSAT1"        "MSI1"         "ACVR1B"       "OS9"          "MAP7"         "NHSL1"        "NIBAN1"      
-    #> [145] "EDNRB"        "GATA4"        "CTSV"         "KIAA0319"     "FLOT1"        "SULF1"        "FXYD6"        "GPAT3"        "BMPR1B"      
-    #> [154] "LEF1"         "CLSTN3"       "INHBE"        "RAB15"        "STON2"        "NUDT7"        "CDH13"        "GAREM1"       "TTYH2"       
-    #> [163] "IGFBP4"       "GEMIN7"       "WTIP"         "CRABP2"       "ETNK2"        "ALDH1L1"      "OTULINL"      "TNFAIP8"      "FAXC"        
-    #> [172] "SDK1"         "ZNF214"       "NCAM1"        "FEZ1"         "MPP7"         "CDH8"         "IL18"         "AKR1C2"       "TDO2"        
-    #> [181] "SPOCK1"       "PRDM8"        "BMP6"         "PTPRD"        "KCTD15"       "ANKFN1"       "KIF5A"        "TSPAN7"       "CD109"       
-    #> [190] "MMP14"        "ARSL"         "TMSB15A"      "TSPAN33"      "ZNF208"       "FAM171A2"     "PDPN"         "CADM3"        "EIF4E3"      
-    #> [199] "RPL22L1"      "HHIP"         "TBX20"        "STEAP1"       "ELAPOR2"      "ZNF704"       "CHMP4C"       "ADCY1"        "SLC16A9"     
-    #> [208] "PKNOX2"       "JCAD"         "JAM3"         "STXBP4"       "PPFIBP2"      "CYB5R2"       "PRTG"         "RIMKLB"       "NNMT"        
-    #> [217] "GPRC5B"       "OR51B5"       "OR51I1"       "CYP2S1"       "NXN"          "DDIT4"        "COA6"         "ZNF30"        "STXBP6"      
-    #> [226] "CXCL8"        "ZFPM2"        "SMAD1"        "KRT8"         "HOXB9"        "CHD7"         "LURAP1"       "DLK2"         "LRRC34"      
-    #> [235] "CYP4F11"      "TLN2"         "ZNF556"       "CALB2"        "SLCO2A1"      "BRSK2"        "NUPR1"        "OR51B6"       "EID2"        
-    #> [244] "EID2B"        "SYNE3"        "NCKAP5"       "MAGEF1"       "SOX12"        "HNRNPA0"      "AP3S1"        "ZNF223"       "ARL14"       
-    #> [253] "NLRP11"       "F2R"          "ZNF322"       "OR52D1"       "FDX1P1"       "PLCB1"        "CADM1"        "OR51B4"       "TMEM121B"    
-    #> [262] "SCN5A"        "THAP7"        "OR51M1"       "SLC24A3"      "MRPL40"       "PRAME"        "KCNQ5"        "KRT10"        "ZNF397"      
-    #> [271] "AKR1C1"       "ZKSCAN4"      "ZNF70"        "PABIR1"       "OR51I2"       "FAM78B"       "ZFP92"        "AKR1C3"       "PPP1R26"     
-    #> [280] "POTEF"        "TCF4"         "ZNF512B"      "MVB12B"       "ZSCAN26"      "STMN3"        "COL13A1"      "TUBA3C"       "MDM4"        
-    #> [289] "FAM169A"      "ZNF830"       "SCAMP5"       "ZNF521"       "SFMBT2"       "DZIP3"        "OR2L2"        "GPANK1"       "MRPS18B"     
-    #> [298] "PRR3"         "TMEM200C"     "GPSM3"        "EMP2"         "RTL10"        "RABGAP1L-IT1" "RFPL4A"       "SNHG14"       "APCDD1L-DT"  
-    #> [307] "YWHAEP1"      "RNASEH1-AS1"  "ZSCAN31"      "FOXD2-AS1"    "POU5F1P4"     "PRKCQ-AS1"    "GUSBP2"       "PEG10"        "N4BP2L2"     
-    #> [316] "LINC00504"    "RBBP4P1"      "CHCHD10"      "PCDHB17P"     "PECAM1"       "GNAO1-AS1"    "SH3GL1P1"     "LIN37"        "NCBP2AS2"    
-    #> [325] "CAHM"         "ZNF595"       "FAM106A"      "H2BC3"        "H2AC16"       "H4C1"         "OR51B2"       "H3C3"
+    #>   [1] "CAMKK1"       "ACSM3"        "TMEM98"       "DLX6"         "MAP3K9"      
+    #>   [6] "PRSS21"       "FUZ"          "CEP68"        "ERCC1"        "BID"         
+    #>  [11] "ABCC2"        "DEF6"         "LRRC7"        "VCAN"         "SPATA7"      
+    #>  [16] "CAPG"         "MPC1"         "GUCY1B1"      "EYA2"         "ANKRD44"     
+    #>  [21] "PRKCQ"        "MTHFD2"       "TRO"          "NAV3"         "MAST4"       
+    #>  [26] "GAL"          "CLTCL1"       "DGCR2"        "MGAT4A"       "VASH1"       
+    #>  [31] "ST6GAL1"      "ZNF532"       "TUBE1"        "MLH1"         "ARHGEF1"     
+    #>  [36] "SLC1A3"       "OPHN1"        "CARMIL1"      "IGSF9B"       "CXCL2"       
+    #>  [41] "MMP2"         "TESC"         "DLL3"         "DSP"          "SYDE2"       
+    #>  [46] "PCSK5"        "TRMT2A"       "SMARCB1"      "PPM1F"        "SRRD"        
+    #>  [51] "SEPTIN3"      "SYNGR1"       "PCK2"         "BMP7"         "ISM1"        
+    #>  [56] "TRIB3"        "FERMT1"       "ZNF516"       "KLHL4"        "CPPED1"      
+    #>  [61] "FZD3"         "JPH1"         "GDAP1"        "TUBB4A"       "FCGRT"       
+    #>  [66] "NOVA2"        "OLFM2"        "TIMM50"       "DMAC2"        "CARD8"       
+    #>  [71] "TMEM59L"      "SCN1B"        "CADM4"        "PTN"          "GIMAP2"      
+    #>  [76] "TRIM14"       "KANK1"        "COL1A1"       "CLEC2B"       "PARP11"      
+    #>  [81] "VDR"          "ADGRD1"       "PHC1"         "SOBP"         "PHACTR2"     
+    #>  [86] "SEMA5A"       "GHR"          "PCDHB5"       "PCDHB6"       "CDH6"        
+    #>  [91] "SLC12A7"      "EHHADH"       "PODXL2"       "ARHGEF26"     "EFEMP1"      
+    #>  [96] "IL18R1"       "ID2"          "NOL10"        "SLC25A12"     "SDC1"        
+    #> [101] "ORC4"         "PAPPA2"       "RHOU"         "CTH"          "AGMAT"       
+    #> [106] "ADGRL2"       "IFT46"        "MREG"         "UBE3D"        "TGIF2"       
+    #> [111] "ABCG2"        "LGALSL"       "BCL11A"       "PCDHB12"      "RDH10"       
+    #> [116] "PDZRN3"       "KIAA1549"     "BAZ2B"        "PFKFB2"       "DAW1"        
+    #> [121] "PTGIS"        "SNAI1"        "ZNF576"       "BMP4"         "EML2"        
+    #> [126] "TMX4"         "ID1"          "SSX1"         "GNAZ"         "PODXL"       
+    #> [131] "CHAC1"        "KIF1A"        "AFDN"         "ZNF227"       "THOC6"       
+    #> [136] "PER2"         "TTC9"         "PSAT1"        "MSI1"         "ACVR1B"      
+    #> [141] "OS9"          "MAP7"         "NHSL1"        "NIBAN1"       "EDNRB"       
+    #> [146] "GATA4"        "CTSV"         "KIAA0319"     "FLOT1"        "SULF1"       
+    #> [151] "FXYD6"        "GPAT3"        "BMPR1B"       "LEF1"         "CLSTN3"      
+    #> [156] "INHBE"        "RAB15"        "STON2"        "NUDT7"        "CDH13"       
+    #> [161] "GAREM1"       "TTYH2"        "IGFBP4"       "GEMIN7"       "WTIP"        
+    #> [166] "CRABP2"       "ETNK2"        "ALDH1L1"      "OTULINL"      "TNFAIP8"     
+    #> [171] "FAXC"         "SDK1"         "ZNF214"       "NCAM1"        "FEZ1"        
+    #> [176] "MPP7"         "CDH8"         "IL18"         "AKR1C2"       "TDO2"        
+    #> [181] "SPOCK1"       "PRDM8"        "BMP6"         "PTPRD"        "KCTD15"      
+    #> [186] "ANKFN1"       "KIF5A"        "TSPAN7"       "CD109"        "MMP14"       
+    #> [191] "ARSL"         "TMSB15A"      "TSPAN33"      "ZNF208"       "FAM171A2"    
+    #> [196] "PDPN"         "CADM3"        "EIF4E3"       "RPL22L1"      "HHIP"        
+    #> [201] "TBX20"        "STEAP1"       "ELAPOR2"      "ZNF704"       "CHMP4C"      
+    #> [206] "ADCY1"        "SLC16A9"      "PKNOX2"       "JCAD"         "JAM3"        
+    #> [211] "STXBP4"       "PPFIBP2"      "CYB5R2"       "PRTG"         "RIMKLB"      
+    #> [216] "NNMT"         "GPRC5B"       "OR51B5"       "OR51I1"       "CYP2S1"      
+    #> [221] "NXN"          "DDIT4"        "COA6"         "ZNF30"        "STXBP6"      
+    #> [226] "CXCL8"        "ZFPM2"        "SMAD1"        "KRT8"         "HOXB9"       
+    #> [231] "CHD7"         "LURAP1"       "DLK2"         "LRRC34"       "CYP4F11"     
+    #> [236] "TLN2"         "ZNF556"       "CALB2"        "SLCO2A1"      "BRSK2"       
+    #> [241] "NUPR1"        "OR51B6"       "EID2"         "EID2B"        "SYNE3"       
+    #> [246] "NCKAP5"       "MAGEF1"       "SOX12"        "HNRNPA0"      "AP3S1"       
+    #> [251] "ZNF223"       "ARL14"        "NLRP11"       "F2R"          "ZNF322"      
+    #> [256] "OR52D1"       "FDX1P1"       "PLCB1"        "CADM1"        "OR51B4"      
+    #> [261] "TMEM121B"     "SCN5A"        "THAP7"        "OR51M1"       "SLC24A3"     
+    #> [266] "MRPL40"       "PRAME"        "KCNQ5"        "KRT10"        "ZNF397"      
+    #> [271] "AKR1C1"       "ZKSCAN4"      "ZNF70"        "PABIR1"       "OR51I2"      
+    #> [276] "FAM78B"       "ZFP92"        "AKR1C3"       "PPP1R26"      "POTEF"       
+    #> [281] "TCF4"         "ZNF512B"      "MVB12B"       "ZSCAN26"      "STMN3"       
+    #> [286] "COL13A1"      "TUBA3C"       "MDM4"         "FAM169A"      "ZNF830"      
+    #> [291] "SCAMP5"       "ZNF521"       "SFMBT2"       "DZIP3"        "OR2L2"       
+    #> [296] "GPANK1"       "MRPS18B"      "PRR3"         "TMEM200C"     "GPSM3"       
+    #> [301] "EMP2"         "RTL10"        "RABGAP1L-IT1" "RFPL4A"       "SNHG14"      
+    #> [306] "APCDD1L-DT"   "YWHAEP1"      "RNASEH1-AS1"  "ZSCAN31"      "FOXD2-AS1"   
+    #> [311] "POU5F1P4"     "PRKCQ-AS1"    "GUSBP2"       "PEG10"        "N4BP2L2"     
+    #> [316] "LINC00504"    "RBBP4P1"      "CHCHD10"      "PCDHB17P"     "PECAM1"      
+    #> [321] "GNAO1-AS1"    "SH3GL1P1"     "LIN37"        "NCBP2AS2"     "CAHM"        
+    #> [326] "ZNF595"       "FAM106A"      "H2BC3"        "H2AC16"       "H4C1"        
+    #> [331] "OR51B2"       "H3C3"
