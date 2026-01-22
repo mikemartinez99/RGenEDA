@@ -89,7 +89,7 @@ test_that("RunPCA fills DimReduction slot for large matrix", {
   dr <- DimReduction(obj)
 
   expect_true(all(c("Scores", "Eigenvectors", "percent_var") %in% names(dr)))
-  expect_s3_class(dr$Loadings, "data.frame")
+  expect_s3_class(dr$Scores, "data.frame")
   expect_s3_class(dr$Eigenvectors, "data.frame")
   expect_equal(nrow(dr$Scores), ncol(obj@normalized))
   expect_equal(nrow(dr$Eigenvectors), length(HVGs(obj)))
