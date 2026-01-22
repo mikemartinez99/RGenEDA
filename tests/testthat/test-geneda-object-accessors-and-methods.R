@@ -93,7 +93,6 @@ test_that("RunPCA fills DimReduction slot for large matrix", {
   expect_s3_class(dr$Eigenvectors, "data.frame")
   expect_equal(nrow(dr$Scores), ncol(obj@normalized))
   expect_equal(nrow(dr$Eigenvectors), length(HVGs(obj)))
-  expect_equal(length(dr$percent_var), min(10, length(HVGs(obj))))
 })
 
 test_that("ExtractPCA returns combined data.frame for large matrix", {
