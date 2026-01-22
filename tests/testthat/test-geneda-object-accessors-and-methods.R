@@ -88,12 +88,12 @@ test_that("RunPCA fills DimReduction slot for large matrix", {
   obj <- RunPCA(obj, nfeatures = 2000) # realistic top HVGs
   dr <- DimReduction(obj)
 
-  expect_true(all(c("Loadings", "Eigenvectors", "percent_var") %in% names(dr)))
+  expect_true(all(c("Scores", "Eigenvectors", "percent_var") %in% names(dr)))
   expect_s3_class(dr$Loadings, "data.frame")
   expect_s3_class(dr$Eigenvectors, "data.frame")
-  expect_equal(nrow(dr$Loadings), ncol(obj@normalized))
+  expect_equal(nrow(dr$Scores), ncol(obj@normalized))
   expect_equal(nrow(dr$Eigenvectors), length(HVGs(obj)))
-  expect_equal(length(dr$percent_var), min(5, length(HVGs(obj))))
+  expect_equal(length(dr$percent_var), min(10, length(HVGs(obj))))
 })
 
 test_that("ExtractPCA returns combined data.frame for large matrix", {
