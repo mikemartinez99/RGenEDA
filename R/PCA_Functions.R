@@ -38,7 +38,7 @@ generatePCs <- function(mat, vars, nFeatures) {
   vsd_sub <- t(vsd_sub)
   pca <- prcomp(vsd_sub)
 
-  nPC <- min(10, ncol(pca$x))
+  nPC <- ncol(pca$x)
 
   percentVar <- pca$sdev^2/sum(pca$sdev^2)
   #percentVar <- percentVar[1:10]
@@ -47,7 +47,7 @@ generatePCs <- function(mat, vars, nFeatures) {
   percentVar <- paste(round(percentVar*100,2), "%", sep = " ")
   names(percentVar) <- paste0("PC", seq_len(nPC))
 
-  print(percentVar)
+  print(percentVar[seq_len(min(10, length(percentVar)))])
 
   pca_res <- list()
   pca_df <- as.data.frame(pca$x[,seq_len(nPC), drop = FALSE])
