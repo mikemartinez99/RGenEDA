@@ -3,7 +3,7 @@
 
 
  <!-- badges: start -->
- ![status](https://img.shields.io/badge/status-in--development-orange) 
+ ![status](https://img.shields.io/badge/status-stable-green) 
  ![Version](https://img.shields.io/badge/version-2.0.2-blue)
   [![pkgdown documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://mikemartinez99.github.io/RGenEDA/)
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
@@ -11,12 +11,6 @@
   [![Codecov test coverage](https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg)](https://app.codecov.io/gh/mikemartinez99/RGenEDA)
  
   <!-- badges: end -->
-
-
-### Development <!-- omit in toc -->
-
-> [!IMPORTANT]
-> **RenEDA is currently under active development. If there is a feature you would like implemented, please submit a feature request on the Issues page of submit a pull request. For information on new additions see the** **[Change Log](#change-log)**
 
 
 > [!WARNING]
