@@ -4,7 +4,7 @@
 
  <!-- badges: start -->
  ![status](https://img.shields.io/badge/status-in--development-orange) 
- ![Version](https://img.shields.io/badge/version-2.0.1-blue)
+ ![Version](https://img.shields.io/badge/version-2.0.2-blue)
   [![pkgdown documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://mikemartinez99.github.io/RGenEDA/)
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
@@ -92,7 +92,12 @@ For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/R
   - Added in **PlotScree** function<br>
   - Updated PCA utilities to dynamically generate PCs up until PC10
   - Renamed the **DimReduction$Loadings** slot to **DimReduction$Scores** to more accurately reflect the information contained in this slot
-  - Added Scree Plot to vignette<br>  
+  - Added Scree Plot to vignette<br>
+
+**![Version](https://img.shields.io/badge/version-2.0.2-blue)** **![Release](https://img.shields.io/badge/Patch-green)**      
+*February 13th, 2026*<br>  
+  - Fixed bug in RunPCA where PCs beyond 10 are named as NA <br>
+  - Fixed bug in PlotScree where PCs beyond 10 are shown as NA <br>
 
 ## Citation  
 If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
