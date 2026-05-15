@@ -36,7 +36,9 @@ library(RGenEDA)
 ```
 
 ## Usage
-For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/RGenEDA/articles/Snail1_Vignette.html)  
+For a full demo, see [Snail1 KO Dataset Demo](https://mikemartinez99.github.io/RGenEDA/articles/Snail1_Vignette.html)
+
+For some background on why EDA is important, see [Compute and Conquer: The Basics of EDA](https://mikemartinez99.github.io/posts/The-Basics-of-Exploratory-Data-Analysis/)
 
 ## Change-log
 
