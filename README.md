@@ -19,7 +19,7 @@
 --- 
 
 
-![Alt text](https://raw.githubusercontent.com/mikemartinez99/RGenEDA/main/img/examples.png)
+![RGenEDA example outputs: sample distance heatmap, HVG variance profile, PCA, eigencorrelations, scree plot, eigenvector heatmap, and DEG p-value, MA and volcano plots](man/figures/overview.png)
 
 
 ## Installation
