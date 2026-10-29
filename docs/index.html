@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,7 +62,7 @@
 </h1>
 </div>
 <p><strong>Clean, unified, streamlined, and reproducible frameworks for genomic exploratory data analyses</strong></p>
-<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-stable-green" alt="status"><img src="https://img.shields.io/badge/version-2.0.2-blue" alt="Version"><a href="https://mikemartinez99.github.io/RGenEDA/"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown documentation"></a> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a></p>
+<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-stable-green" alt="status"><img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version"><a href="https://mikemartinez99.github.io/RGenEDA/"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown documentation"></a> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a></p>
 <p><!-- badges: end --></p>
 <blockquote>
 <p>[!WARNING] <strong>RGenEDA has updated to v2.0.0 which introduced some breaking changes. Please ensure you are using the most up-to-date version</strong></p>
@@ -92,40 +92,14 @@
 <div class="section level2">
 <h2 id="change-log">Change-log<a class="anchor" aria-label="anchor" href="#change-log"></a>
 </h2>
-<p><strong><img src="https://img.shields.io/badge/version-0.0.0.900-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Initial-grey" alt="Release"></strong> <em>April 2025: “The poor-man’s EDA”</em><br><br>
-- Implemented core, standalone functions<br><br>
-- Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations<br></p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong> <em>October 16th, 2025: “The GenEDA Object Update</em><br><br>
-- Introduced S4 <strong>GenEDA</strong> object for streamlined data handling<br><br>
-- Added <strong>methods</strong> for HVG calculation and PCA storage within S4 slots<br><br>
-- Added <strong>visualization functions</strong><br><br>
-- PCA plots<br><br>
-- Variance plots for HVGs<br><br>
-- Eigenvector (gene-loading) plots<br><br>
-- Revamped eigencorrelation plots to only use top number of HVGs identified in HVG selection/PCA<br><br>
-- Enhanced plot output flexibility (return <strong>ggplot2, pheatmap</strong>, or <strong>ComplexHeatmap</strong> objects for full customization<br><br>
-- Added <strong>unit tests</strong><br><br>
-- Added <strong>Pasilla dataset vignette</strong><br></p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 3rd, 2025</em><br> - Rely soley on <strong>Pheatmap</strong> for all heatmap visualizations<br><br>
-- Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function<br><br>
-- Added optional <strong>DEGs slot</strong> to GenEDA object to interface with <strong>DESeq2</strong><br><br>
-- Added <strong>MA plot</strong> functionality<br></p>
-<p><strong><img src="https://img.shields.io/badge/version-1.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>November 10th, 2025</em><br><br>
-- Fixed example blocks in roxygen headers<br><br>
-- Addressed all R cmd build errors, warnings, and notes<br></p>
-<p><strong><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong><br><em>November 15th, 2025: “The DEG update”</em><br><br>
-- Added <strong>assay</strong> argument to <strong>SetDEGs</strong> function<br><br>
-- Added <strong>assay</strong> and <strong>saveAssay</strong> argument to <strong>FilterDEGs</strong> function to specify which assay to filter and what to save filtered assay as<br><br>
-- Added <strong>assay</strong> argument to <strong>PlotMA</strong> to specify which DEG slot to plot<br><br>
-- Added <strong>PlotVolcano</strong> function for direct volcano plotting functionality<br><br>
-- Added <strong>FindHVDEGs</strong> to intersect DEGs with HVGs calculated during EDA functions<br><br>
-- Added <strong>GenSave</strong> function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()<br><br>
-- Renamed eigencorr, ordcorr, and distanceHeatmap functions to <strong>PlotEigenCorr</strong>, <strong>PlotOrdCorr</strong>, and <strong>PlotDistances</strong> respectively to match other plotting function name conventions<br><br>
-- Replaced Pasilla dataset demo with <strong>Snail1 KO dataset</strong> from <strong>Matsuri et al., 2018</strong><br></p>
-<p><strong><img src="https://img.shields.io/badge/version-2.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>January 21st, 2026</em><br><br>
-- Added in <strong>PlotScree</strong> function<br> - Updated PCA utilities to dynamically generate PCs up until PC10 - Renamed the <strong>DimReduction<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>a</mi><mi>d</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>s</mi><mo>*</mo><mi>*</mi><mi>s</mi><mi>l</mi><mi>o</mi><mi>t</mi><mi>t</mi><mi>o</mi><mo>*</mo><mi>*</mi><mi>D</mi><mi>i</mi><mi>m</mi><mi>R</mi><mi>e</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Loadings** slot to **DimReduction</annotation></semantics></math>Scores</strong> to more accurately reflect the information contained in this slot - Added Scree Plot to vignette<br></p>
-<p><strong><img src="https://img.shields.io/badge/version-2.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong><br><em>February 13th, 2026</em><br><br>
-- Fixed bug in RunPCA where PCs beyond 10 are named as NA <br> - Fixed bug in PlotScree where PCs beyond 10 are shown as NA <br></p>
+<p><strong><img src="https://img.shields.io/badge/version-0.0.0.900-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Initial-grey" alt="Release"></strong> <em>April 2025: “The poor-man’s EDA”</em><br> - Implemented core, standalone functions<br> - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong> <em>October 16th, 2025: “The GenEDA Object Update</em><br> - Introduced S4 <strong>GenEDA</strong> object for streamlined data handling<br> - Added <strong>methods</strong> for HVG calculation and PCA storage within S4 slots<br> - Added <strong>visualization functions</strong><br> - PCA plots<br> - Variance plots for HVGs<br> - Eigenvector (gene-loading) plots<br> - Revamped eigencorrelation plots to only use top number of HVGs identified in HVG selection/PCA<br> - Enhanced plot output flexibility (return <strong>ggplot2, pheatmap</strong>, or <strong>ComplexHeatmap</strong> objects for full customization<br> - Added <strong>unit tests</strong><br> - Added <strong>Pasilla dataset vignette</strong><br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>November 3rd, 2025</em><br> - Rely soley on <strong>Pheatmap</strong> for all heatmap visualizations<br> - Fixed top-gene-loading bug for selected PCs in PlotEigenHeatmap function<br> - Added optional <strong>DEGs slot</strong> to GenEDA object to interface with <strong>DESeq2</strong><br> - Added <strong>MA plot</strong> functionality<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-1.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>November 10th, 2025</em><br> - Fixed example blocks in roxygen headers<br> - Addressed all R cmd build errors, warnings, and notes<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-2.0.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Major-red" alt="Release"></strong> <em>November 15th, 2025: “The DEG update”</em><br> - Added <strong>assay</strong> argument to <strong>SetDEGs</strong> function<br> - Added <strong>assay</strong> and <strong>saveAssay</strong> argument to <strong>FilterDEGs</strong> function to specify which assay to filter and what to save filtered assay as<br> - Added <strong>assay</strong> argument to <strong>PlotMA</strong> to specify which DEG slot to plot<br> - Added <strong>PlotVolcano</strong> function for direct volcano plotting functionality<br> - Added <strong>FindHVDEGs</strong> to intersect DEGs with HVGs calculated during EDA functions<br> - Added <strong>GenSave</strong> function to save save pheatmap objects in a manner similar to ggplpot2::ggsave()<br> - Renamed eigencorr, ordcorr, and distanceHeatmap functions to <strong>PlotEigenCorr</strong>, <strong>PlotOrdCorr</strong>, and <strong>PlotDistances</strong> respectively to match other plotting function name conventions<br> - Replaced Pasilla dataset demo with <strong>Snail1 KO dataset</strong> from <strong>Matsuri et al., 2018</strong><br></p>
+<p><strong><img src="https://img.shields.io/badge/version-2.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>January 21st, 2026</em><br> - Added in <strong>PlotScree</strong> function<br> - Updated PCA utilities to dynamically generate PCs up until PC10 - Renamed the <strong>DimReduction<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>a</mi><mi>d</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>s</mi><mo>*</mo><mi>*</mi><mi>s</mi><mi>l</mi><mi>o</mi><mi>t</mi><mi>t</mi><mi>o</mi><mo>*</mo><mi>*</mi><mi>D</mi><mi>i</mi><mi>m</mi><mi>R</mi><mi>e</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Loadings** slot to **DimReduction</annotation></semantics></math>Scores</strong> to more accurately reflect the information contained in this slot - Added Scree Plot to vignette<br></p>
+<p><strong><img src="https://img.shields.io/badge/version-2.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>February 13th, 2026</em><br> - Fixed bug in RunPCA where PCs beyond 10 are named as NA <br> - Fixed bug in PlotScree where PCs beyond 10 are shown as NA <br></p>
+<p><strong><img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Minor-orange" alt="Release"></strong> <em>October 29th, 2026</em><br> - Fixed cosmetics of printing statements <br> - Minor bug fixes in PCA functions and accessors <br></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
