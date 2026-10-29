@@ -42,9 +42,10 @@ test_that("GenSave converts cm to inches for PDF output", {
 
   # PDF MediaBox is in points (72 per inch): 4 x 3 inches = 288 x 216
   # The pdf device truncates to whole points, so allow 1 point of rounding
+  # Search the raw bytes: the binary PDF header is invalid UTF-8, so string
+  # regex on rawToChar() output finds no match in UTF-8 locales
   pdf_raw <- readBin(f, "raw", file.size(f))
-  pdf_text <- rawToChar(pdf_raw[pdf_raw != as.raw(0)])
-  box <- regmatches(pdf_text, regexpr("MediaBox \\[0 0 [0-9.]+ [0-9.]+", pdf_text))
+  box <- rawToChar(grepRaw("MediaBox \\[0 0 [0-9.]+ [0-9.]+", pdf_raw, value = TRUE))
   dims <- as.numeric(strsplit(sub("MediaBox \\[0 0 ", "", box), " ")[[1]])
   expect_true(all(abs(dims - c(288, 216)) <= 1))
 })
