@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -211,7 +211,7 @@ metadata (bare minimum requirements).</p>
 <span><span class="co">#&gt;   HVGs: 0</span></span>
 <span><span class="co">#&gt;   DimReduction: 0</span></span>
 <span><span class="co">#&gt;   counts: NULL</span></span>
-<span><span class="co">#&gt;   DEGs: DEG</span></span></code></pre></div>
+<span><span class="co">#&gt;   DEGs: none</span></span></code></pre></div>
 <p>You will see that the object also contains slots for Highly Variable
 Genes (HVGs), DimReduction (PCA, etc..) and Differentially Expressed
 Genes (DEGs). These will be populated shortly with
@@ -307,38 +307,45 @@ argument.</p>
 <span><span class="co">#&gt; Calculating principal components from top 2000 HVGs</span></span>
 <span><span class="co">#&gt; Percent variations:</span></span>
 <span><span class="co">#&gt;       PC1       PC2       PC3       PC4       PC5       PC6 </span></span>
-<span><span class="co">#&gt; "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"</span></span>
+<span><span class="co">#&gt; "85.43 %"  "7.07 %"  "3.89 %"  "2.28 %"  "1.33 %"     "0 %"</span></span>
 <span></span>
 <span><span class="co"># DimReductions can be accessed with accessor function</span></span>
 <span><span class="co"># head(DimReduction(obj))</span></span>
 <span></span>
 <span><span class="co"># Inspect PCA outputs</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">Scores</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                  PC1       PC2       PC3        PC4        PC5          PC6</span></span>
-<span><span class="co">#&gt; ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14</span></span>
-<span><span class="co">#&gt; ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14</span></span>
-<span><span class="co">#&gt; ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14</span></span>
-<span><span class="co">#&gt; ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14</span></span>
-<span><span class="co">#&gt; ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14</span></span>
-<span><span class="co">#&gt; ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14</span></span>
+<span><span class="co">#&gt;                  PC1       PC2         PC3         PC4          PC5</span></span>
+<span><span class="co">#&gt; ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259</span></span>
+<span><span class="co">#&gt; ERR1736466 -14.27872 -2.406553 -5.26248029 -0.01697393  0.313289330</span></span>
+<span><span class="co">#&gt; ERR1736467 -13.35504 -1.694899  3.44737576 -3.03463682 -1.042987566</span></span>
+<span><span class="co">#&gt; ERR1736468  12.70944 -4.145799  1.47958222  0.20911815  2.703775110</span></span>
+<span><span class="co">#&gt; ERR1736469  12.51669 -2.370634  0.09842185  2.20330061 -2.739470641</span></span>
+<span><span class="co">#&gt; ERR1736470  14.67757  5.775900 -1.71551858 -2.34392774 -0.005150492</span></span>
+<span><span class="co">#&gt;                     PC6</span></span>
+<span><span class="co">#&gt; ERR1736465 3.993043e-14</span></span>
+<span><span class="co">#&gt; ERR1736466 4.093910e-14</span></span>
+<span><span class="co">#&gt; ERR1736467 3.968706e-14</span></span>
+<span><span class="co">#&gt; ERR1736468 3.303503e-14</span></span>
+<span><span class="co">#&gt; ERR1736469 3.173788e-14</span></span>
+<span><span class="co">#&gt; ERR1736470 3.630529e-14</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">Eigenvectors</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                  PC1         PC2           PC3          PC4          PC5</span></span>
-<span><span class="co">#&gt; CENPI    0.003588589 -0.02172881 -0.0196200153 -0.015192540 -0.005752305</span></span>
-<span><span class="co">#&gt; TULP3    0.021586498 -0.02096203  0.0134327078 -0.016091133  0.033236356</span></span>
-<span><span class="co">#&gt; MAP3K14  0.021846399  0.04358180 -0.0447224066 -0.022827314 -0.064475180</span></span>
-<span><span class="co">#&gt; AP3D1    0.026800954  0.02836574 -0.0380992712 -0.006296689  0.006278297</span></span>
-<span><span class="co">#&gt; DIP2B   -0.002712758 -0.01559409 -0.0310157471 -0.028917713  0.008953505</span></span>
-<span><span class="co">#&gt; TAZ      0.003357044  0.01302154 -0.0009023767 -0.003193418 -0.005208482</span></span>
-<span><span class="co">#&gt;                  PC6</span></span>
-<span><span class="co">#&gt; CENPI    0.028620033</span></span>
-<span><span class="co">#&gt; TULP3    0.029272845</span></span>
-<span><span class="co">#&gt; MAP3K14 -0.007776757</span></span>
-<span><span class="co">#&gt; AP3D1    0.052602611</span></span>
-<span><span class="co">#&gt; DIP2B   -0.023714858</span></span>
-<span><span class="co">#&gt; TAZ      0.028888142</span></span>
+<span><span class="co">#&gt;                 PC1          PC2           PC3          PC4          PC5</span></span>
+<span><span class="co">#&gt; THY1    0.150266440 -0.022809065  0.0000110537 -0.006329718 -0.028030018</span></span>
+<span><span class="co">#&gt; CCL2    0.135706807 -0.025658201  0.0070373490  0.003838021 -0.040018651</span></span>
+<span><span class="co">#&gt; SSX1   -0.130106138  0.036993763  0.0189472965 -0.007723523  0.001874006</span></span>
+<span><span class="co">#&gt; AKR1C2 -0.116614608  0.003828601  0.0030343526 -0.019723927 -0.002551927</span></span>
+<span><span class="co">#&gt; GPX1    0.111588141  0.002460421 -0.0335286040 -0.039545468 -0.007872470</span></span>
+<span><span class="co">#&gt; MYL12B  0.005002684  0.178455620 -0.2807259755  0.269866847 -0.311091450</span></span>
+<span><span class="co">#&gt;                PC6</span></span>
+<span><span class="co">#&gt; THY1   -0.13041073</span></span>
+<span><span class="co">#&gt; CCL2    0.12077408</span></span>
+<span><span class="co">#&gt; SSX1    0.04077754</span></span>
+<span><span class="co">#&gt; AKR1C2  0.06171997</span></span>
+<span><span class="co">#&gt; GPX1   -0.01918598</span></span>
+<span><span class="co">#&gt; MYL12B -0.00531372</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">percent_var</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       PC1       PC2       PC3       PC4       PC5       PC6 </span></span>
-<span><span class="co">#&gt; "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"</span></span>
+<span><span class="co">#&gt; "85.43 %"  "7.07 %"  "3.89 %"  "2.28 %"  "1.33 %"     "0 %"</span></span>
 <span></span>
 <span></span>
 <span><span class="co"># Visualize a scree plot</span></span>
@@ -356,20 +363,27 @@ can also be further customized with <code>ggplot2</code>.</p>
 <code class="sourceCode R"><span></span>
 <span><span class="va">pcaDF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ExtractPCA.html">ExtractPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pcaDF</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                  PC1       PC2       PC3        PC4        PC5          PC6</span></span>
-<span><span class="co">#&gt; ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14</span></span>
-<span><span class="co">#&gt; ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14</span></span>
-<span><span class="co">#&gt; ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14</span></span>
-<span><span class="co">#&gt; ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14</span></span>
-<span><span class="co">#&gt; ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14</span></span>
-<span><span class="co">#&gt; ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14</span></span>
-<span><span class="co">#&gt;                Sample          Disease Genotype        CellLine_CellType</span></span>
-<span><span class="co">#&gt; ERR1736465 ERR1736465 breast carcinoma       WT HS578T - epithelial cell</span></span>
-<span><span class="co">#&gt; ERR1736466 ERR1736466 breast carcinoma       WT HS578T - epithelial cell</span></span>
-<span><span class="co">#&gt; ERR1736467 ERR1736467 breast carcinoma       WT HS578T - epithelial cell</span></span>
-<span><span class="co">#&gt; ERR1736468 ERR1736468 breast carcinoma Snai1_KO HS578T - epithelial cell</span></span>
-<span><span class="co">#&gt; ERR1736469 ERR1736469 breast carcinoma Snai1_KO HS578T - epithelial cell</span></span>
-<span><span class="co">#&gt; ERR1736470 ERR1736470 breast carcinoma Snai1_KO HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt;                  PC1       PC2         PC3         PC4          PC5</span></span>
+<span><span class="co">#&gt; ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259</span></span>
+<span><span class="co">#&gt; ERR1736466 -14.27872 -2.406553 -5.26248029 -0.01697393  0.313289330</span></span>
+<span><span class="co">#&gt; ERR1736467 -13.35504 -1.694899  3.44737576 -3.03463682 -1.042987566</span></span>
+<span><span class="co">#&gt; ERR1736468  12.70944 -4.145799  1.47958222  0.20911815  2.703775110</span></span>
+<span><span class="co">#&gt; ERR1736469  12.51669 -2.370634  0.09842185  2.20330061 -2.739470641</span></span>
+<span><span class="co">#&gt; ERR1736470  14.67757  5.775900 -1.71551858 -2.34392774 -0.005150492</span></span>
+<span><span class="co">#&gt;                     PC6     Sample          Disease Genotype</span></span>
+<span><span class="co">#&gt; ERR1736465 3.993043e-14 ERR1736465 breast carcinoma       WT</span></span>
+<span><span class="co">#&gt; ERR1736466 4.093910e-14 ERR1736466 breast carcinoma       WT</span></span>
+<span><span class="co">#&gt; ERR1736467 3.968706e-14 ERR1736467 breast carcinoma       WT</span></span>
+<span><span class="co">#&gt; ERR1736468 3.303503e-14 ERR1736468 breast carcinoma Snai1_KO</span></span>
+<span><span class="co">#&gt; ERR1736469 3.173788e-14 ERR1736469 breast carcinoma Snai1_KO</span></span>
+<span><span class="co">#&gt; ERR1736470 3.630529e-14 ERR1736470 breast carcinoma Snai1_KO</span></span>
+<span><span class="co">#&gt;                   CellLine_CellType</span></span>
+<span><span class="co">#&gt; ERR1736465 HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt; ERR1736466 HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt; ERR1736467 HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt; ERR1736468 HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt; ERR1736469 HS578T - epithelial cell</span></span>
+<span><span class="co">#&gt; ERR1736470 HS578T - epithelial cell</span></span>
 <span></span>
 <span><span class="co"># Plot PCA</span></span>
 <span><span class="fu"><a href="../reference/PlotPCA.html">PlotPCA</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
@@ -382,7 +396,7 @@ can also be further customized with <code>ggplot2</code>.</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span></span>
 <span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/extract-pca-1.png" width="70%" style="display: block; margin: auto;"></p>
@@ -401,13 +415,13 @@ sample-to-sample differences.</p>
 <span><span class="va">pc1_eigen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractEigen.html">extractEigen</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>                          component <span class="op">=</span> <span class="st">"PC1"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pc1_eigen</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      Gene  EigenVector       PctVar</span></span>
-<span><span class="co">#&gt; 1   CENPI  0.003588589 0.0012877974</span></span>
-<span><span class="co">#&gt; 2   TULP3  0.021586498 0.0465976905</span></span>
-<span><span class="co">#&gt; 3 MAP3K14  0.021846399 0.0477265145</span></span>
-<span><span class="co">#&gt; 4   AP3D1  0.026800954 0.0718291147</span></span>
-<span><span class="co">#&gt; 5   DIP2B -0.002712758 0.0007359055</span></span>
-<span><span class="co">#&gt; 6     TAZ  0.003357044 0.0011269741</span></span>
+<span><span class="co">#&gt;     Gene  EigenVector      PctVar</span></span>
+<span><span class="co">#&gt; 1   THY1  0.150266440 2.258000304</span></span>
+<span><span class="co">#&gt; 2   CCL2  0.135706807 1.841633753</span></span>
+<span><span class="co">#&gt; 3   SSX1 -0.130106138 1.692760703</span></span>
+<span><span class="co">#&gt; 4 AKR1C2 -0.116614608 1.359896690</span></span>
+<span><span class="co">#&gt; 5   GPX1  0.111588141 1.245191327</span></span>
+<span><span class="co">#&gt; 6 MYL12B  0.005002684 0.002502684</span></span>
 <span></span>
 <span></span>
 <span><span class="va">hm2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotEigenHeatmap.html">PlotEigenHeatmap</a></span><span class="op">(</span><span class="va">obj</span>,</span>
@@ -428,8 +442,16 @@ sample-to-sample differences.</p>
 with sample metadata using <code><a href="../reference/PlotEigenCorr.html">PlotEigenCorr()</a></code>. This function
 computes Pearson correlations and displays them as a heatmap, helping to
 reveal which metadata features are most associated with major axes of
-variation. This function returns a list of 4 elements:</p>
-<p>• <code>$cor_matrix</code> (Pearson correlation values)</p>
+variation. Categorical variables with two levels (such as Genotype) use
+Pearson correlation; categorical variables with more than two levels
+(such as batch) are summarized by the unsigned multiple correlation R
+from a one-way linear model, so results do not depend on how levels are
+labelled. Variables that cannot be tested, such as columns with a single
+value or a unique value per sample (here, Disease, CellLine_CellType,
+and Sample), are dropped. This function returns a list of 4
+elements:</p>
+<p>• <code>$cor_matrix</code> (Pearson correlation values, or multiple
+correlation R for variables with more than two levels)</p>
 <p>• <code>$pval_matrix</code> (Associated correlation p-values)</p>
 <p>• <code>$stars</code> (asterisk representations of p-values)</p>
 <p>• <code>$plot</code> (Eigencorr plot, as a <code>ggplot2</code>
@@ -440,16 +462,6 @@ rather than PCs.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="va">ec</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotEigenCorr.html">PlotEigenCorr</a></span><span class="op">(</span><span class="va">obj</span>, num_pcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
-<span><span class="co">#&gt; Warning in cor(x, y): the standard deviation is zero</span></span>
 <span><span class="va">ec</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/eigencorr-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
@@ -470,16 +482,16 @@ histogram of un-corrected pvalues can be plotted using
 <code><a href="../reference/PlotPValHist.html">PlotPValHist()</a></code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Set a new DEG assay</span></span>
-<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SetDEGs.html">SetDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>, </span>
+<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SetDEGs.html">SetDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
 <span>               deg_table <span class="op">=</span> <span class="va">res</span>,</span>
 <span>               assay <span class="op">=</span> <span class="st">"unfiltered"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># P value histogram</span></span>
-<span><span class="fu"><a href="../reference/PlotPValHist.html">PlotPValHist</a></span><span class="op">(</span><span class="va">obj</span>, </span>
+<span><span class="fu"><a href="../reference/PlotPValHist.html">PlotPValHist</a></span><span class="op">(</span><span class="va">obj</span>,</span>
 <span>             assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
 <span>             alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/PValHist-1.png" width="70%" style="display: block; margin: auto;"></p>
@@ -495,11 +507,11 @@ DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></c
 <span>              alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>              lfc1 <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>              lfc2 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt;                               DEG unfiltered</span></span>
-<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &gt;1 (Up)      0        656</span></span>
-<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &lt;-1 (Down)   0        542</span></span>
-<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &gt;2 (Up)      0        228</span></span>
-<span><span class="co">#&gt; padj&lt;0.05 &amp; log2FC &lt;-2 (Down)   0        181</span></span>
+<span><span class="co">#&gt;                                 unfiltered</span></span>
+<span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &gt;=1 (Up)           656</span></span>
+<span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &lt;=-1 (Down)        542</span></span>
+<span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &gt;=2 (Up)           228</span></span>
+<span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &lt;=-2 (Down)        181</span></span>
 <span></span>
 <span><span class="co"># Filter the DEG assay and save as a new one</span></span>
 <span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterDEGs.html">FilterDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
@@ -526,48 +538,32 @@ be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> an
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span></span>
 <span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">size</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">size</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_point()`).</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 542 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre></div>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/MA-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>Or a volcano plot by specifying numerator and denominator
 (denominator is your comparison reference level).</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu"><a href="../reference/PlotVolcano.html">PlotVolcano</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>, </span>
+<span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
 <span>       alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>       l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>       den <span class="op">=</span> <span class="st">"WT"</span>,</span>
 <span>       num <span class="op">=</span> <span class="st">"Snai1_KO"</span>,</span>
-<span>       title <span class="op">=</span> <span class="st">"Example Volcano"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 538 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre></div>
+<span>       title <span class="op">=</span> <span class="st">"Example Volcano"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/Volcano-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>To get a glance at everything at once, we can plot a differential
 expression dashboard with <code><a href="../reference/DEDashboard.html">DEDashboard()</a></code></p>
 <pre><code><span><span class="co">#&gt; Scale for <span style="color: #00BB00;">size</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">size</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_point()`).</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 640 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 530 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 643 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 527 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
+<span><span class="co">#&gt; (`geom_point()`).</span></span></code></pre>
 <p><img src="Snail1_Vignette_files/figure-html/test-1.png" width="1536" style="display: block; margin: auto;"></p>
 <p>To explore whether a differentially expressed gene (DEG) is also a
 highly variable gene (HVG), the intersect of these two vectors can be
@@ -580,7 +576,7 @@ list with <code>$positive</code>, <code>$negative</code>, and
 <code>$both</code> slots.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/FindHVDEGs.html">FindHVDEGs</a></span><span class="op">(</span><span class="va">obj</span>, </span>
+<span><span class="fu"><a href="../reference/FindHVDEGs.html">FindHVDEGs</a></span><span class="op">(</span><span class="va">obj</span>,</span>
 <span>           assay <span class="op">=</span> <span class="st">"padj05_lfc1"</span>,</span>
 <span>           direction <span class="op">=</span> <span class="st">"negative"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 332 -log2FC hvDEGs found.</span></span>

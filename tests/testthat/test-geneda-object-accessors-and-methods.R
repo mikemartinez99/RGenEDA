@@ -129,3 +129,31 @@ test_that("PlotPCA with custom colors works", {
   p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition", colors = cols)
   expect_s3_class(p, "ggplot")
 })
+
+#----- GenEDA() starts with an empty DEGs slot, so "DEG" is a valid assay name
+test_that("SetDEGs accepts assay name 'DEG' on a freshly constructed object", {
+  mat <- matrix(rnorm(20), nrow = 5, dimnames = list(paste0("Gene", 1:5), paste0("S", 1:4)))
+  meta <- data.frame(condition = c("A", "A", "B", "B"), row.names = colnames(mat))
+  obj <- GenEDA(normalized = mat, metadata = meta)
+  expect_length(obj@DEGs, 0)
+
+  deg <- data.frame(log2FoldChange = rnorm(5), padj = runif(5), row.names = rownames(mat))
+  obj <- SetDEGs(obj, deg, "DEG")
+  expect_equal(DEGs(obj, "DEG"), deg)
+})
+
+#----- show() reports DEG assays on one line
+test_that("show() reports no DEGs on a fresh object and lists assays on one line", {
+  mat <- matrix(rnorm(20), nrow = 5, dimnames = list(paste0("Gene", 1:5), paste0("S", 1:4)))
+  meta <- data.frame(condition = c("A", "A", "B", "B"), row.names = colnames(mat))
+  obj <- GenEDA(normalized = mat, metadata = meta)
+
+  out <- capture.output(show(obj))
+  expect_true(any(grepl("^  DEGs: none$", out)))
+
+  deg <- data.frame(log2FoldChange = rnorm(5), padj = runif(5), row.names = rownames(mat))
+  obj <- SetDEGs(SetDEGs(obj, deg, "a"), deg, "b")
+  out <- capture.output(show(obj))
+  expect_equal(sum(grepl("DEGs:", out)), 1L)
+  expect_true(any(grepl("^  DEGs: a, b$", out)))
+})

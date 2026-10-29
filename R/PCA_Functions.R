@@ -26,14 +26,14 @@ FindVariableFeatures <- function(object, nfeatures) {
 #' @description Generate principal component analysis data that can be used in downstream analyses.
 #'
 #' @param mat A data matrix where rows are features and columns are samples
-#' @param vars A vector of gene variances (can calculate using RGenEDA::plotVariance)
+#' @param vars A vector of gene variances (can calculate using RGenEDA::plotVariance) or gene names
 #' @param nFeatures Number of top features to generate principal components on.
 #'
 #' @returns A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
 #' @export
 generatePCs <- function(mat, vars, nFeatures) {
   var_features_n <- nFeatures
-  select <- order(vars, decreasing = TRUE)[1:var_features_n]
+  select <- if (is.character(vars)) vars else order(vars, decreasing = TRUE)[seq_len(var_features_n)]
   vsd_sub <- mat[select,]
   vsd_sub <- t(vsd_sub)
   pca <- prcomp(vsd_sub)
@@ -43,11 +43,11 @@ generatePCs <- function(mat, vars, nFeatures) {
   percentVar <- pca$sdev^2/sum(pca$sdev^2)
   #percentVar <- percentVar[1:10]
 
-  message("Percent variations:")
   percentVar <- paste(round(percentVar*100,2), "%", sep = " ")
   names(percentVar) <- paste0("PC", seq_len(nPC))
 
-  print(percentVar[seq_len(min(10, length(percentVar)))])
+  cli::cli_inform("Percent variations:")
+  cli::cli_verbatim(utils::capture.output(print(percentVar[seq_len(min(10, length(percentVar)))])))
 
   pca_res <- list()
   pca_df <- as.data.frame(pca$x[,seq_len(nPC), drop = FALSE])
@@ -76,11 +76,11 @@ RunPCA <- function(object, nfeatures = 2000) {
   stopifnot(methods::is(object, "geneda"))
 
   if (length(object@HVGs) == 0L){
-    message("HVG slot is empty. Running FindVariableFeatures with top 2000 genes")
+    cli::cli_inform("HVG slot is empty. Running FindVariableFeatures with top {nfeatures} genes")
     object <- FindVariableFeatures(object, nfeatures = nfeatures)
   }
   nFeatUse <- length(object@HVGs)
-  message(paste("Calculating principal components from top", nFeatUse, "HVGs"))
+  cli::cli_inform("Calculating principal components from top {nFeatUse} HVGs")
   object@DimReduction <- generatePCs(object@normalized, object@HVGs, nFeatUse)
   validObject(object)
   object
@@ -121,12 +121,12 @@ ExtractPCA <- function(object) {
   stopifnot(methods::is(object, "geneda"))
 
   if (length(object@DimReduction) == 0L) {
-    message("DimReduction slot is empty. Please use RunPCA.")
+    cli::cli_abort("DimReduction slot is empty. Please use RunPCA.")
   }
   pcaRes <- object@DimReduction[["Scores"]]
   meta <- object@metadata
   if (is.null(rownames(meta)) || any(rownames(meta) == "")) {
-    stop("Metadata does not contain valid rownames. Please ensure metadata rows are named.")
+    cli::cli_abort("Metadata does not contain valid rownames. Please ensure metadata rows are named.")
   }
   order <- rownames(meta)
   pcaRes <- pcaRes[order,]
@@ -151,13 +151,14 @@ ExtractPCA <- function(object) {
 #' rownames(mock_norm) <- paste0("Gene", 1:4)
 #' mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
 #' obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
+#' obj <- RunPCA(obj)
 #' extractEigen(object = obj, component = "PC1")
 #'}
 extractEigen <- function(object, component) {
   stopifnot(methods::is(object, "geneda"))
 
   if (length(object@DimReduction) == 0L) {
-    message("DimReduction slot is empty. Please use RunPCA.")
+    cli::cli_abort("DimReduction slot is empty. Please use RunPCA.")
   }
   eigenvecs <- object@DimReduction[["Eigenvectors"]][[component]]
   percentVar <- object@DimReduction[["percent_var"]][[component]]

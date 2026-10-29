@@ -8,6 +8,14 @@
 #' convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
 #' respectively.
 #'
+#' Two-level categorical variables are coded by factor level order, so the sign
+#' of the correlation follows the level order. Categorical variables with more
+#' than two levels are summarized by the multiple correlation R (the square root
+#' of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+#' and its p-value comes from the model F-test, so results do not depend on how
+#' levels are labelled. Variables that cannot be tested (a single level, constant
+#' values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+#'
 #' Default num_mds is 10, but function will internally set max number of NMDS
 #' to be n-1 where n is your number of samples.
 #'
@@ -33,26 +41,22 @@ PlotOrdCorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray
   MAT <- object@normalized
   META <- object@metadata
 
-  #----- Convert all META categories to numeric (copy to avoid modifying slot)
+  #----- Copy metadata (categorical columns are handled in .assocTest)
   META_num <- META
-  for (i in colnames(META_num)) {
-    if (!is.numeric(META_num[[i]])) {
-      META_num[[i]] <- as.numeric(as.factor(META_num[[i]]))
-    }
-  }
 
   #----- Optionally subset metadata columns
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META_num))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
+      missing_str <- paste(missing_cols, collapse = ", ")
+      cli::cli_abort("The following metadata columns were not found: {missing_str}")
     }
     META_num <- META_num[, meta_cols, drop = FALSE]
   }
 
   #----- Ensure META rownames match those of MAT
   if (!all(rownames(META_num) == colnames(MAT))) {
-    stop("Rownames of metadata must match the colnames of normalized matrix.")
+    cli::cli_abort("Rownames of metadata must match the colnames of normalized matrix.")
   }
 
   #----- Compute distance matrix across samples (rows must be samples)
@@ -61,7 +65,7 @@ PlotOrdCorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray
   #----- Adjust k if it's larger than n - 1
   max_k <- nrow(as.matrix(distmat)) - 1
   if (num_mds > max_k) {
-    message(sprintf("Reducing num_mds from %d to %d (max allowed for %d samples).", num_mds, max_k, max_k + 1))
+    cli::cli_inform("Reducing num_mds from {num_mds} to {max_k} (max allowed for {max_k + 1} samples).")
     num_mds <- max_k
   }
 
@@ -96,15 +100,16 @@ PlotOrdCorr <- function(object, num_mds = 10, meta_cols = NULL, distance = "bray
   #----- Loop through META variables and calculate correlation for each NMDS axis
   for (meta_var in colnames(META_num)) {
     for (axis in colnames(nmds_scores)) {
-      test <- cor.test(nmds_scores[[axis]], META_num[[meta_var]], method = "pearson", use = "complete.obs")
-      cor_matrix[meta_var, axis] <- test$estimate
-      pval_matrix[meta_var, axis] <- test$p.value
+      test <- .assocTest(nmds_scores[[axis]], META_num[[meta_var]])
+      cor_matrix[meta_var, axis] <- test[["estimate"]]
+      pval_matrix[meta_var, axis] <- test[["p.value"]]
     }
   }
 
-  #----- Remove NA
-  cor_matrix <- na.omit(cor_matrix)
-  pval_matrix <- na.omit(pval_matrix)
+  #----- Remove variables that could not be tested (drop the same rows from both)
+  keep <- stats::complete.cases(cor_matrix) & stats::complete.cases(pval_matrix)
+  cor_matrix <- cor_matrix[keep, , drop = FALSE]
+  pval_matrix <- pval_matrix[keep, , drop = FALSE]
 
   #----- Create significance stars based on p-value thresholds
   stars <- ifelse(pval_matrix < 0.001, "***",

@@ -74,7 +74,7 @@ PlotCountDist <- function(object, split_by = NULL) {
   if (!is.null(split_by) && split_by %in% colnames(meta)) {
     p <- p + facet_wrap(as.formula(paste0("~", split_by)), scales = "free_x")
   } else if (!is.null(split_by)) {
-    warning(paste("Column", split_by, "not found in metadata. Ignoring faceting."))
+    cli::cli_warn("Column {split_by} not found in metadata. Ignoring faceting.")
   }
 
   return(p)

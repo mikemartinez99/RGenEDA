@@ -11,7 +11,7 @@ PlotScree <- function(object) {
 
   #----- Pull PCA results
   if (length(object@DimReduction) == 0) {
-    stop("No dimensionality reduction results were found.")
+    cli::cli_abort("No dimensionality reduction results were found.")
   }
 
   #----- Grab the variance results

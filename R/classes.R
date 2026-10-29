@@ -120,5 +120,5 @@ GenEDA <- function(normalized,
       metadata = metadata,
       HVGs = character(0L),
       DimReduction = list(),
-      DEGs = list(DEG = NULL))
+      DEGs = list())
 }

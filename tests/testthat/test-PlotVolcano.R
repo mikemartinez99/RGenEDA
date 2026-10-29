@@ -90,3 +90,49 @@ test_that("PlotVolcano respects title argument", {
   # Check that ggtitle has been added
   expect_true("My Volcano Plot" %in% p$labels$title)
 })
+
+#----- PlotVolcano works without num/den
+test_that("PlotVolcano uses default group labels when num and den are NULL", {
+  obj <- create_test_geneda()
+  obj <- SetDEGs(obj, dummy_deg, "DEG")
+  p <- PlotVolcano(obj, "DEG", 0.05, 1)
+  expect_s3_class(p, "ggplot")
+  expect_true(all(c("Upregulated in numerator", "Upregulated in denominator") %in% levels(p$data$Group)))
+})
+
+#----- PlotVolcano errors when num and den are the same
+test_that("PlotVolcano errors when num and den are identical", {
+  obj <- create_test_geneda()
+  obj <- SetDEGs(obj, dummy_deg, "DEG")
+  expect_error(PlotVolcano(obj, "DEG", 0.05, 1, "A", "A"),
+               "num and den must be different group names.")
+})
+
+#----- Genes exactly on a threshold are kept and grouped like FilterDEGs
+test_that("PlotVolcano keeps genes that sit exactly on the thresholds", {
+  obj <- create_test_geneda()
+  deg <- data.frame(
+    log2FoldChange = c(1, -1, 0.5, 2),
+    padj = c(0.01, 0.05, 0.05, 0.5),
+    row.names = paste0("Gene", 1:4)
+  )
+  obj <- SetDEGs(obj, deg, "DEG")
+  p <- PlotVolcano(obj, "DEG", 0.05, 1, "Den", "Num")
+  groups <- setNames(as.character(p$data$Group), p$data$gene)
+
+  expect_equal(nrow(p$data), 4)
+  expect_equal(groups[["Gene1"]], "Upregulated in Num")
+  expect_equal(groups[["Gene2"]], "Upregulated in Den")
+  expect_equal(groups[["Gene3"]], "padj < 0.05")
+  expect_equal(groups[["Gene4"]], "ns")
+})
+
+#----- NA values in unrelated columns do not drop genes
+test_that("PlotVolcano keeps genes with NA in columns it does not use", {
+  obj <- create_test_geneda()
+  deg <- dummy_deg
+  deg$symbol <- NA
+  obj <- SetDEGs(obj, deg, "DEG")
+  p <- PlotVolcano(obj, "DEG", 0.05, 1, "Den", "Num")
+  expect_equal(nrow(p$data), nrow(deg))
+})

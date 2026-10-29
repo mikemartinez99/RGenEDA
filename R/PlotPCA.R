@@ -42,8 +42,8 @@ PlotPCA <- function(object,
   if (is.numeric(x)) x <- paste0("PC", x)
   if (is.numeric(y)) y <- paste0("PC", y)
 
-  if (!(x %in% colnames(pca_df))) stop(paste("Column", x, "not found in PCA data."))
-  if (!(y %in% colnames(pca_df))) stop(paste("Column", y, "not found in PCA data."))
+  if (!(x %in% colnames(pca_df))) cli::cli_abort("Column {x} not found in PCA data.")
+  if (!(y %in% colnames(pca_df))) cli::cli_abort("Column {y} not found in PCA data.")
 
   # Retrieve variance explained
   percent_var <- object@DimReduction$percent_var
@@ -53,18 +53,16 @@ PlotPCA <- function(object,
   ylab <- gsub(" ", "", ylab)
 
   # Check color_by
-  if (!(color_by %in% colnames(pca_df))) stop(paste("Column", color_by, "not found in PCA data."))
+  if (!(color_by %in% colnames(pca_df))) cli::cli_abort("Column {color_by} not found in PCA data.")
 
   # Check custom colors
   if (!is.null(colors)) {
-    if (!(color_by %in% colnames(pca_df))) stop(paste("Column", color_by, "not found in PCA data."))
+    if (!(color_by %in% colnames(pca_df))) cli::cli_abort("Column {color_by} not found in PCA data.")
     # Ensure all levels are mapped
     unique_vals <- unique(pca_df[[color_by]])
     if (!all(unique_vals %in% names(colors))) {
-      stop(paste0(
-        "Color vector does not include all unique values of '", color_by, "'. Missing: ",
-        paste(setdiff(unique_vals, names(colors)), collapse = ", ")
-      ))
+      missing_str <- paste(setdiff(unique_vals, names(colors)), collapse = ", ")
+      cli::cli_abort("Color vector does not include all unique values of '{color_by}'. Missing: {missing_str}")
     }
   }
 
@@ -89,13 +87,13 @@ PlotPCA <- function(object,
 
   # Add shape mapping if specified
   if (!is.null(shape_by)) {
-    if (!(shape_by %in% colnames(pca_df))) stop(paste("Column", shape_by, "not found in PCA data."))
+    if (!(shape_by %in% colnames(pca_df))) cli::cli_abort("Column {shape_by} not found in PCA data.")
     p <- p + aes_string(shape = shape_by)
   }
 
   # Add faceting if requested
   if (!is.null(split_by)) {
-    if (!(split_by %in% colnames(pca_df))) stop(paste("Column", split_by, "not found in PCA data."))
+    if (!(split_by %in% colnames(pca_df))) cli::cli_abort("Column {split_by} not found in PCA data.")
     p <- p + facet_wrap(as.formula(paste("~", split_by))) +
       theme(strip.text = element_text(face = "bold"))
   }

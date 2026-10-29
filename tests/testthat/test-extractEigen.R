@@ -64,10 +64,18 @@ test_that("extractEigen returns correct EigenVector values", {
   expect_equal(res$EigenVector, obj@DimReduction$Eigenvectors$PC2)
 })
 
-test_that("extractEigen warns when DimReduction slot is empty", {
+test_that("extractEigen errors when DimReduction slot is empty", {
   obj <- create_test_geneda()
   obj@DimReduction <- list()
 
-  expect_message(res <- extractEigen(obj, "PC1"),
-                 "DimReduction slot is empty. Please use RunPCA")
+  expect_error(extractEigen(obj, "PC1"),
+               "DimReduction slot is empty. Please use RunPCA")
+})
+
+test_that("ExtractPCA errors when DimReduction slot is empty", {
+  obj <- create_test_geneda()
+  obj@DimReduction <- list()
+
+  expect_error(ExtractPCA(obj),
+               "DimReduction slot is empty. Please use RunPCA")
 })

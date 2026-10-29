@@ -4,7 +4,7 @@
 \alias{PlotVolcano}
 \title{PlotVolcano}
 \usage{
-PlotVolcano(object, assay, alpha, l2fc, den, num, title = NULL)
+PlotVolcano(object, assay, alpha, l2fc, den = NULL, num = NULL, title = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
@@ -15,9 +15,11 @@ PlotVolcano(object, assay, alpha, l2fc, den, num, title = NULL)
 
 \item{l2fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
 
-\item{den}{Denominator (reference level for comparison, num vs. den)}
+\item{den}{Denominator (reference level for comparison, num vs. den).
+If \code{NULL}, the legend uses "denominator".}
 
-\item{num}{Numerator (numerator level for comparison, num vs. den)}
+\item{num}{Numerator (numerator level for comparison, num vs. den).
+If \code{NULL}, the legend uses "numerator".}
 
 \item{title}{Optional character vector of what plot should be titled.}
 }
@@ -27,6 +29,10 @@ A \code{ggplot2} object
 \description{
 Plot volcano plot from a \code{geneda} object. Requires that you have ran
 \code{SetDEGs} on your object following differential expression in \code{DESeq2}.
+}
+\details{
+Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}),
+matching \code{FilterDEGs()}. Genes with a missing \code{log2FoldChange} or \code{padj} are not plotted.
 }
 \examples{
 \donttest{

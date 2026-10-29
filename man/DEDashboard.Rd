@@ -15,9 +15,11 @@ DEDashboard(object, assay, alpha = 0.05, l2fc = 1, num = NULL, den = NULL)
 
 \item{l2fc}{Numeric. Log2 fold-change threshold for MA and volcano plots.}
 
-\item{num}{Character. Name of the numerator group for volcano plot labeling.}
+\item{num}{Character. Name of the numerator group for volcano plot labeling.
+If \code{NULL} (default), the legend uses "numerator".}
 
-\item{den}{Character. Name of the denominator group for volcano plot labeling.}
+\item{den}{Character. Name of the denominator group for volcano plot labeling.
+If \code{NULL} (default), the legend uses "denominator".}
 }
 \value{
 A \code{patchwork} object combining plots.

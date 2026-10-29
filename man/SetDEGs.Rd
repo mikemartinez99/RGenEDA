@@ -15,7 +15,7 @@ columns \code{log2FoldChange} and \code{padj}}
 \item{assay}{What to name the DEG slot}
 }
 \value{
-Updated \code{geneda} object with \code{DEGs$DEG} set
+Updated \code{geneda} object with \code{DEGs[[assay]]} set
 }
 \description{
 Set unfiltered DEGs on the object

@@ -24,6 +24,7 @@ colnames(mock_norm) <- paste0("Sample", 1:3)
 rownames(mock_norm) <- paste0("Gene", 1:4)
 mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
 obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
+obj <- RunPCA(obj)
 extractEigen(object = obj, component = "PC1")
 }
 }

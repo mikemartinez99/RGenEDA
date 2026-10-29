@@ -9,7 +9,7 @@ generatePCs(mat, vars, nFeatures)
 \arguments{
 \item{mat}{A data matrix where rows are features and columns are samples}
 
-\item{vars}{A vector of gene variances (can calculate using RGenEDA::plotVariance)}
+\item{vars}{A vector of gene variances (can calculate using RGenEDA::plotVariance) or gene names}
 
 \item{nFeatures}{Number of top features to generate principal components on.}
 }

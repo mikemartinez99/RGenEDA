@@ -30,6 +30,14 @@ For continuous variables, Pearson correlation is used. P values follow this
 convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
 respectively.
 
+Two-level categorical variables are coded by factor level order, so the sign
+of the correlation follows the level order. Categorical variables with more
+than two levels are summarized by the multiple correlation R (the square root
+of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+and its p-value comes from the model F-test, so results do not depend on how
+levels are labelled. Variables that cannot be tested (a single level, constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples.
 }

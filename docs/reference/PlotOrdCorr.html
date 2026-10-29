@@ -5,6 +5,13 @@ labels and significance stars.
 For continuous variables, Pearson correlation is used. P values follow this
 convention: p &amp;lt; 0.001, p &amp;lt; 0.01, p &amp;lt; 0.05 = three, two, one stars,
 respectively.
+Two-level categorical variables are coded by factor level order, so the sign
+of the correlation follows the level order. Categorical variables with more
+than two levels are summarized by the multiple correlation R (the square root
+of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+and its p-value comes from the model F-test, so results do not depend on how
+levels are labelled. Variables that cannot be tested (a single level, constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples."><meta property="og:description" content="Calculate correlations between NMDS ordination axes (from beta
 diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
@@ -12,6 +19,13 @@ labels and significance stars.
 For continuous variables, Pearson correlation is used. P values follow this
 convention: p &amp;lt; 0.001, p &amp;lt; 0.01, p &amp;lt; 0.05 = three, two, one stars,
 respectively.
+Two-level categorical variables are coded by factor level order, so the sign
+of the correlation follows the level order. Categorical variables with more
+than two levels are summarized by the multiple correlation R (the square root
+of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+and its p-value comes from the model F-test, so results do not depend on how
+levels are labelled. Variables that cannot be tested (a single level, constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples."><meta property="og:image" content="https://mikemartinez99.github.io/RGenEDA/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -21,7 +35,7 @@ to be n-1 where n is your number of samples."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -55,6 +69,13 @@ labels and significance stars.</p>
 <p>For continuous variables, Pearson correlation is used. P values follow this
 convention: p &lt; 0.001, p &lt; 0.01, p &lt; 0.05 = three, two, one stars,
 respectively.</p>
+<p>Two-level categorical variables are coded by factor level order, so the sign
+of the correlation follows the level order. Categorical variables with more
+than two levels are summarized by the multiple correlation R (the square root
+of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+and its p-value comes from the model F-test, so results do not depend on how
+levels are labelled. Variables that cannot be tested (a single level, constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.</p>
 <p>Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples.</p>
     </div>

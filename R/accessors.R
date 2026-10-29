@@ -41,7 +41,7 @@ DimReduction <- function(object) {
 #' Access DEGs container
 #' @param object A `geneda` object
 #' @param assay The name of the DEGs slot to return
-#' @return List with `DEG` (unfiltered data.frame) and optionally named filtered result sets
+#' @return The DEG data.frame stored under `assay`, or NULL if it is not set
 #' @export
 DEGs <- function(object, assay) {
   object@DEGs[[assay]]

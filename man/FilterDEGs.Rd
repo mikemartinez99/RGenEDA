@@ -7,7 +7,7 @@
 FilterDEGs(object, assay, alpha = 0.05, l2fc = 1, saveAssay)
 }
 \arguments{
-\item{object}{A \code{geneda} object with \code{DEGs$DEG} set}
+\item{object}{A \code{geneda} object with a DEG table set via \code{SetDEGs()}}
 
 \item{assay}{The DEG slot to filter}
 
@@ -21,7 +21,7 @@ FilterDEGs(object, assay, alpha = 0.05, l2fc = 1, saveAssay)
 Updated \code{geneda} object with filtered results stored in \code{DEGs[[saveAssay]]}
 }
 \description{
-Filters the unfiltered DEGs in \code{DEGs$DEG} and stores the filtered results
+Filters the unfiltered DEGs in \code{DEGs[[assay]]} and stores the filtered results
 in a new named slot \code{DEGs[[saveAssay]]}. Multiple filtered result sets can
 be stored with different assay names.
 }

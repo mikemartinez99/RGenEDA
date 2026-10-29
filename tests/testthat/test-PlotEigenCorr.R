@@ -87,3 +87,57 @@ test_that("PlotEigenCorr plot aesthetics", {
   expect_true("x" %in% names(aes_mapping))
   expect_true("y" %in% names(aes_mapping))
 })
+
+# Helper with a 3-level categorical variable for association tests
+create_multilevel_geneda <- function(batch) {
+  mat <- matrix(rnorm(6 * 5), nrow = 5)
+  colnames(mat) <- paste0("S", 1:6)
+  rownames(mat) <- paste0("Gene", 1:5)
+  meta <- data.frame(batch = batch, sample_id = colnames(mat), row.names = colnames(mat))
+  obj <- GenEDA(normalized = mat, metadata = meta)
+  scores <- data.frame(PC1 = c(1, 1.2, 5, 5.3, 9, 9.1), PC2 = c(3, -1, 2, 0, -2, 1))
+  rownames(scores) <- colnames(mat)
+  obj@DimReduction <- list(Scores = scores)
+  obj
+}
+
+#----- Results for multi-level factors do not depend on level labels
+test_that("PlotEigenCorr is invariant to relabelling a multi-level factor", {
+  res1 <- PlotEigenCorr(create_multilevel_geneda(c("a", "a", "b", "b", "c", "c")), num_pcs = 2)
+  res2 <- PlotEigenCorr(create_multilevel_geneda(c("z", "z", "b", "b", "m", "m")), num_pcs = 2)
+
+  expect_equal(res1$cor_matrix["batch", ], res2$cor_matrix["batch", ])
+  expect_equal(res1$pval_matrix["batch", ], res2$pval_matrix["batch", ])
+})
+
+#----- Multi-level factors use the unsigned multiple correlation from lm()
+test_that("PlotEigenCorr uses sqrt(R^2) and the F-test for multi-level factors", {
+  obj <- create_multilevel_geneda(c("a", "a", "b", "b", "c", "c"))
+  res <- PlotEigenCorr(obj, num_pcs = 2)
+
+  fit <- summary(lm(obj@DimReduction$Scores$PC1 ~ factor(obj@metadata$batch)))
+  fstat <- fit$fstatistic
+  expect_equal(res$cor_matrix["batch", "PC1"], sqrt(fit$r.squared))
+  expect_equal(res$pval_matrix["batch", "PC1"],
+               unname(pf(fstat[1], fstat[2], fstat[3], lower.tail = FALSE)))
+  expect_true(all(res$cor_matrix["batch", ] >= 0))
+})
+
+#----- Untestable variables are dropped from both matrices together
+test_that("PlotEigenCorr drops untestable variables from cor and pval matrices", {
+  obj <- create_multilevel_geneda(c("a", "a", "b", "b", "c", "c"))
+  res <- PlotEigenCorr(obj, num_pcs = 2)
+
+  # sample_id has one level per sample, so there are no residual degrees of freedom
+  expect_false("sample_id" %in% rownames(res$cor_matrix))
+  expect_identical(rownames(res$cor_matrix), rownames(res$pval_matrix))
+  expect_identical(rownames(res$stars), rownames(res$cor_matrix))
+})
+
+#----- Two-level factors still use Pearson correlation
+test_that("PlotEigenCorr keeps Pearson correlation for two-level factors", {
+  obj <- create_test_geneda()
+  res <- PlotEigenCorr(obj, num_pcs = 1, meta_cols = "condition")
+  expected <- cor(obj@DimReduction$Scores$PC1, as.numeric(factor(obj@metadata$condition)))
+  expect_equal(res$cor_matrix["condition", "PC1"], expected)
+})

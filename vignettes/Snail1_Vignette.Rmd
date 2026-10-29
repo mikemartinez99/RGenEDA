@@ -67,7 +67,7 @@ head(metadata)
 
 ```
 
-It is helpful to establish color palettes early on in an exploratory analysis to keep figures consistent. `RGenEDA` uses the list of named vectors convention for creating color vectors for plotting functions. 
+It is helpful to establish color palettes early on in an exploratory analysis to keep figures consistent. `RGenEDA` uses the list of named vectors convention for creating color vectors for plotting functions.
 
 ```{r color vectors}
 
@@ -79,7 +79,7 @@ colorList <- list(
 
 ## Processing and normalization
 
-The standard DESeq2 workflow can now be applied. The end goal is to obtain normalized counts and differential expression results. 
+The standard DESeq2 workflow can now be applied. The end goal is to obtain normalized counts and differential expression results.
 Lowly expressed genes are filtered out before running `DESeq2.`
 
 ```{r deseq-prep, message=FALSE}
@@ -132,7 +132,7 @@ You will see that the object also contains slots for Highly Variable Genes (HVGs
 
 ## Count distributions across samples
 
-To visualize normalized count distributions across samples, the `PlotCountDist()` function can be used. This is a quick and helpful way to visualize effectiveness of normalization, as the overall distributions should be similar across samples. Samples with very low or very high overall counts compared to others might indicate problematic samples, technical artifacts, or batch effect. This function returns a `ggplot2` object to facilitate any additional customization.  
+To visualize normalized count distributions across samples, the `PlotCountDist()` function can be used. This is a quick and helpful way to visualize effectiveness of normalization, as the overall distributions should be similar across samples. Samples with very low or very high overall counts compared to others might indicate problematic samples, technical artifacts, or batch effect. This function returns a `ggplot2` object to facilitate any additional customization.
 
 ```{r count-dist}
 
@@ -165,7 +165,7 @@ hm$heatmap
 
 ## Identify highly variable genes
 
-Next, genes are ranked by decreasing variance to find highly variable genes (HVGs) which most-likely drive biological differences. The full variance profile curve for all genes profiled with `plotHVGVariance()` as a means to pick a meaningful number of HVGs to retain for calculating principal components in the next section. 
+Next, genes are ranked by decreasing variance to find highly variable genes (HVGs) which most-likely drive biological differences. The full variance profile curve for all genes profiled with `plotHVGVariance()` as a means to pick a meaningful number of HVGs to retain for calculating principal components in the next section.
 
 ```{r hvgs-plot, fig.show='hold', out.width='60%', cache = FALSE}
 
@@ -173,7 +173,7 @@ Next, genes are ranked by decreasing variance to find highly variable genes (HVG
 PlotHVGVariance(obj)
 
 ```
-Based on the curve, 2,000 genes seems sufficient in capturing the majority of variation. These genes can be extracted and retained in the HVGs slot with `FindVariableFeatures()` 
+Based on the curve, 2,000 genes seems sufficient in capturing the majority of variation. These genes can be extracted and retained in the HVGs slot with `FindVariableFeatures()`
 
 
 ```{r hvgs-find}
@@ -196,12 +196,12 @@ Using the identified HVGs, principal components can be calculated using `RunPCA(
 This function stores PCA results in the DimReduction slot, including:
 
 •	`$Scores` (sample scores)
-	
+
 •	`$Eigenvectors` (gene contributions)
-	
+
 •	`$percent_var` (Percent variance explained per component, up to PC5)
 
-If `FindVariableFeatures()` was not ran beforehand, `RunPCA` will calculate HVGs by default with 2000 features. This argument can be overriden directly using the `nfeatures` argument. 
+If `FindVariableFeatures()` was not ran beforehand, `RunPCA` will calculate HVGs by default with 2000 features. This argument can be overriden directly using the `nfeatures` argument.
 
 ```{r run-pca}
 
@@ -263,14 +263,14 @@ hm2$heatmap
 ## Correlate PCs with metadata
 
 To interpret principal components, individual PCs can be correlated with sample metadata using `PlotEigenCorr()`.
-This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. This function returns a list of 4 elements:
+This function computes Pearson correlations and displays them as a heatmap, helping to reveal which metadata features are most associated with major axes of variation. Categorical variables with two levels (such as Genotype) use Pearson correlation; categorical variables with more than two levels (such as batch) are summarized by the unsigned multiple correlation R from a one-way linear model, so results do not depend on how levels are labelled. Variables that cannot be tested, such as columns with a single value or a unique value per sample (here, Disease, CellLine_CellType, and Sample), are dropped. This function returns a list of 4 elements:
 
-•	`$cor_matrix` (Pearson correlation values)
-	
+•	`$cor_matrix` (Pearson correlation values, or multiple correlation R for variables with more than two levels)
+
 •	`$pval_matrix` (Associated correlation p-values)
-	
+
 •	`$stars` (asterisk representations of p-values)
-	
+
 •	`$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved with `ggsave`)
 
 **Note:** `PlotOrdCorr()` can be used for microbiome data as it correlates metadata features with NMDS beta values rather than PCs.
@@ -288,22 +288,22 @@ ec$plot
 
 Differentially expressed genes can now be stored in the `RGenEDA` object. `RGenEDA` was designed to directly work with DEG tables derived from `DESeq2` and contain the column names "baseMean", "log2FoldChange" and "padj". DEG tables from other packages can be used with some minor dataframe manipulation.
 
-Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs()` command (for example, raw DESeq2 results and Shrunk DESeq2 results.) 
+Note: multiple DEG assays can be appended to the DEGs slot by passing an assay name in the `SetDEGs()` command (for example, raw DESeq2 results and Shrunk DESeq2 results.)
 
-To get a quick diagnosis of the differential expression results, a histogram of un-corrected pvalues can be plotted using `PlotPValHist()`. 
+To get a quick diagnosis of the differential expression results, a histogram of un-corrected pvalues can be plotted using `PlotPValHist()`.
 
 ```{r PValHist, fig.show='hold', out.width='70%'}
 
-res <- results(dds) |> 
+res <- results(dds) |>
   as.data.frame()
 
 # Set a new DEG assay
-obj <- SetDEGs(object = obj, 
+obj <- SetDEGs(object = obj,
                deg_table = res,
                assay = "unfiltered")
 
 # P value histogram
-PlotPValHist(obj, 
+PlotPValHist(obj,
              assay = "unfiltered",
              alpha = 0.05)
 ```
@@ -349,7 +349,7 @@ Or a volcano plot by specifying numerator and denominator (denominator is your c
 ```{r Volcano, fig.show='hold', out.width='70%'}
 
 PlotVolcano(obj,
-       assay = "unfiltered", 
+       assay = "unfiltered",
        alpha = 0.05,
        l2fc = 1,
        den = "WT",
@@ -362,9 +362,9 @@ To get a glance at everything at once, we can plot a differential expression das
 ```{r test, echo=FALSE, fig.width=16, fig.height=14}
 
 DB <- DEDashboard(obj,
-            assay = "unfiltered", 
+            assay = "unfiltered",
             alpha = 0.05, l2fc = 1,
-            num = "Snai1_KO", 
+            num = "Snai1_KO",
             den = "WT")
 
 DB
@@ -377,7 +377,7 @@ To explore whether a differentially expressed gene (DEG) is also a highly variab
 
 ```{r hvDEGs, fig.show='hold', out.width='70%'}
 
-FindHVDEGs(obj, 
+FindHVDEGs(obj,
            assay = "padj05_lfc1",
            direction = "negative")
 

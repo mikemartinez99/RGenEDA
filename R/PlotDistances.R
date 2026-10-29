@@ -51,14 +51,15 @@ PlotDistances <- function(object,
   META <- object@metadata
   stopifnot(!is.null(colnames(MAT)), !is.null(rownames(META)))
   if (!identical(rownames(META), colnames(MAT))) {
-    stop("Rownames of metadata must match colnames of normalized matrix.")
+    cli::cli_abort("Rownames of metadata must match colnames of normalized matrix.")
   }
 
   # Optional metadata subset for subtitle context
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
+      missing_str <- paste(missing_cols, collapse = ", ")
+      cli::cli_abort("The following metadata columns were not found: {missing_str}")
     }
     META <- META[, meta_cols, drop = FALSE]
   }

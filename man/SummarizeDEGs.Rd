@@ -23,4 +23,7 @@ A data.frame of DEG counts by assay and criteria.
 \description{
 Summarizes the number of DEGs in each assay of a \code{geneda} object according to thresholds
 for adjusted p-value and log2 fold-change, separately reporting upregulated and downregulated genes.
+Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= lfc}), matching \code{FilterDEGs()}.
+Genes with a missing \code{log2FoldChange} or \code{padj} are not counted; missing values in
+other columns (e.g., gene annotations) are ignored.
 }
