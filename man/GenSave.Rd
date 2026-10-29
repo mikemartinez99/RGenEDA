@@ -23,7 +23,8 @@ GenSave(
 
 \item{height}{Numeric, the height of the output image. Default is 6.}
 
-\item{units}{Character, units for width and height when saving raster images. Default is "in".}
+\item{units}{Character, units for width and height: one of "in", "cm", "mm", or "px".
+Default is "in". Values are converted to inches for PDF and SVG output.}
 
 \item{res}{Numeric, the resolution (in dpi) for raster images. Default is 300.}
 

@@ -131,3 +131,57 @@ test_that("FindHVDEGs direction argument validation works", {
   expect_error(FindHVDEGs(obj, "DEG", "invalid"), "'arg' should be one of \\\"positive\\\", \\\"negative\\\", \\\"both\\\"")
 })
 
+
+#===== SummarizeDEGs =====#
+
+#----- SummarizeDEGs ignores NA values in columns it does not use
+test_that("SummarizeDEGs counts genes with NA in unrelated columns", {
+  obj <- create_test_geneda()
+  deg <- data.frame(
+    log2FoldChange = c(3, 3, 3, -3, 0.1),
+    padj = c(1e-4, 1e-4, 1e-4, 1e-4, 0.9),
+    symbol = c("a", NA, NA, "d", "e"),
+    row.names = paste0("Gene", 1:5)
+  )
+  obj <- SetDEGs(obj, deg, "DEG")
+  res <- SummarizeDEGs(obj, assays = "DEG")
+
+  expect_equal(res[1, "DEG"], 3)
+  expect_equal(res[2, "DEG"], 1)
+})
+
+#----- SummarizeDEGs drops genes missing log2FoldChange or padj
+test_that("SummarizeDEGs skips genes with NA log2FoldChange or padj", {
+  obj <- create_test_geneda()
+  deg <- data.frame(
+    log2FoldChange = c(3, NA, 3),
+    padj = c(1e-4, 1e-4, NA),
+    row.names = paste0("Gene", 1:3)
+  )
+  obj <- SetDEGs(obj, deg, "DEG")
+  expect_equal(SummarizeDEGs(obj, assays = "DEG")[1, "DEG"], 1)
+})
+
+#----- SummarizeDEGs and FilterDEGs agree at the thresholds
+test_that("SummarizeDEGs thresholds match FilterDEGs, including boundary values", {
+  obj <- create_test_geneda()
+  deg <- data.frame(
+    log2FoldChange = c(1, -1, 2, 0.5, 1.5),
+    padj = c(0.05, 0.01, 0.05, 0.01, 0.2),
+    row.names = paste0("Gene", 1:5)
+  )
+  obj <- SetDEGs(obj, deg, "DEG")
+  obj <- FilterDEGs(obj, "DEG", alpha = 0.05, l2fc = 1, saveAssay = "filt")
+  res <- SummarizeDEGs(obj, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = "DEG")
+
+  expect_equal(res[1, "DEG"] + res[2, "DEG"], nrow(DEGs(obj, "filt")))
+  expect_equal(res[3, "DEG"], 1)
+})
+
+#----- SummarizeDEGs warns about unknown assays
+test_that("SummarizeDEGs warns and skips assays that do not exist", {
+  obj <- create_test_geneda()
+  obj <- SetDEGs(obj, dummy_deg, "DEG")
+  expect_warning(SummarizeDEGs(obj, assays = c("DEG", "nope")),
+                 "Assay nope not found in DEGs slot; skipping.")
+})

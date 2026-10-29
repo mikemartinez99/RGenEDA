@@ -41,7 +41,7 @@ PlotEigenHeatmap <- function(object, pc = "PC1", n = 25,
   return <- match.arg(return)
 
   if (!(length(object@DimReduction) > 0L && all(c("Eigenvectors","Scores") %in% names(object@DimReduction)))) {
-    stop("DimReduction is missing required entries 'Eigenvectors' and 'Loadings'. Run RunPCA().")
+    cli::cli_abort("DimReduction is missing required entries 'Eigenvectors' and 'Loadings'. Run RunPCA().")
   }
 
   # Extract gene-level percent variance using extractEigen
@@ -55,7 +55,7 @@ PlotEigenHeatmap <- function(object, pc = "PC1", n = 25,
   mat <- object@normalized
   common_genes <- intersect(rownames(mat), pc_top$Gene)
   if (length(common_genes) == 0L) {
-    stop("No overlap between eigenvector gene IDs and expression matrix rownames. Check rownames(normalized) vs rownames(DimReduction$Eigenvectors).")
+    cli::cli_abort("No overlap between eigenvector gene IDs and expression matrix rownames. Check rownames(normalized) vs rownames(DimReduction$Eigenvectors).")
   }
   top_ex <- mat[common_genes, , drop = FALSE]
 
@@ -65,7 +65,8 @@ PlotEigenHeatmap <- function(object, pc = "PC1", n = 25,
     meta <- object@metadata
     missing_cols <- setdiff(annotate_by, colnames(meta))
     if (length(missing_cols) > 0L) {
-      stop(paste0("Missing metadata columns: ", paste(missing_cols, collapse = ", ")))
+      missing_str <- paste(missing_cols, collapse = ", ")
+      cli::cli_abort("Missing metadata columns: {missing_str}")
     }
     annotation_col <- meta[, annotate_by, drop = FALSE]
     # Ensure factors for color mapping

@@ -14,32 +14,35 @@
 #' @param l2fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
 #' @param title Optional character vector of what plot should be titled.
 #'
+#' @details Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >= l2fc`),
+#' matching `FilterDEGs()`.
+#'
 #' @returns A `ggplot2` object
 #' @export
 PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   if (!assay %in% names(object@DEGs)) {
-    stop(paste("Assay", assay, "was not found in DEGs slot!"))
+    cli::cli_abort("Assay {assay} was not found in DEGs slot!")
   } else {
     df <- DEGs(object, assay)
     if (nrow(df) == 0) {
-      stop("No differential expression results found in object@DEGs$DEG")
+      cli::cli_abort("No differential expression results found in object@DEGs$DEG")
     }
   }
 
   requiredCols <- c("log2FoldChange", "baseMean")
   if (!all(requiredCols %in% colnames(df))) {
-    stop("log2FoldChange or baseMean or both are missing from DEG table!")
+    cli::cli_abort("log2FoldChange or baseMean or both are missing from DEG table!")
   }
 
   df$col <- NA
-  df$col[df$padj < alpha & abs(df$log2FoldChange) > l2fc] <- "red"
+  df$col[df$padj <= alpha & abs(df$log2FoldChange) >= l2fc] <- "red"
   df$col[is.na(df$col)] <- "black"
 
   df$gene <- rownames(df)
 
-  cap_pos_yvalue <- max(abs(df$log2FoldChange)) + 0.4
+  cap_pos_yvalue <- max(abs(df$log2FoldChange), na.rm = TRUE) + 0.4
   cap_neg_yvalue <- cap_pos_yvalue/-1
 
   resPlot <- ggplot(df, aes(x = baseMean, y = log2FoldChange, fill=col, size = -log10(padj))) +
@@ -47,16 +50,16 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
     theme_classic() +
     scale_x_continuous(trans='log2') +
     ylab("Log2 fold change") +
-    xlab("Mean normalized counts (Log2, SCT)") +
+    xlab("Mean normalized counts (Log2)") +
     geom_hline(yintercept = 0, color = "blue", linetype = "dashed", size = 0.4) +
     labs(size = expression("-log"[10]*" adj. P-value)"), fill = "sig") +
     scale_size(range = c(1, 12)) +
     scale_fill_manual(name = " ",
-                      values = c("black", "indianred"),
-                      labels = c("Not. sig.", paste0("Adj. P<0.05 & |LFC| > ", l2fc))) +
+                      values = c(black = "black", red = "indianred"),
+                      labels = c(black = "Not. sig.", red = paste0("Adj. P<", alpha, " & |LFC| > ", l2fc))) +
     scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
     ylim(cap_neg_yvalue, cap_pos_yvalue) +
-    geom_label_repel(data = subset(df, log2FoldChange > l2fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange >= l2fc & padj <= alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = 0.04,
@@ -65,7 +68,7 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
                      max.overlaps = 20,
                      segment.size = 0.3, fill = "grey90",
                      segment.color = 'grey50', size = 3.5) +
-    geom_label_repel(data = subset(df, log2FoldChange < -l2fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange <= -l2fc & padj <= alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = -0.04,
@@ -87,7 +90,7 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
     guides(size=guide_legend(override.aes = list(fill="black", alpha=1)))
 
   if (!is.null(title)) {
-    resPlot + ggtitle(title)
+    resPlot <- resPlot + ggtitle(title)
   }
 
   return(resPlot)

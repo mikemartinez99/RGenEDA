@@ -68,10 +68,18 @@
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">mock_norm</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Gene"</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">mock_meta</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>,<span class="st">"B"</span>,<span class="st">"A"</span><span class="op">)</span>, row.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">mock_norm</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="GenEDA.html">GenEDA</a></span><span class="op">(</span>normalized <span class="op">=</span> <span class="va">mock_norm</span>, metadata <span class="op">=</span> <span class="va">mock_meta</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> HVG slot is empty. Running FindVariableFeatures with top 2000 genes</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating principal components from top 4 HVGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variations:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>       PC1       PC2       PC3 </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> "75.22 %" "24.78 %"     "0 %" </span>
 <span class="r-in"><span><span class="fu">extractEigen</span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>, component <span class="op">=</span> <span class="st">"PC1"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> DimReduction slot is empty. Please use RunPCA.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] PctVar</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    Gene EigenVector     PctVar</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 Gene1  0.98536553 97.0945222</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 Gene3 -0.11469173  1.3154193</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 Gene2 -0.09503842  0.9032302</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 Gene4 -0.08287510  0.6868283</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -12,7 +12,7 @@ DEGs(object, assay)
 \item{assay}{The name of the DEGs slot to return}
 }
 \value{
-List with \code{DEG} (unfiltered data.frame) and optionally named filtered result sets
+The DEG data.frame stored under \code{assay}, or NULL if it is not set
 }
 \description{
 Access DEGs container

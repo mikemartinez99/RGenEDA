@@ -24,3 +24,7 @@ A \code{ggplot2} object
 Plot MA plot from a \code{geneda} object. Requires that you have ran
 \code{SetDEGs} on your object following differential expression in \code{DESeq2}.
 }
+\details{
+Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}),
+matching \code{FilterDEGs()}.
+}

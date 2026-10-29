@@ -18,13 +18,13 @@ PlotPValHist <- function(object, assay, bins = 40, alpha = 0.05, title = NULL) {
 
   #----- Pull DEG table
   if (!assay %in% names(object@DEGs)) {
-    stop(paste("Assay", assay, "was not found in DEGs slot!"))
+    cli::cli_abort("Assay {assay} was not found in DEGs slot!")
   }
   df <- DEGs(object, assay)
 
   #----- Input validation
   if (!"pvalue" %in% colnames(df)) {
-    stop("The DEG table must contain a 'pvalue' column.")
+    cli::cli_abort("The DEG table must contain a 'pvalue' column.")
   }
 
   #----- Drop missing values

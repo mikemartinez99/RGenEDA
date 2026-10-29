@@ -10,11 +10,10 @@ setMethod(
     cat(sprintf("  HVGs: %d\n", length(object@HVGs)))
     cat(sprintf("  DimReduction: %d\n", length(object@DimReduction)))
     cat(sprintf("  counts: %s\n", if (is.null(object@counts)) "NULL" else "present"))
-    deg_status <- if (is.null(object@DEGs)){
-      "NULL"
+    deg_status <- if (length(object@DEGs) == 0L) {
+      "none"
     } else {
-      names(object@DEGs)
-
+      paste(names(object@DEGs), collapse = ", ")
     }
     cat(sprintf("  DEGs: %s\n", deg_status))
     invisible(object)

@@ -6,6 +6,14 @@
 #' P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
 #' one stars, respectively.
 #'
+#' Two-level categorical variables are coded by factor level order, so the sign
+#' of the correlation follows the level order. Categorical variables with more
+#' than two levels are summarized by the multiple correlation R (the square root
+#' of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
+#' and its p-value comes from the model F-test, so results do not depend on how
+#' levels are labelled. Variables that cannot be tested (a single level, constant
+#' values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+#'
 #' Requires PCA scores in `DimReduction(object)`; does not recompute PCA.
 #'
 #' @import ggplot2
@@ -48,31 +56,27 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   MAT <- object@normalized
   META <- object@metadata
 
-  #----- Convert all META categories to numeric (copy to avoid modifying slot)
+  #----- Copy metadata (categorical columns are handled in .assocTest)
   META_num <- META
-  for (i in colnames(META_num)) {
-    if (!is.numeric(META_num[[i]])) {
-      META_num[[i]] <- as.numeric(as.factor(META_num[[i]]))
-    }
-  }
 
   #----- Optionally subset metadata columns
   if (!is.null(meta_cols)) {
     missing_cols <- setdiff(meta_cols, colnames(META_num))
     if (length(missing_cols) > 0L) {
-      stop(paste0("The following metadata columns were not found: ", paste(missing_cols, collapse = ", ")))
+      missing_str <- paste(missing_cols, collapse = ", ")
+      cli::cli_abort("The following metadata columns were not found: {missing_str}")
     }
     META_num <- META_num[, meta_cols, drop = FALSE]
   }
 
   #----- Ensure META rownames match those of MAT
   if (!all(rownames(META_num) == colnames(MAT))) {
-    stop("Rownames of metadata must match the colnames of normalized matrix.")
+    cli::cli_abort("Rownames of metadata must match the colnames of normalized matrix.")
   }
 
   #----- Obtain PCs from stored DimReduction (required)
   if (!(length(object@DimReduction) > 0L && "Scores" %in% names(object@DimReduction))) {
-    stop("DimReduction slot is empty. Please run RunPCA() before calling PlotEigenCorr().")
+    cli::cli_abort("DimReduction slot is empty. Please run RunPCA() before calling PlotEigenCorr().")
   }
   pcs_mat <- as.data.frame(object@DimReduction[["Scores"]])
   # Align PCs to metadata order if necessary
@@ -90,15 +94,16 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   #----- Loop through META variables and calculate correlation for each PC
   for (meta_var in colnames(META_num)) {
     for (pc in colnames(pcs)) {
-      test <- cor.test(pcs[[pc]], META_num[[meta_var]], method = "pearson", use = "complete.obs")
-      cor_matrix[meta_var, pc] <- test$estimate
-      pval_matrix[meta_var, pc] <- test$p.value
+      test <- .assocTest(pcs[[pc]], META_num[[meta_var]])
+      cor_matrix[meta_var, pc] <- test[["estimate"]]
+      pval_matrix[meta_var, pc] <- test[["p.value"]]
     }
   }
 
-  #----- Remove NA
-  cor_matrix <- na.omit(cor_matrix)
-  pval_matrix <- na.omit(pval_matrix)
+  #----- Remove variables that could not be tested (drop the same rows from both)
+  keep <- stats::complete.cases(cor_matrix) & stats::complete.cases(pval_matrix)
+  cor_matrix <- cor_matrix[keep, , drop = FALSE]
+  pval_matrix <- pval_matrix[keep, , drop = FALSE]
 
   #----- Create significance stars based on p-value thresholds
   stars <- ifelse(pval_matrix < 0.001, "***",

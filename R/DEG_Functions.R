@@ -4,7 +4,7 @@
 #' @param deg_table A data.frame of DESeq2-like results containing at least
 #'   columns `log2FoldChange` and `padj`
 #' @param assay What to name the DEG slot
-#' @return Updated `geneda` object with `DEGs$DEG` set
+#' @return Updated `geneda` object with `DEGs[[assay]]` set
 #' @export
 SetDEGs <- function(object, deg_table, assay) {
   stopifnot(methods::is(object, "geneda"))
@@ -12,14 +12,15 @@ SetDEGs <- function(object, deg_table, assay) {
   req_cols <- c("log2FoldChange", "padj")
   missing_cols <- setdiff(req_cols, colnames(deg_table))
   if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
+    req_str <- paste(req_cols, collapse = ", ")
+    cli::cli_abort("DEG table must contain columns: {req_str}")
   }
   if (is.null(rownames(deg_table))) {
-    stop("DEG table does not have genes as rownames!")
+    cli::cli_abort("DEG table does not have genes as rownames!")
   }
 
   if (assay %in% names(object@DEGs)) {
-    stop(paste("Assay", assay, "already exists!"))
+    cli::cli_abort("Assay {assay} already exists!")
   } else {
     object@DEGs[[assay]] <- deg_table
   }
@@ -29,11 +30,11 @@ SetDEGs <- function(object, deg_table, assay) {
 
 #' Filter DEGs by padj and absolute log2FoldChange
 #'
-#' Filters the unfiltered DEGs in `DEGs$DEG` and stores the filtered results
+#' Filters the unfiltered DEGs in `DEGs[[assay]]` and stores the filtered results
 #' in a new named slot `DEGs[[saveAssay]]`. Multiple filtered result sets can
 #' be stored with different assay names.
 #'
-#' @param object A `geneda` object with `DEGs$DEG` set
+#' @param object A `geneda` object with a DEG table set via `SetDEGs()`
 #' @param assay The DEG slot to filter
 #' @param alpha Adjusted p-value threshold (<=)
 #' @param l2fc Absolute log2 fold change threshold (>=)
@@ -44,16 +45,17 @@ SetDEGs <- function(object, deg_table, assay) {
 FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
   stopifnot(methods::is(object, "geneda"))
   if (is.null(object@DEGs[[assay]])) {
-    stop(paste("Assay", assay, "is NULL. Use SetDEGs() first."))
+    cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() first.")
   }
   if (missing(saveAssay) || is.null(saveAssay) || !is.character(saveAssay) || length(saveAssay) != 1L) {
-    stop("saveAssay must be a single character string.")
+    cli::cli_abort("saveAssay must be a single character string.")
   }
   df <- object@DEGs[[assay]]
   req_cols <- c("log2FoldChange", "padj")
   missing_cols <- setdiff(req_cols, colnames(df))
   if (length(missing_cols) > 0L) {
-    stop(paste0("DEG table must contain columns: ", paste(req_cols, collapse = ", ")))
+    req_str <- paste(req_cols, collapse = ", ")
+    cli::cli_abort("DEG table must contain columns: {req_str}")
   }
   filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
     abs(df$log2FoldChange) >= l2fc & df$padj <= alpha
@@ -66,7 +68,7 @@ FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
 #'
 #' Looks for DEGs after filtering that overlap with HVGs.
 #'
-#' @param object A `geneda` object with `DEGs$DEG` set
+#' @param object A `geneda` object with a DEG table set via `SetDEGs()`
 #' @param assay The DEG slot to pull results from (typically a result of `FilterDEGs`)
 #' @param direction One of positive, negative, or both (indicating the direction
 #' of DEG fold change to intersect with HVGs)
@@ -80,7 +82,7 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 
   # Access DEGs
   if (is.null(object@DEGs[[assay]])) {
-    stop(paste("Assay", assay, "is NULL. Use SetDEGs() or FilterDEGs() first!"))
+    cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() or FilterDEGs() first!")
   } else {
     degDF <- DEGs(object, assay)
     degDF$Gene <- rownames(degDF)
@@ -88,7 +90,7 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 
   # Access HVGs
   if (length(object@HVGs) == 0L){
-    stop("HVG Slot is empty. Use FindVariableFeatures() first!")
+    cli::cli_abort("HVG Slot is empty. Use FindVariableFeatures() first!")
   } else {
     hvgList <- HVGs(object)
   }
@@ -101,25 +103,27 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 
   if (direction == "positive") {
     if (length(posInt) == 1) {
-      message(paste(length(posInt), "+log2FC hvDEG found."))
+      cli::cli_inform("{length(posInt)} +log2FC hvDEG found.")
     } else {
-      message(paste(length(posInt), "+log2FC hvDEGs found."))
+      cli::cli_inform("{length(posInt)} +log2FC hvDEGs found.")
     }
     return(posInt)
 
   } else if (direction == "negative") {
     if (length(negInt) == 1) {
-      message(paste(length(negInt), "-log2FC hvDEG found."))
+      cli::cli_inform("{length(negInt)} -log2FC hvDEG found.")
     } else {
-      message(paste(length(negInt), "-log2FC hvDEGs found."))
+      cli::cli_inform("{length(negInt)} -log2FC hvDEGs found.")
     }
     return(negInt)
 
   } else {
     sumhvDEGs <- length(posInt) + length(negInt)
-    message(paste(length(posInt), "+log2FC hvDEGs found."))
-    message(paste(length(negInt), "-log2FC hvDEGs found."))
-    message(paste(sumhvDEGs, "Total hvDEGs found."))
+    cli::cli_inform(c(
+      "{length(posInt)} +log2FC hvDEGs found.",
+      "{length(negInt)} -log2FC hvDEGs found.",
+      "{sumhvDEGs} Total hvDEGs found."
+    ))
     return(list(
       positive = posInt,
       negative = negInt,
@@ -134,6 +138,9 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 #' @description
 #' Summarizes the number of DEGs in each assay of a `geneda` object according to thresholds
 #' for adjusted p-value and log2 fold-change, separately reporting upregulated and downregulated genes.
+#' Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >= lfc`), matching `FilterDEGs()`.
+#' Genes with a missing `log2FoldChange` or `padj` are not counted; missing values in
+#' other columns (e.g., gene annotations) are ignored.
 #'
 #' @param object A `geneda` object containing DEGs in its `DEGs` slot.
 #' @param alpha Numeric; adjusted p-value threshold. Default is 0.05.
@@ -145,7 +152,7 @@ FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "bot
 #' @export
 SummarizeDEGs <- function(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NULL) {
   stopifnot(methods::is(object, "geneda"))
-  if (length(object@DEGs) == 0) stop("No DEGs found in object.")
+  if (length(object@DEGs) == 0) cli::cli_abort("No DEGs found in object.")
 
   # Use all assays if none are specified
   if (is.null(assays)) {
@@ -153,10 +160,10 @@ SummarizeDEGs <- function(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NUL
   }
 
   criteria <- c(
-    paste0("padj<", alpha, " & log2FC >", lfc1, " (Up)"),
-    paste0("padj<", alpha, " & log2FC <", -lfc1, " (Down)"),
-    paste0("padj<", alpha, " & log2FC >", lfc2, " (Up)"),
-    paste0("padj<", alpha, " & log2FC <", -lfc2, " (Down)")
+    paste0("padj<=", alpha, " & log2FC >=", lfc1, " (Up)"),
+    paste0("padj<=", alpha, " & log2FC <=", -lfc1, " (Down)"),
+    paste0("padj<=", alpha, " & log2FC >=", lfc2, " (Up)"),
+    paste0("padj<=", alpha, " & log2FC <=", -lfc2, " (Down)")
   )
 
   out <- matrix(0, nrow = length(criteria), ncol = length(assays),
@@ -164,35 +171,26 @@ SummarizeDEGs <- function(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NUL
 
   for (assay in assays) {
     if (!assay %in% names(object@DEGs)) {
-      warning(paste("Assay", assay, "not found in DEGs slot; skipping."))
+      cli::cli_warn("Assay {assay} not found in DEGs slot; skipping.")
       next
     }
     df <- DEGs(object, assay)
-    df <- na.omit(df)
 
     # Ensure numeric
-    df$log2FoldChange <- as.numeric(df$log2FoldChange)
-    df$padj <- as.numeric(df$padj)
+    lfc <- as.numeric(df$log2FoldChange)
+    padj <- as.numeric(df$padj)
+
+    # Only drop genes missing the columns used for counting
+    keep <- stats::complete.cases(lfc, padj)
+    lfc <- lfc[keep]
+    padj <- padj[keep]
 
     # Count DEGs by criteria
-    out[1, assay] <- sum(df$padj < alpha & df$log2FoldChange > lfc1)
-    out[2, assay] <- sum(df$padj < alpha & df$log2FoldChange < -lfc1)
-    out[3, assay] <- sum(df$padj < alpha & df$log2FoldChange > lfc2)
-    out[4, assay] <- sum(df$padj < alpha & df$log2FoldChange < -lfc2)
+    out[1, assay] <- sum(padj <= alpha & lfc >= lfc1)
+    out[2, assay] <- sum(padj <= alpha & lfc <= -lfc1)
+    out[3, assay] <- sum(padj <= alpha & lfc >= lfc2)
+    out[4, assay] <- sum(padj <= alpha & lfc <= -lfc2)
   }
 
   return(as.data.frame(out))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
