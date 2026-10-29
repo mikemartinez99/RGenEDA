@@ -38,18 +38,21 @@ generatePCs <- function(mat, vars, nFeatures) {
   vsd_sub <- t(vsd_sub)
   pca <- prcomp(vsd_sub)
 
+  nPC <- ncol(pca$x)
+
   percentVar <- pca$sdev^2/sum(pca$sdev^2)
-  percentVar <- percentVar[1:5]
+  #percentVar <- percentVar[1:10]
 
   message("Percent variations:")
   percentVar <- paste(round(percentVar*100,2), "%", sep = " ")
-  names(percentVar) <- c("PC1", "PC2", "PC3", "PC4", "PC5")
-  print(percentVar)
+  names(percentVar) <- paste0("PC", seq_len(nPC))
+
+  print(percentVar[seq_len(min(10, length(percentVar)))])
 
   pca_res <- list()
-  pca_df <- as.data.frame(pca$x)
-  pca_eigenvecs <- as.data.frame(pca$rotation[,1:5])
-  pca_res[["Loadings"]] <- pca_df
+  pca_df <- as.data.frame(pca$x[,seq_len(nPC), drop = FALSE])
+  pca_eigenvecs <- as.data.frame(pca$rotation[,seq_len(nPC), drop = FALSE])
+  pca_res[["Scores"]] <- pca_df
   pca_res[["Eigenvectors"]] <- pca_eigenvecs
   pca_res[["percent_var"]] <- percentVar
   return(pca_res)
@@ -120,7 +123,7 @@ ExtractPCA <- function(object) {
   if (length(object@DimReduction) == 0L) {
     message("DimReduction slot is empty. Please use RunPCA.")
   }
-  pcaRes <- object@DimReduction[["Loadings"]]
+  pcaRes <- object@DimReduction[["Scores"]]
   meta <- object@metadata
   if (is.null(rownames(meta)) || any(rownames(meta) == "")) {
     stop("Metadata does not contain valid rownames. Please ensure metadata rows are named.")

@@ -4,7 +4,7 @@
 \alias{PlotVolcano}
 \title{PlotVolcano}
 \usage{
-PlotVolcano(object, assay, alpha, fc, den, num, title = NULL)
+PlotVolcano(object, assay, alpha, l2fc, den, num, title = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
@@ -13,7 +13,7 @@ PlotVolcano(object, assay, alpha, fc, den, num, title = NULL)
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
-\item{fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
+\item{l2fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
 
 \item{den}{Denominator (reference level for comparison, num vs. den)}
 

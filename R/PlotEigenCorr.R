@@ -6,7 +6,7 @@
 #' P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
 #' one stars, respectively.
 #'
-#' Requires PCA loadings in `DimReduction(object)`; does not recompute PCA.
+#' Requires PCA scores in `DimReduction(object)`; does not recompute PCA.
 #'
 #' @import ggplot2
 #' @import RColorBrewer
@@ -14,7 +14,7 @@
 #' @importFrom stats prcomp cor.test na.omit var as.formula
 #'
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
-#'   optionally `DimReduction` loadings.
+#'   optionally `DimReduction` scores.
 #' @param num_pcs Number of principal components to correlate.
 #' @param meta_cols Optional character vector of metadata column names to include.
 #'   Defaults to all metadata columns.
@@ -71,10 +71,10 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
   }
 
   #----- Obtain PCs from stored DimReduction (required)
-  if (!(length(object@DimReduction) > 0L && "Loadings" %in% names(object@DimReduction))) {
+  if (!(length(object@DimReduction) > 0L && "Scores" %in% names(object@DimReduction))) {
     stop("DimReduction slot is empty. Please run RunPCA() before calling PlotEigenCorr().")
   }
-  pcs_mat <- as.data.frame(object@DimReduction[["Loadings"]])
+  pcs_mat <- as.data.frame(object@DimReduction[["Scores"]])
   # Align PCs to metadata order if necessary
   if (!identical(rownames(pcs_mat), rownames(META_num))) {
     pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]

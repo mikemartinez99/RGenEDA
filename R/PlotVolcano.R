@@ -11,7 +11,7 @@
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
-#' @param fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
+#' @param l2fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
 #' @param den Denominator (reference level for comparison, num vs. den)
 #' @param num Numerator (numerator level for comparison, num vs. den)
 #' @param title Optional character vector of what plot should be titled.
@@ -47,7 +47,7 @@
 #' }
 #' @export
 
-PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
+PlotVolcano <- function(object, assay, alpha, l2fc, den, num, title = NULL) {
   stopifnot(methods::is(object, "geneda"))
 
   if (!assay %in% names(object@DEGs)) {
@@ -65,11 +65,11 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
   }
 
   df$Group <- NA
-  df$Group[df$padj > alpha & abs(df$log2FoldChange) < fc] <- "ns"
-  df$Group[df$padj > alpha & abs(df$log2FoldChange) > fc] <- "ns"
-  df$Group[df$padj < alpha & abs(df$log2FoldChange) < fc] <- paste("padj <", alpha)
-  df$Group[df$padj < alpha & df$log2FoldChange > fc] <- paste("Upregulated in", num)
-  df$Group[df$padj < alpha & df$log2FoldChange < -fc] <- paste("Upregulated in", den)
+  df$Group[df$padj > alpha & abs(df$log2FoldChange) < l2fc] <- "ns"
+  df$Group[df$padj > alpha & abs(df$log2FoldChange) > l2fc] <- "ns"
+  df$Group[df$padj < alpha & abs(df$log2FoldChange) < l2fc] <- paste("padj <", alpha)
+  df$Group[df$padj < alpha & df$log2FoldChange > l2fc] <- paste("Upregulated in", num)
+  df$Group[df$padj < alpha & df$log2FoldChange < -l2fc] <- paste("Upregulated in", den)
 
   df$Group <- factor(df$Group, levels = c(
     paste("Upregulated in", den),
@@ -95,6 +95,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
   cap_pos_xvalue <- max(abs(df$log2FoldChange)) + 0.4
   cap_neg_xvalue <- cap_pos_xvalue/-1
 
+  df <- na.omit(df)
   resPlot <- ggplot(df, aes(x = log2FoldChange, y = -log10(padj), fill = Group)) +
     geom_point(alpha = 0.5, shape = 21)  +
     theme_classic(base_size = 16) +
@@ -105,7 +106,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
     scale_fill_manual(values = groupColors) +
     scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
     xlim(cap_neg_xvalue, cap_pos_xvalue) +
-    geom_label_repel(data = subset(df, log2FoldChange > fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange > l2fc & padj < alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = 0.04,
@@ -114,7 +115,7 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
                      max.overlaps = 20,
                      segment.size = 0.3, fill = "grey90",
                      segment.color = 'grey50', size = 3.5) +
-    geom_label_repel(data = subset(df, log2FoldChange < -fc & padj < alpha), aes(label = gene),
+    geom_label_repel(data = subset(df, log2FoldChange < -l2fc & padj < alpha), aes(label = gene),
                      box.padding   = 0.35,
                      nudge_x = 0.05,
                      nudge_y = -0.04,
@@ -123,8 +124,8 @@ PlotVolcano <- function(object, assay, alpha, fc, den, num, title = NULL) {
                      segment.size = 0.3, fill = "grey90",
                      max.overlaps = 20,
                      segment.color = 'grey50', size = 3.5) +
-    geom_vline(xintercept = fc, colour = "black", linetype="dotted") +
-    geom_vline(xintercept = -fc, colour = "black", linetype="dotted") +
+    geom_vline(xintercept = l2fc, colour = "black", linetype="dotted") +
+    geom_vline(xintercept = -l2fc, colour = "black", linetype="dotted") +
     theme(legend.key.size = unit(1, "cm"),
           title = element_text(colour="black", size = 20),
           axis.text.x=element_text(colour="black", size = 14),

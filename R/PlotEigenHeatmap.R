@@ -40,7 +40,7 @@ PlotEigenHeatmap <- function(object, pc = "PC1", n = 25,
   stopifnot(methods::is(object, "geneda"))
   return <- match.arg(return)
 
-  if (!(length(object@DimReduction) > 0L && all(c("Eigenvectors","Loadings") %in% names(object@DimReduction)))) {
+  if (!(length(object@DimReduction) > 0L && all(c("Eigenvectors","Scores") %in% names(object@DimReduction)))) {
     stop("DimReduction is missing required entries 'Eigenvectors' and 'Loadings'. Run RunPCA().")
   }
 

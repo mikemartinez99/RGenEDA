@@ -1,6 +1,6 @@
 Package: RGenEDA
 Title: Genomic Exploratory Data Analysis
-Version: 2.0.0
+Version: 2.0.2
 Authors@R: 
     person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
 Description: Provides a unified and reproducible framework for performing genomic exploratory data analysis (EDA). Highly repetitive functions and analyses have been collated into an easy-to-use S4 object that produces quick results and customizable visualizations to assess variation in your data. See <https://github.com/mikemartinez99/RGenEDA>.
@@ -16,8 +16,10 @@ Imports:
     RColorBrewer,
     dplyr,
     ggplot2,
+    ggpubr,
     ggrepel,
     grid,
+    patchwork,
     scales,
     tidyr,
     vegan,
@@ -32,3 +34,4 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
+LazyData: true

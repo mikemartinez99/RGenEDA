@@ -4,7 +4,7 @@
 \alias{PlotMA}
 \title{PlotMA}
 \usage{
-PlotMA(object, assay, alpha, fc, title = NULL)
+PlotMA(object, assay, alpha, l2fc, title = NULL)
 }
 \arguments{
 \item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
@@ -13,7 +13,7 @@ PlotMA(object, assay, alpha, fc, title = NULL)
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
-\item{fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
+\item{l2fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
 
 \item{title}{Optional character vector of what plot should be titled.}
 }

@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --green: #1B9E5A;
+    --coral: #E25B4C;
+    --ink: #124443;
+    --muted: #7A8F8A;
+  }
+  html, body { margin: 0; padding: 0; background: #ffffff; }
+  body { width: 3300px; height: 1875px; position: relative; overflow: hidden;
+         font-family: "K2D", sans-serif; color: var(--ink); }
+  .logo { position: absolute; left: 60px; top: 48px; width: 300px; }
+  .panel { position: absolute; border: 7px dashed var(--green); border-radius: 70px; box-sizing: border-box; }
+  .panel.eda { left: 400px; top: 92px; width: 2840px; height: 985px; }
+  .panel.deg { left: 60px; top: 1140px; width: 3180px; height: 690px; border-color: var(--coral); }
+  .title { position: absolute; top: -56px; left: 50%; transform: translateX(-50%);
+           background: #fff; border: 7px solid var(--green); border-radius: 26px;
+           padding: 8px 48px; font-size: 66px; font-weight: 600; color: var(--green);
+           white-space: nowrap; letter-spacing: 0.5px; }
+  .deg .title { border-color: var(--coral); color: var(--coral); }
+  .row { position: absolute; display: flex; align-items: center; gap: 28px; }
+  .row img { height: 430px; display: block; }
+  .deg .row img { height: 490px; }
+  ul.feat { position: absolute; margin: 0; padding: 0; list-style: none; width: 760px;
+            font-size: 42px; font-weight: 500; line-height: 1.75; color: var(--ink); white-space: nowrap; }
+  ul.feat li::before { content: "–  "; color: var(--coral); font-weight: 700; }
+  .eda ul.feat { left: 2050px; top: 540px; }
+  .eda ul.feat li::before { color: var(--green); }
+  .deg ul.feat { left: 2400px; top: 90px; }
+  .example { position: absolute; left: 2400px; bottom: 40px; font-size: 30px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <img class="logo" src="LOGO_PNG">
+
+  <div class="panel eda">
+    <div class="title">Exploratory data analysis</div>
+    <div class="row" style="left: 70px; top: 62px;">
+      <img src="FIG/clustering-1.png">
+      <img src="FIG/hvgs-plot-1.png">
+      <img src="FIG/extract-pca-1.png">
+      <img src="FIG/eigencorr-1.png">
+    </div>
+    <div class="row" style="left: 70px; top: 520px;">
+      <img src="FIG/count-dist-1.png">
+      <img src="FIG/run-pca-1.png">
+      <img src="FIG/eigenvecs-1.png">
+    </div>
+    <ul class="feat">
+      <li>One S4 object for the whole workflow</li>
+      <li>HVG selection and variance profiles</li>
+      <li>PCA, scree and eigenvector heatmaps</li>
+      <li>Eigencorrelations with metadata</li>
+      <li>Returns ggplot2 and pheatmap objects</li>
+    </ul>
+  </div>
+
+  <div class="panel deg">
+    <div class="title">Differential expression</div>
+    <div class="row" style="left: 70px; top: 80px;">
+      <img src="FIG/PValHist-1.png">
+      <img src="FIG/MA-1.png">
+      <img src="FIG/Volcano-1.png">
+    </div>
+    <ul class="feat">
+      <li>Multiple DEG tables in one object</li>
+      <li>Filter DEGs by padj and log2FC</li>
+      <li>MA, volcano and p-value plots</li>
+      <li>Intersect DEGs with HVGs</li>
+      <li>Save pheatmaps like ggsave</li>
+    </ul>
+    <div class="example">Example: Snai1 KO vs WT (Matsuri et al. 2018)</div>
+  </div>
+</body>
+</html>

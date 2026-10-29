@@ -5,3 +5,5 @@
 ^img$
 ^\.github$
 ^codecov\.yml$
+^pkgdown$
+^_pkgdown\.yml$

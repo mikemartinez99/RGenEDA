@@ -11,10 +11,8 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @slot normalized Normalized expression matrix (features x samples).
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
-#' @slot DimReduction List for PCA results with `Loadings`, `Eigenvectors`, `percent_var`.
-#' @slot DEGs List container for differential expression results. Contains `DEG`
-#'   (data.frame) for unfiltered results, and optionally named slots for filtered
-#'   results (e.g., `DEGs$assay1`, `DEGs$assay2`).
+#' @slot DimReduction List for PCA results with `Scores`, `Eigenvectors`, `percent_var`.
+#' @slot DEGs List container for differential expression results.
 #'
 #' @exportClass geneda
 
@@ -68,15 +66,18 @@ setClass(
     }
   }
   if (length(object@DimReduction) > 0L) {
-    needed_pcs <- c("Loadings", "Eigenvectors", "percent_var")
+    needed_pcs <- c("Scores", "Eigenvectors", "percent_var")
     if (!all(needed_pcs %in% names(object@DimReduction))) {
       errors <- c(errors, "'DimReduction' must contain names: Loadings, Eigenvectors, percent_var.")
     }
   }
 
   if (length(object@DEGs) > 0L) {
-    if (!is.null(object@DEGs$DEG) && !is.data.frame(object@DEGs$DEG)) {
-      errors <- c(errors, "'DEGs$DEG' must be a data.frame or NULL.")
+    for (nm in names(object@DEGs)) {
+      elem <- object@DEGs[[nm]]
+      if (!is.null(elem) && !is.data.frame(elem)) {
+        errors <- c(errors, sprintf("'DEGs$%s' must be a data.frame or NULL.", nm))
+      }
     }
   }
 
