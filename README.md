@@ -106,7 +106,7 @@ For some background on why EDA is important, see [Compute and Conquer: The Basic
   - Added biocViews, URL, and BugReports to DESCRIPTION <br>
   - Added **as.geneda()** to create GenEDA objects directly from SummarizedExperiment, DESeqDataSet, and DESeqTransform objects <br>
   - Added runnable examples for all exported functions using the bundled Snail1KO data <br>
-  - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br>
+E  - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br>
 
 ## Citation
 If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**
