@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,11 +41,13 @@
 <li><a class="dropdown-item" href="../articles/Snail1_Vignette.html">RGenEDA Tutorial</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mikemartinez99/RGenEDA/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -61,7 +63,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>RGenEDA Tutorial</h1>
             
       
-
+      <small class="dont-index">Source: <a href="https://github.com/mikemartinez99/RGenEDA/blob/HEAD/vignettes/Snail1_Vignette.Rmd" class="external-link"><code>vignettes/Snail1_Vignette.Rmd</code></a></small>
       <div class="d-none name"><code>Snail1_Vignette.Rmd</code></div>
     </div>
 
@@ -119,8 +121,7 @@ variable of interest (Genotype) for simplicity sake (though your
 experiment may have many. <code>RGenEDA</code> can handle any number of
 covariates.)</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Load the counts and metadata and extract</span></span>
+<code class="sourceCode R"><span><span class="co"># Load the counts and metadata and extract</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"Snail1KO"</span><span class="op">)</span></span>
 <span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">Snail1KO</span><span class="op">[[</span><span class="st">"rawCounts"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="va">metadata</span> <span class="op">&lt;-</span> <span class="va">Snail1KO</span><span class="op">[[</span><span class="st">"metadata"</span><span class="op">]</span><span class="op">]</span></span>
@@ -147,10 +148,10 @@ analysis to keep figures consistent. <code>RGenEDA</code> uses the list
 of named vectors convention for creating color vectors for plotting
 functions.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Color palettes for plotting</span></span>
+<code class="sourceCode R"><span><span class="co"># Color palettes for plotting</span></span>
 <span><span class="va">colorList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  Genotype <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span> <span class="op">=</span> <span class="st">"steelblue3"</span>, <span class="st">"Snai1_KO"</span> <span class="op">=</span> <span class="st">"firebrick3"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>    Genotype <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span> <span class="op">=</span> <span class="st">"steelblue3"</span>, <span class="st">"Snai1_KO"</span> <span class="op">=</span> <span class="st">"firebrick3"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="processing-and-normalization">Processing and normalization<a class="anchor" aria-label="anchor" href="#processing-and-normalization"></a>
@@ -159,15 +160,14 @@ functions.</p>
 obtain normalized counts and differential expression results. Lowly
 expressed genes are filtered out before running <code>DESeq2.</code></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Ensure tables are not scrambled</span></span>
+<code class="sourceCode R"><span><span class="co"># Ensure tables are not scrambled</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
 <span><span class="va">dds</span> <span class="op">&lt;-</span> <span class="fu">DESeqDataSetFromMatrix</span><span class="op">(</span></span>
-<span>  countData <span class="op">=</span> <span class="va">counts</span>,</span>
-<span>  colData <span class="op">=</span> <span class="va">metadata</span>,</span>
-<span>  design <span class="op">=</span> <span class="op">~</span> <span class="va">Genotype</span></span>
+<span>    countData <span class="op">=</span> <span class="va">counts</span>,</span>
+<span>    colData <span class="op">=</span> <span class="va">metadata</span>,</span>
+<span>    design <span class="op">=</span> <span class="op">~</span><span class="va">Genotype</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in</span></span>
 <span><span class="co">#&gt; design formula are characters, converting to factors</span></span>
@@ -177,7 +177,7 @@ expressed genes are filtered out before running <code>DESeq2.</code></p>
 <span></span>
 <span><span class="co"># Pre-filter: keep genes with at least 10 counts in  at least 3 samples</span></span>
 <span><span class="va">keep</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="fu">counts</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span></span>
-<span><span class="va">dds</span> <span class="op">&lt;-</span> <span class="va">dds</span><span class="op">[</span><span class="va">keep</span>,<span class="op">]</span></span>
+<span><span class="va">dds</span> <span class="op">&lt;-</span> <span class="va">dds</span><span class="op">[</span><span class="va">keep</span>, <span class="op">]</span></span>
 <span></span>
 <span><span class="co"># Run DESeq2</span></span>
 <span><span class="va">dds</span> <span class="op">&lt;-</span> <span class="fu">DESeq</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span></span>
@@ -194,14 +194,14 @@ expressed genes are filtered out before running <code>DESeq2.</code></p>
 all components of your analysis, starting with normalized data and
 metadata (bare minimum requirements).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Factor metadata</span></span>
+<code class="sourceCode R"><span><span class="co"># Factor metadata</span></span>
 <span><span class="va">metadata</span><span class="op">$</span><span class="va">Genotype</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">metadata</span><span class="op">$</span><span class="va">Genotype</span>, levels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span>, <span class="st">"Snai1_KO"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Initialize GenEDA object with normalized counts and metadata</span></span>
 <span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/GenEDA.html">GenEDA</a></span><span class="op">(</span></span>
-<span>  normalized <span class="op">=</span> <span class="va">mat</span>,</span>
-<span>  metadata <span class="op">=</span> <span class="va">metadata</span><span class="op">)</span></span>
+<span>    normalized <span class="op">=</span> <span class="va">mat</span>,</span>
+<span>    metadata <span class="op">=</span> <span class="va">metadata</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View object summary</span></span>
 <span><span class="va">obj</span></span>
@@ -216,6 +216,28 @@ metadata (bare minimum requirements).</p>
 Genes (HVGs), DimReduction (PCA, etc..) and Differentially Expressed
 Genes (DEGs). These will be populated shortly with
 <code>RGenEDA</code></p>
+<div class="section level4">
+<h4 id="creating-a-geneda-object-from-deseq2-or-summarizedexperiment">Creating a GenEDA object from DESeq2 or SummarizedExperiment<a class="anchor" aria-label="anchor" href="#creating-a-geneda-object-from-deseq2-or-summarizedexperiment"></a>
+</h4>
+<p>If your data are already in a <code>SummarizedExperiment</code> or
+<code>DESeqDataSet</code>, use <code><a href="../reference/as.geneda.html">as.geneda()</a></code> instead. It
+carries over the raw counts, normalized values, and <code>colData</code>
+in one step. Here, the <code>rlog</code> values computed above are used
+as the normalized data. If <code>normalized</code> is not supplied,
+<code><a href="../reference/as.geneda.html">as.geneda()</a></code> computes a variance stabilizing transformation
+(<code>transform = "vst"</code>) or log2 CPM
+(<code>transform = "logcpm"</code>) from the counts.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj_from_dds</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as.geneda.html">as.geneda</a></span><span class="op">(</span><span class="va">dds</span>, normalized <span class="op">=</span> <span class="va">rld</span><span class="op">)</span></span>
+<span><span class="va">obj_from_dds</span></span>
+<span><span class="co">#&gt; geneda object</span></span>
+<span><span class="co">#&gt;   features: 11247</span></span>
+<span><span class="co">#&gt;   samples:  6</span></span>
+<span><span class="co">#&gt;   HVGs: 0</span></span>
+<span><span class="co">#&gt;   DimReduction: 0</span></span>
+<span><span class="co">#&gt;   counts: present</span></span>
+<span><span class="co">#&gt;   DEGs: none</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="count-distributions-across-samples">Count distributions across samples<a class="anchor" aria-label="anchor" href="#count-distributions-across-samples"></a>
@@ -228,9 +250,8 @@ very high overall counts compared to others might indicate problematic
 samples, technical artifacts, or batch effect. This function returns a
 <code>ggplot2</code> object to facilitate any additional
 customization.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/PlotCountDist.html">PlotCountDist</a></span><span class="op">(</span><span class="va">obj</span>, split_by <span class="op">=</span> <span class="st">"Genotype"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/PlotCountDist.html">PlotCountDist</a></span><span class="op">(</span><span class="va">obj</span>, split_by <span class="op">=</span> <span class="st">"Genotype"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/count-dist-1.png" width="576" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level3">
@@ -244,13 +265,12 @@ This provides a quick assessment of replicate quality and metadata
 features that drive clustering. To save <code>pheatmap</code> objects
 within <code>RGenEDA</code>, we can use the <code><a href="../reference/GenSave.html">GenSave()</a></code>
 function, which is similar in function to <code>ggsave()</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotDistances.html">PlotDistances</a></span><span class="op">(</span></span>
-<span>  <span class="va">obj</span>,</span>
-<span>  meta_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Genotype"</span><span class="op">)</span>,</span>
-<span>  palettes <span class="op">=</span> <span class="va">colorList</span>,</span>
-<span>  return <span class="op">=</span> <span class="st">"plot"</span></span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">hm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotDistances.html">PlotDistances</a></span><span class="op">(</span></span>
+<span>    <span class="va">obj</span>,</span>
+<span>    meta_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Genotype"</span><span class="op">)</span>,</span>
+<span>    palettes <span class="op">=</span> <span class="va">colorList</span>,</span>
+<span>    return <span class="op">=</span> <span class="st">"plot"</span></span>
 <span><span class="op">)</span></span>
 <span><span class="va">hm</span><span class="op">$</span><span class="va">heatmap</span></span>
 <span></span>
@@ -266,26 +286,20 @@ variance profile curve for all genes profiled with
 <code>plotHVGVariance()</code> as a means to pick a meaningful number of
 HVGs to retain for calculating principal components in the next
 section.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">#----- Plot variance profile</span></span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#----- Plot variance profile</span></span>
 <span><span class="fu"><a href="../reference/PlotHVGVariance.html">PlotHVGVariance</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/hvgs-plot-1.png" width="60%" style="display: block; margin: auto;">
 Based on the curve, 2,000 genes seems sufficient in capturing the
 majority of variation. These genes can be extracted and retained in the
 HVGs slot with <code><a href="../reference/FindVariableFeatures.html">FindVariableFeatures()</a></code></p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">#----- Add HVGs to object</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#----- Add HVGs to object</span></span>
 <span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">obj</span>, <span class="fl">2000</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co">#== Access HVGs (2 methods)</span></span>
-<span><span class="co"># 1: Accessor function</span></span>
+<span><span class="co"># == Access HVGs with the accessor function</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="../reference/HVGs.html">HVGs</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "THY1"   "CCL2"   "SSX1"   "AKR1C2" "GPX1"   "MYL12B"</span></span>
-<span></span>
-<span><span class="co"># 2: Call the slot directly</span></span>
-<span><span class="co">#head(obj@HVGs)</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "THY1"   "CCL2"   "SSX1"   "AKR1C2" "GPX1"   "MYL12B"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="principal-component-analysis">Principal component analysis<a class="anchor" aria-label="anchor" href="#principal-component-analysis"></a>
@@ -293,27 +307,30 @@ HVGs slot with <code><a href="../reference/FindVariableFeatures.html">FindVariab
 <p>Using the identified HVGs, principal components can be calculated
 using <code><a href="../reference/RunPCA.html">RunPCA()</a></code> This function stores PCA results in the
 DimReduction slot, including:</p>
-<p>• <code>$Scores</code> (sample scores)</p>
-<p>• <code>$Eigenvectors</code> (gene contributions)</p>
-<p>• <code>$percent_var</code> (Percent variance explained per
-component, up to PC5)</p>
+<ul>
+<li><p><code>$Scores</code> (sample scores)</p></li>
+<li><p><code>$Eigenvectors</code> (gene contributions)</p></li>
+<li><p><code>$percent_var</code> (Percent variance explained per
+component, up to PC5)</p></li>
+</ul>
 <p>If <code><a href="../reference/FindVariableFeatures.html">FindVariableFeatures()</a></code> was not ran beforehand,
 <code>RunPCA</code> will calculate HVGs by default with 2000 features.
 This argument can be overriden directly using the <code>nfeatures</code>
 argument.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Calculating principal components from top 2000 HVGs</span></span>
 <span><span class="co">#&gt; Percent variations:</span></span>
-<span><span class="co">#&gt;       PC1       PC2       PC3       PC4       PC5       PC6 </span></span>
-<span><span class="co">#&gt; "85.43 %"  "7.07 %"  "3.89 %"  "2.28 %"  "1.33 %"     "0 %"</span></span>
+<span><span class="co">#&gt; PC1: 85.43 %</span></span>
+<span><span class="co">#&gt; PC2: 7.07 %</span></span>
+<span><span class="co">#&gt; PC3: 3.89 %</span></span>
+<span><span class="co">#&gt; PC4: 2.28 %</span></span>
+<span><span class="co">#&gt; PC5: 1.33 %</span></span>
+<span><span class="co">#&gt; PC6: 0 %</span></span>
 <span></span>
-<span><span class="co"># DimReductions can be accessed with accessor function</span></span>
-<span><span class="co"># head(DimReduction(obj))</span></span>
-<span></span>
-<span><span class="co"># Inspect PCA outputs</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">Scores</span><span class="op">)</span></span>
+<span><span class="co"># Inspect PCA outputs with the DimReduction() accessor</span></span>
+<span><span class="va">pca</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/DimReduction.html">DimReduction</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca</span><span class="op">$</span><span class="va">Scores</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  PC1       PC2         PC3         PC4          PC5</span></span>
 <span><span class="co">#&gt; ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259</span></span>
 <span><span class="co">#&gt; ERR1736466 -14.27872 -2.406553 -5.26248029 -0.01697393  0.313289330</span></span>
@@ -328,7 +345,7 @@ argument.</p>
 <span><span class="co">#&gt; ERR1736468 3.303503e-14</span></span>
 <span><span class="co">#&gt; ERR1736469 3.173788e-14</span></span>
 <span><span class="co">#&gt; ERR1736470 3.630529e-14</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">Eigenvectors</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca</span><span class="op">$</span><span class="va">Eigenvectors</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                 PC1          PC2           PC3          PC4          PC5</span></span>
 <span><span class="co">#&gt; THY1    0.150266440 -0.022809065  0.0000110537 -0.006329718 -0.028030018</span></span>
 <span><span class="co">#&gt; CCL2    0.135706807 -0.025658201  0.0070373490  0.003838021 -0.040018651</span></span>
@@ -343,7 +360,7 @@ argument.</p>
 <span><span class="co">#&gt; AKR1C2  0.06171997</span></span>
 <span><span class="co">#&gt; GPX1   -0.01918598</span></span>
 <span><span class="co">#&gt; MYL12B -0.00531372</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">obj</span><span class="op">@</span><span class="va">DimReduction</span><span class="op">$</span><span class="va">percent_var</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pca</span><span class="op">$</span><span class="va">percent_var</span><span class="op">)</span></span>
 <span><span class="co">#&gt;       PC1       PC2       PC3       PC4       PC5       PC6 </span></span>
 <span><span class="co">#&gt; "85.43 %"  "7.07 %"  "3.89 %"  "2.28 %"  "1.33 %"     "0 %"</span></span>
 <span></span>
@@ -359,9 +376,8 @@ argument.</p>
 <code><a href="../reference/ExtractPCA.html">ExtractPCA()</a></code> which enables flexible plotting. For
 convenience, <code><a href="../reference/PlotPCA.html">PlotPCA()</a></code> allows a quick visualization which
 can also be further customized with <code>ggplot2</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">pcaDF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ExtractPCA.html">ExtractPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pcaDF</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/ExtractPCA.html">ExtractPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pcaDF</span><span class="op">)</span></span>
 <span><span class="co">#&gt;                  PC1       PC2         PC3         PC4          PC5</span></span>
 <span><span class="co">#&gt; ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259</span></span>
@@ -386,16 +402,19 @@ can also be further customized with <code>ggplot2</code>.</p>
 <span><span class="co">#&gt; ERR1736470 HS578T - epithelial cell</span></span>
 <span></span>
 <span><span class="co"># Plot PCA</span></span>
-<span><span class="fu"><a href="../reference/PlotPCA.html">PlotPCA</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
-<span>        x <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>        y <span class="op">=</span> <span class="fl">2</span>,</span>
-<span>        color_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span>
-<span>        colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span> <span class="op">=</span> <span class="st">"steelblue3"</span>, <span class="st">"Snai1_KO"</span> <span class="op">=</span> <span class="st">"firebrick3"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/PlotPCA.html">PlotPCA</a></span><span class="op">(</span></span>
+<span>    object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>    x <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    y <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>    color_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span>
+<span>    colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span> <span class="op">=</span> <span class="st">"steelblue3"</span>, <span class="st">"Snai1_KO"</span> <span class="op">=</span> <span class="st">"firebrick3"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: `aes_string()` was deprecated in ggplot2 3.0.0.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span></span>
-<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
+<span><span class="co">#&gt;   Please report the issue at</span></span>
+<span><span class="co">#&gt;   <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/mikemartinez99/RGenEDA/issues&gt;</span>.</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span></code></pre></div>
@@ -410,10 +429,11 @@ expression visualized as a heatmap annotated by the percent variation
 explained using <code><a href="../reference/extractEigen.html">extractEigen()</a></code> and
 <code><a href="../reference/PlotEigenHeatmap.html">PlotEigenHeatmap()</a></code>. This can again identify
 sample-to-sample differences.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">pc1_eigen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractEigen.html">extractEigen</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
-<span>                          component <span class="op">=</span> <span class="st">"PC1"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pc1_eigen</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/extractEigen.html">extractEigen</a></span><span class="op">(</span></span>
+<span>    object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>    component <span class="op">=</span> <span class="st">"PC1"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">pc1_eigen</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     Gene  EigenVector      PctVar</span></span>
 <span><span class="co">#&gt; 1   THY1  0.150266440 2.258000304</span></span>
@@ -425,13 +445,14 @@ sample-to-sample differences.</p>
 <span></span>
 <span></span>
 <span><span class="va">hm2</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotEigenHeatmap.html">PlotEigenHeatmap</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>                 pc <span class="op">=</span> <span class="st">"PC1"</span>,</span>
-<span>                 n <span class="op">=</span> <span class="fl">25</span>,</span>
-<span>                 annotate_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span>
-<span>                 annotate_colors <span class="op">=</span> <span class="va">colorList</span><span class="op">)</span></span>
+<span>    pc <span class="op">=</span> <span class="st">"PC1"</span>,</span>
+<span>    n <span class="op">=</span> <span class="fl">25</span>,</span>
+<span>    annotate_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span>
+<span>    annotate_colors <span class="op">=</span> <span class="va">colorList</span></span>
+<span><span class="op">)</span></span>
 <span><span class="va">hm2</span><span class="op">$</span><span class="va">heatmap</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/eigenvecs-1.png" width="768" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)</span></span></code></pre></div>
 </div>
@@ -450,18 +471,21 @@ labelled. Variables that cannot be tested, such as columns with a single
 value or a unique value per sample (here, Disease, CellLine_CellType,
 and Sample), are dropped. This function returns a list of 4
 elements:</p>
-<p>• <code>$cor_matrix</code> (Pearson correlation values, or multiple
-correlation R for variables with more than two levels)</p>
-<p>• <code>$pval_matrix</code> (Associated correlation p-values)</p>
-<p>• <code>$stars</code> (asterisk representations of p-values)</p>
-<p>• <code>$plot</code> (Eigencorr plot, as a <code>ggplot2</code>
-object, which can be saved with <code>ggsave</code>)</p>
+<ul>
+<li><p><code>$cor_matrix</code> (Pearson correlation values, or multiple
+correlation R for variables with more than two levels)</p></li>
+<li><p><code>$pval_matrix</code> (Associated correlation
+p-values)</p></li>
+<li><p><code>$stars</code> (asterisk representations of
+p-values)</p></li>
+<li><p><code>$plot</code> (Eigencorr plot, as a <code>ggplot2</code>
+object, which can be saved with <code>ggsave</code>)</p></li>
+</ul>
 <p><strong>Note:</strong> <code><a href="../reference/PlotOrdCorr.html">PlotOrdCorr()</a></code> can be used for
 microbiome data as it correlates metadata features with NMDS beta values
 rather than PCs.</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">ec</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotEigenCorr.html">PlotEigenCorr</a></span><span class="op">(</span><span class="va">obj</span>, num_pcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">ec</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotEigenCorr.html">PlotEigenCorr</a></span><span class="op">(</span><span class="va">obj</span>, num_pcs <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
 <span><span class="va">ec</span><span class="op">$</span><span class="va">plot</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/eigencorr-1.png" width="70%" style="display: block; margin: auto;"></p>
 </div>
@@ -480,33 +504,35 @@ DESeq2 results and Shrunk DESeq2 results.)</p>
 <p>To get a quick diagnosis of the differential expression results, a
 histogram of un-corrected pvalues can be plotted using
 <code><a href="../reference/PlotPValHist.html">PlotPValHist()</a></code>.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">results</span><span class="op">(</span><span class="va">dds</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Set a new DEG assay</span></span>
-<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SetDEGs.html">SetDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
-<span>               deg_table <span class="op">=</span> <span class="va">res</span>,</span>
-<span>               assay <span class="op">=</span> <span class="st">"unfiltered"</span><span class="op">)</span></span>
+<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SetDEGs.html">SetDEGs</a></span><span class="op">(</span></span>
+<span>    object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>    deg_table <span class="op">=</span> <span class="va">res</span>,</span>
+<span>    assay <span class="op">=</span> <span class="st">"unfiltered"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># P value histogram</span></span>
 <span><span class="fu"><a href="../reference/PlotPValHist.html">PlotPValHist</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>             assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
-<span>             alpha <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span></code></pre></div>
+<span>    assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/PValHist-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>To quickly summarize the DEG results with different thresholds, run
 <code>SummarizeDEGs</code>(). This function can take multiple assays if
 needed and outputs results in a tabular format.</p>
 <p>DEG assays can be filtered and directly saved as a new assay in the
 DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></code></p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># Summarize DEGs</span></span>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Summarize DEGs</span></span>
 <span><span class="fu"><a href="../reference/SummarizeDEGs.html">SummarizeDEGs</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>              alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>              lfc1 <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>              lfc2 <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    lfc1 <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    lfc2 <span class="op">=</span> <span class="fl">2</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt;                                 unfiltered</span></span>
 <span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &gt;=1 (Up)           656</span></span>
 <span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &lt;=-1 (Down)        542</span></span>
@@ -514,11 +540,13 @@ DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></c
 <span><span class="co">#&gt; padj&lt;=0.05 &amp; log2FC &lt;=-2 (Down)        181</span></span>
 <span></span>
 <span><span class="co"># Filter the DEG assay and save as a new one</span></span>
-<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterDEGs.html">FilterDEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>,</span>
-<span>                  assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
-<span>                  alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>                  l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>                  saveAssay <span class="op">=</span> <span class="st">"padj05_lfc1"</span><span class="op">)</span></span>
+<span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/FilterDEGs.html">FilterDEGs</a></span><span class="op">(</span></span>
+<span>    object <span class="op">=</span> <span class="va">obj</span>,</span>
+<span>    assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    saveAssay <span class="op">=</span> <span class="st">"padj05_lfc1"</span></span>
+<span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Grab results with accessor function</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="../reference/DEGs.html">DEGs</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">obj</span>, assay <span class="op">=</span> <span class="st">"unfiltered"</span><span class="op">)</span><span class="op">)</span></span>
@@ -529,18 +557,12 @@ DEGs slot using <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></c
 be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> and <code><a href="../reference/PlotVolcano.html">PlotVolcano()</a></code>
 “Num” and “Den” arguments refer to numerator level and denominator level
 (reference level of experiment, in our case, “WT”)</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/PlotMA.html">PlotMA</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
-<span>       alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>       l2fc <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Please use `linewidth` instead.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span></span>
-<span><span class="co">#&gt;   Please report the issue to the authors.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
+<span>    assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    l2fc <span class="op">=</span> <span class="fl">1</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; Scale for <span style="color: #00BB00;">size</span> is already present.</span></span>
 <span><span class="co">#&gt; Adding another scale for <span style="color: #00BB00;">size</span>, which will replace the existing scale.</span></span>
 <span><span class="co">#&gt; Warning: Removed 5 rows containing missing values or values outside the scale range</span></span>
@@ -548,15 +570,15 @@ be plotted using <code><a href="../reference/PlotMA.html">PlotMA()</a></code> an
 <p><img src="Snail1_Vignette_files/figure-html/MA-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>Or a volcano plot by specifying numerator and denominator
 (denominator is your comparison reference level).</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/PlotVolcano.html">PlotVolcano</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>       assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
-<span>       alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
-<span>       l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>       den <span class="op">=</span> <span class="st">"WT"</span>,</span>
-<span>       num <span class="op">=</span> <span class="st">"Snai1_KO"</span>,</span>
-<span>       title <span class="op">=</span> <span class="st">"Example Volcano"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/PlotVolcano.html">PlotVolcano</a></span><span class="op">(</span><span class="va">obj</span>,</span>
+<span>    assay <span class="op">=</span> <span class="st">"unfiltered"</span>,</span>
+<span>    alpha <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>    l2fc <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>    den <span class="op">=</span> <span class="st">"WT"</span>,</span>
+<span>    num <span class="op">=</span> <span class="st">"Snai1_KO"</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Example Volcano"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="Snail1_Vignette_files/figure-html/Volcano-1.png" width="70%" style="display: block; margin: auto;"></p>
 <p>To get a glance at everything at once, we can plot a differential
 expression dashboard with <code><a href="../reference/DEDashboard.html">DEDashboard()</a></code></p>
@@ -574,11 +596,11 @@ fold change to intersect with HVGs can be either “positive”, or
 “negative”, which returns a vector of genes, or “both” which contains a
 list with <code>$positive</code>, <code>$negative</code>, and
 <code>$both</code> slots.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="../reference/FindHVDEGs.html">FindHVDEGs</a></span><span class="op">(</span><span class="va">obj</span>,</span>
-<span>           assay <span class="op">=</span> <span class="st">"padj05_lfc1"</span>,</span>
-<span>           direction <span class="op">=</span> <span class="st">"negative"</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/FindHVDEGs.html">FindHVDEGs</a></span><span class="op">(</span><span class="va">obj</span>,</span>
+<span>    assay <span class="op">=</span> <span class="st">"padj05_lfc1"</span>,</span>
+<span>    direction <span class="op">=</span> <span class="st">"negative"</span></span>
+<span><span class="op">)</span></span>
 <span><span class="co">#&gt; 332 -log2FC hvDEGs found.</span></span>
 <span><span class="co">#&gt;   [1] "CAMKK1"       "ACSM3"        "TMEM98"       "DLX6"         "MAP3K9"      </span></span>
 <span><span class="co">#&gt;   [6] "PRSS21"       "FUZ"          "CEP68"        "ERCC1"        "BID"         </span></span>
@@ -648,6 +670,81 @@ list with <code>$positive</code>, <code>$negative</code>, and
 <span><span class="co">#&gt; [326] "ZNF595"       "FAM106A"      "H2BC3"        "H2AC16"       "H4C1"        </span></span>
 <span><span class="co">#&gt; [331] "OR51B2"       "H3C3"</span></span></code></pre></div>
 </div>
+</div>
+<div class="section level2">
+<h2 id="session-information">Session information<a class="anchor" aria-label="anchor" href="#session-information"></a>
+</h2>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; R version 4.4.1 (2024-06-14)</span></span>
+<span><span class="co">#&gt; Platform: aarch64-apple-darwin20</span></span>
+<span><span class="co">#&gt; Running under: macOS Sonoma 14.6</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Matrix products: default</span></span>
+<span><span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib </span></span>
+<span><span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; locale:</span></span>
+<span><span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; time zone: America/New_York</span></span>
+<span><span class="co">#&gt; tzcode source: internal</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; attached base packages:</span></span>
+<span><span class="co">#&gt; [1] stats4    stats     graphics  grDevices utils     datasets  methods  </span></span>
+<span><span class="co">#&gt; [8] base     </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; other attached packages:</span></span>
+<span><span class="co">#&gt;  [1] ggtext_0.1.2                lubridate_1.9.4            </span></span>
+<span><span class="co">#&gt;  [3] forcats_1.0.0               stringr_1.6.0              </span></span>
+<span><span class="co">#&gt;  [5] dplyr_1.2.0                 purrr_1.2.1                </span></span>
+<span><span class="co">#&gt;  [7] readr_2.1.5                 tidyr_1.3.2                </span></span>
+<span><span class="co">#&gt;  [9] tibble_3.3.1                ggplot2_4.0.2              </span></span>
+<span><span class="co">#&gt; [11] tidyverse_2.0.0             pasilla_1.32.0             </span></span>
+<span><span class="co">#&gt; [13] DEXSeq_1.50.0               RColorBrewer_1.1-3         </span></span>
+<span><span class="co">#&gt; [15] AnnotationDbi_1.68.0        DESeq2_1.44.0              </span></span>
+<span><span class="co">#&gt; [17] SummarizedExperiment_1.36.0 GenomicRanges_1.58.0       </span></span>
+<span><span class="co">#&gt; [19] GenomeInfoDb_1.42.3         IRanges_2.40.1             </span></span>
+<span><span class="co">#&gt; [21] S4Vectors_0.44.0            MatrixGenerics_1.18.1      </span></span>
+<span><span class="co">#&gt; [23] matrixStats_1.5.0           Biobase_2.66.0             </span></span>
+<span><span class="co">#&gt; [25] BiocGenerics_0.52.0         BiocParallel_1.40.2        </span></span>
+<span><span class="co">#&gt; [27] RGenEDA_0.99.0             </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
+<span><span class="co">#&gt;   [1] DBI_1.2.3               bitops_1.0-9            httr2_1.2.1            </span></span>
+<span><span class="co">#&gt;   [4] permute_0.9-10          biomaRt_2.60.1          rlang_1.1.7            </span></span>
+<span><span class="co">#&gt;   [7] magrittr_2.0.4          compiler_4.4.1          RSQLite_2.4.2          </span></span>
+<span><span class="co">#&gt;  [10] mgcv_1.9-3              png_0.1-8               systemfonts_1.3.1      </span></span>
+<span><span class="co">#&gt;  [13] vctrs_0.7.2             pkgconfig_2.0.3         crayon_1.5.3           </span></span>
+<span><span class="co">#&gt;  [16] fastmap_1.2.0           dbplyr_2.5.1            XVector_0.46.0         </span></span>
+<span><span class="co">#&gt;  [19] labeling_0.4.3          Rsamtools_2.22.0        rmarkdown_2.29         </span></span>
+<span><span class="co">#&gt;  [22] tzdb_0.5.0              UCSC.utils_1.2.0        ragg_1.5.0             </span></span>
+<span><span class="co">#&gt;  [25] bit_4.6.0               xfun_0.53               zlibbioc_1.52.0        </span></span>
+<span><span class="co">#&gt;  [28] cachem_1.1.0            jsonlite_2.0.0          progress_1.2.3         </span></span>
+<span><span class="co">#&gt;  [31] blob_1.2.4              DelayedArray_0.32.0     parallel_4.4.1         </span></span>
+<span><span class="co">#&gt;  [34] prettyunits_1.2.0       cluster_2.1.8.1         R6_2.6.1               </span></span>
+<span><span class="co">#&gt;  [37] bslib_0.9.0             stringi_1.8.7           genefilter_1.86.0      </span></span>
+<span><span class="co">#&gt;  [40] jquerylib_0.1.4         Rcpp_1.1.1              knitr_1.50             </span></span>
+<span><span class="co">#&gt;  [43] timechange_0.3.0        Matrix_1.7-3            splines_4.4.1          </span></span>
+<span><span class="co">#&gt;  [46] tidyselect_1.2.1        dichromat_2.0-0.1       abind_1.4-8            </span></span>
+<span><span class="co">#&gt;  [49] yaml_2.3.10             vegan_2.7-3             codetools_0.2-20       </span></span>
+<span><span class="co">#&gt;  [52] hwriter_1.3.2.1         curl_7.0.0              lattice_0.22-7         </span></span>
+<span><span class="co">#&gt;  [55] withr_3.0.2             KEGGREST_1.44.1         S7_0.2.1               </span></span>
+<span><span class="co">#&gt;  [58] evaluate_1.0.5          survival_3.8-3          desc_1.4.3             </span></span>
+<span><span class="co">#&gt;  [61] BiocFileCache_2.12.0    xml2_1.4.0              Biostrings_2.74.1      </span></span>
+<span><span class="co">#&gt;  [64] filelock_1.0.3          pillar_1.11.1           generics_0.1.4         </span></span>
+<span><span class="co">#&gt;  [67] hms_1.1.3               scales_1.4.0            xtable_1.8-4           </span></span>
+<span><span class="co">#&gt;  [70] glue_1.8.0              pheatmap_1.0.13         tools_4.4.1            </span></span>
+<span><span class="co">#&gt;  [73] annotate_1.82.0         locfit_1.5-9.12         XML_3.99-0.19          </span></span>
+<span><span class="co">#&gt;  [76] fs_1.6.6                grid_4.4.1              colorspace_2.1-2       </span></span>
+<span><span class="co">#&gt;  [79] nlme_3.1-168            GenomeInfoDbData_1.2.13 patchwork_1.3.2        </span></span>
+<span><span class="co">#&gt;  [82] cli_3.6.5               rappdirs_0.3.3          textshaping_1.0.3      </span></span>
+<span><span class="co">#&gt;  [85] S4Arrays_1.6.0          gtable_0.3.6            sass_0.4.10            </span></span>
+<span><span class="co">#&gt;  [88] digest_0.6.37           SparseArray_1.6.2       ggrepel_0.9.8          </span></span>
+<span><span class="co">#&gt;  [91] geneplotter_1.82.0      htmlwidgets_1.6.4       farver_2.1.2           </span></span>
+<span><span class="co">#&gt;  [94] memoise_2.0.1           htmltools_0.5.8.1       pkgdown_2.1.3          </span></span>
+<span><span class="co">#&gt;  [97] lifecycle_1.0.5         httr_1.4.7              statmod_1.5.0          </span></span>
+<span><span class="co">#&gt; [100] gridtext_0.1.5          bit64_4.6.0-1           MASS_7.3-65</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

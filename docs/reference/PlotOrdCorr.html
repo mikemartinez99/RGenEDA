@@ -10,8 +10,10 @@ of the correlation follows the level order. Categorical variables with more
 than two levels are summarized by the multiple correlation R (the square root
 of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 and its p-value comes from the model F-test, so results do not depend on how
-levels are labelled. Variables that cannot be tested (a single level, constant
-values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+levels are labelled. Variables that cannot be tested (a single level,
+constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are
+dropped.
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples."><meta property="og:description" content="Calculate correlations between NMDS ordination axes (from beta
 diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
@@ -24,8 +26,10 @@ of the correlation follows the level order. Categorical variables with more
 than two levels are summarized by the multiple correlation R (the square root
 of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 and its p-value comes from the model F-test, so results do not depend on how
-levels are labelled. Variables that cannot be tested (a single level, constant
-values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+levels are labelled. Variables that cannot be tested (a single level,
+constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are
+dropped.
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples."><meta property="og:image" content="https://mikemartinez99.github.io/RGenEDA/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -35,7 +39,7 @@ to be n-1 where n is your number of samples."><meta property="og:image" content=
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -48,8 +52,10 @@ to be n-1 where n is your number of samples."><meta property="og:image" content=
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Snail1_Vignette.html">RGenEDA Tutorial</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mikemartinez99/RGenEDA/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -58,7 +64,7 @@ to be n-1 where n is your number of samples."><meta property="og:image" content=
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot Ordination Correlations With Metadata Heatmap</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/mikemartinez99/RGenEDA/blob/HEAD/R/PlotOrdCorr.R" class="external-link"><code>R/PlotOrdCorr.R</code></a></small>
       <div class="d-none name"><code>PlotOrdCorr.Rd</code></div>
     </div>
 
@@ -74,8 +80,10 @@ of the correlation follows the level order. Categorical variables with more
 than two levels are summarized by the multiple correlation R (the square root
 of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 and its p-value comes from the model F-test, so results do not depend on how
-levels are labelled. Variables that cannot be tested (a single level, constant
-values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.</p>
+levels are labelled. Variables that cannot be tested (a single level,
+constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are
+dropped.</p>
 <p>Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples.</p>
     </div>
@@ -98,7 +106,8 @@ to be n-1 where n is your number of samples.</p>
 
 
 <dt id="arg-meta-cols">meta_cols<a class="anchor" aria-label="anchor" href="#arg-meta-cols"></a></dt>
-<dd><p>Optional character vector of metadata column names to include.
+<dd><p>Optional character vector of metadata column names to
+include.
 Defaults to all metadata columns.</p></dd>
 
 
@@ -113,6 +122,22 @@ and variance explained (squared correlations between ordination distances and
 observed dissimilarities.)</p>
     </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Snail1KO</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Snail1KO</span><span class="op">$</span><span class="va">rawCounts</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">counts</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">Snail1KO</span><span class="op">$</span><span class="va">metadata</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">meta</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span></span></span>
+<span class="r-in"><span><span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1e6</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="GenEDA.html">GenEDA</a></span><span class="op">(</span>normalized <span class="op">=</span> <span class="va">norm</span>, metadata <span class="op">=</span> <span class="va">meta</span>, counts <span class="op">=</span> <span class="va">counts</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">42</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">oc</span> <span class="op">&lt;-</span> <span class="fu">PlotOrdCorr</span><span class="op">(</span><span class="va">obj</span>, num_mds <span class="op">=</span> <span class="fl">3</span>, meta_cols <span class="op">=</span> <span class="st">"Genotype"</span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>stress is (nearly) zero: you may have insufficient data</span>
+<span class="r-in"><span><span class="va">oc</span><span class="op">$</span><span class="va">plot</span></span></span>
+<span class="r-plt img"><img src="PlotOrdCorr-1.png" alt="" width="700" height="433"></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

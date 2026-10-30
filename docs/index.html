@@ -28,7 +28,7 @@
 
     <a class="navbar-brand me-2" href="index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,11 +44,13 @@
 <li><a class="dropdown-item" href="articles/Snail1_Vignette.html">RGenEDA Tutorial</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="search.json">
 </form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mikemartinez99/RGenEDA/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -62,7 +64,7 @@
 </h1>
 </div>
 <p><strong>Clean, unified, streamlined, and reproducible frameworks for genomic exploratory data analyses</strong></p>
-<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-stable-green" alt="status"><img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version"><a href="https://mikemartinez99.github.io/RGenEDA/"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown documentation"></a> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a></p>
+<p><!-- badges: start --> <img src="https://img.shields.io/badge/status-stable-green" alt="status"><img src="https://img.shields.io/badge/version-0.99.0-blue" alt="Version"><a href="https://mikemartinez99.github.io/RGenEDA/"><img src="https://img.shields.io/badge/docs-pkgdown-blue.svg" alt="pkgdown documentation"></a> <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License: GPL v3"><a href="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://app.codecov.io/gh/mikemartinez99/RGenEDA" class="external-link"><img src="https://codecov.io/gh/mikemartinez99/RGenEDA/graph/badge.svg" alt="Codecov test coverage"></a></p>
 <p><!-- badges: end --></p>
 <blockquote>
 <p>[!WARNING] <strong>RGenEDA has updated to v2.0.0 which introduced some breaking changes. Please ensure you are using the most up-to-date version</strong></p>
@@ -81,7 +83,7 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://devtools.r-lib.org/" class="external-link">devtools</a></span><span class="op">)</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"mikemartinez99/RGenEDA"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">RGenEDA</span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mikemartinez99/RGenEDA" class="external-link">RGenEDA</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
@@ -100,6 +102,7 @@
 <p><strong><img src="https://img.shields.io/badge/version-2.0.1-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>January 21st, 2026</em><br> - Added in <strong>PlotScree</strong> function<br> - Updated PCA utilities to dynamically generate PCs up until PC10 - Renamed the <strong>DimReduction<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>o</mi><mi>a</mi><mi>d</mi><mi>i</mi><mi>n</mi><mi>g</mi><mi>s</mi><mo>*</mo><mi>*</mi><mi>s</mi><mi>l</mi><mi>o</mi><mi>t</mi><mi>t</mi><mi>o</mi><mo>*</mo><mi>*</mi><mi>D</mi><mi>i</mi><mi>m</mi><mi>R</mi><mi>e</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Loadings** slot to **DimReduction</annotation></semantics></math>Scores</strong> to more accurately reflect the information contained in this slot - Added Scree Plot to vignette<br></p>
 <p><strong><img src="https://img.shields.io/badge/version-2.0.2-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Patch-green" alt="Release"></strong> <em>February 13th, 2026</em><br> - Fixed bug in RunPCA where PCs beyond 10 are named as NA <br> - Fixed bug in PlotScree where PCs beyond 10 are shown as NA <br></p>
 <p><strong><img src="https://img.shields.io/badge/version-2.1.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Minor-orange" alt="Release"></strong> <em>October 29th, 2026</em><br> - Fixed cosmetics of printing statements <br> - Minor bug fixes in PCA functions and accessors <br></p>
+<p><strong><img src="https://img.shields.io/badge/version-0.99.0-blue" alt="Version"></strong> <strong><img src="https://img.shields.io/badge/Bioconductor-blue" alt="Release"></strong> <em>Bioconductor submission</em><br> - Renumbered to 0.99.0 following Bioconductor versioning conventions (continues from 2.1.0) <br> - Added biocViews, URL, and BugReports to DESCRIPTION <br> - Added <strong>as.geneda()</strong> to create GenEDA objects directly from SummarizedExperiment, DESeqDataSet, and DESeqTransform objects <br> - Added runnable examples for all exported functions using the bundled Snail1KO data <br> E - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br></p>
 </div>
 <div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
@@ -113,7 +116,15 @@
 <p><a href="mailto:f007qps@dartmouth.edu" class="email">f007qps@dartmouth.edu</a></p>
 </div>
 </div>
-  </main><aside class="col-md-3"><div class="license">
+  </main><aside class="col-md-3"><div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/mikemartinez99/RGenEDA/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/mikemartinez99/RGenEDA/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="https://www.r-project.org/Licenses/GPL-3" class="external-link">GPL-3</a></li>
