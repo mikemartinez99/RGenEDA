@@ -9,6 +9,22 @@
 \arguments{
 \item{object}{A \code{geneda} object}
 }
+\value{
+Invisibly returns \code{object}; called for its printed summary.
+}
 \description{
-Show method for geneda
+Prints a short summary of a \code{geneda} object: the number of features,
+samples, and HVGs, whether PCA results and counts are present, and the
+names of stored DEG tables.
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- RunPCA(obj, nfeatures = 1000)
+show(obj)
 }

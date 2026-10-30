@@ -12,7 +12,8 @@ optionally \code{DimReduction} scores.}
 
 \item{num_pcs}{Number of principal components to correlate.}
 
-\item{meta_cols}{Optional character vector of metadata column names to include.
+\item{meta_cols}{Optional character vector of metadata column names to
+include.
 Defaults to all metadata columns.}
 }
 \value{
@@ -30,29 +31,23 @@ of the correlation follows the level order. Categorical variables with more
 than two levels are summarized by the multiple correlation R (the square root
 of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 and its p-value comes from the model F-test, so results do not depend on how
-levels are labelled. Variables that cannot be tested (a single level, constant
-values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+levels are labelled. Variables that cannot be tested (a single level,
+constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are
+dropped.
 
 Requires PCA scores in \code{DimReduction(object)}; does not recompute PCA.
 }
 \examples{
-\donttest{
-mock_norm <- matrix(rnorm(5000 * 6, mean = 0, sd = 2), nrow = 5000, ncol = 6)
-colnames(mock_norm) <- paste0("Sample", 1:6)
-rownames(mock_norm) <- paste0("Gene", 1:5000)
-
-# Sample metadata
-mock_meta <- data.frame(condition = c("A","B","A","B","A","B"),
-row.names = colnames(mock_norm))
-
-# Construct GenEDA object
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-
-# Run PCA
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
 obj <- RunPCA(obj)
-
-# Compute eigencorrelation plot using first 5 PCs
-ec <- PlotEigenCorr(obj, num_pcs = 5)
+ec <- PlotEigenCorr(obj, num_pcs = 5, meta_cols = "Genotype")
 ec$plot
-}
 }

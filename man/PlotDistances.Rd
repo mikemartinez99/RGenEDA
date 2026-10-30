@@ -40,17 +40,16 @@ object and plot a ggplot2 heatmap. Optionally subset metadata columns and
 reorder rows/columns by hierarchical clustering.
 }
 \examples{
-\donttest{
-mock_norm <- matrix(rnorm(12, mean = 0, sd = 2), nrow = 4, ncol = 3)
-colnames(mock_norm) <- paste0("Sample", 1:3)
-rownames(mock_norm) <- paste0("Gene", 1:4)
-mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-colorList <- list(condition = c("A" = "red", "B" = "blue"))
-PlotDistances(
-    obj,
-    meta_cols = c("condition"),
-    palettes = colorList,
-    return = "plot")
-    }
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+colorList <- list(Genotype = c(WT = "grey40", Snai1_KO = "firebrick3"))
+dists <- PlotDistances(obj,
+    meta_cols = "Genotype", palettes = colorList,
+    return = "plot"
+)
 }

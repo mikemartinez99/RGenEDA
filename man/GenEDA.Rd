@@ -9,17 +9,32 @@ GenEDA(normalized, metadata, counts = NULL, DEGs = NULL)
 \arguments{
 \item{normalized}{Normalized expression matrix (features x samples).}
 
-\item{metadata}{Sample metadata \code{data.frame} with row names matching \code{colnames(normalized)}.}
+\item{metadata}{Sample metadata \code{data.frame} with row names matching
+\code{colnames(normalized)}.}
 
 \item{counts}{Optional counts matrix (features x samples).}
 
-\item{DEGs}{Optional DEG results from \code{DESeq2}
-Note: This constructor does not compute HVGs or PCA. Use
-\code{FindVariableFeatures()} and \code{RunPCA()} afterward.}
+\item{DEGs}{Optional named list of DEG tables (\code{data.frame} or
+\code{DESeqResults}), stored with \code{SetDEGs()} using the list names as assay
+names. Each table needs \code{log2FoldChange} and \code{padj} columns.}
 }
 \value{
 A \code{geneda} object.
 }
 \description{
 Construct a geneda object
+}
+\details{
+This constructor does not compute HVGs or PCA. Use
+\code{FindVariableFeatures()} and \code{RunPCA()} afterward.
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj
 }

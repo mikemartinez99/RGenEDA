@@ -9,11 +9,40 @@ FindHVDEGs(object, assay, direction = c("positive", "negative", "both"))
 \arguments{
 \item{object}{A \code{geneda} object with a DEG table set via \code{SetDEGs()}}
 
-\item{assay}{The DEG slot to pull results from (typically a result of \code{FilterDEGs})}
+\item{assay}{The DEG slot to pull results from (typically a result of
+\code{FilterDEGs})}
 
 \item{direction}{One of positive, negative, or both (indicating the direction
 of DEG fold change to intersect with HVGs)}
 }
+\value{
+For \code{direction = "positive"} or \code{"negative"}, a character vector of
+gene IDs that are both DEGs in that direction and HVGs. For
+\code{direction = "both"}, a list with elements \code{positive}, \code{negative}, and
+\code{both} (all overlapping genes).
+}
 \description{
 Looks for DEGs after filtering that overlap with HVGs.
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+obj <- FilterDEGs(obj, assay = "KO_vs_WT", saveAssay = "KO_vs_WT_filtered")
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+hv <- FindHVDEGs(obj, assay = "KO_vs_WT_filtered", direction = "both")
+lengths(hv)
+\dontshow{\}) # examplesIf}
 }

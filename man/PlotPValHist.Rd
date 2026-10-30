@@ -9,7 +9,8 @@ PlotPValHist(object, assay, bins = 40, alpha = 0.05, title = NULL)
 \arguments{
 \item{object}{A \code{geneda} object containing DEGs in the DEGs slot.}
 
-\item{assay}{The name of the DEG table to use (must contain a "pvalue" column).}
+\item{assay}{The name of the DEG table to use (must contain a "pvalue"
+column).}
 
 \item{bins}{Number of histogram bins (default 40).}
 
@@ -22,7 +23,27 @@ p-values < alpha will be highlighted.}
 A ggplot2 object
 }
 \description{
-Generate a p-value histogram from a DEG table inside a \code{geneda} object.
+Generate a p-value histogram from a DEG table inside a
+\code{geneda} object.
 This function uses raw p-values only and highlights p-values below a given
 threshold (default 0.05).
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+PlotPValHist(obj, assay = "KO_vs_WT")
+\dontshow{\}) # examplesIf}
 }

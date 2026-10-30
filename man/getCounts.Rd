@@ -15,3 +15,13 @@ Matrix or NULL
 \description{
 Access counts matrix (avoid name clash with DESeq2::counts)
 }
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+getCounts(obj)[1:5, ]
+}

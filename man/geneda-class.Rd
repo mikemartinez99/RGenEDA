@@ -20,8 +20,19 @@ highly variable genes (HVGs), and PCA dimensionality reduction results.
 
 \item{\code{HVGs}}{Character vector of selected highly variable gene IDs (row names).}
 
-\item{\code{DimReduction}}{List for PCA results with \code{Scores}, \code{Eigenvectors}, \code{percent_var}.}
+\item{\code{DimReduction}}{List for PCA results with \code{Scores}, \code{Eigenvectors},
+\code{percent_var}.}
 
 \item{\code{DEGs}}{List container for differential expression results.}
 }}
 
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+is(obj, "geneda")
+}

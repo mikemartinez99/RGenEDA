@@ -11,90 +11,145 @@
 #' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
-#' @param l2fc Absolute value log2Fold-change magnitude threshold (log2FoldChange column)
+#' @param l2fc Absolute value log2Fold-change magnitude threshold
+#'   (log2FoldChange column)
 #' @param title Optional character vector of what plot should be titled.
 #'
-#' @details Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >= l2fc`),
+#' @details Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >=
+#'   l2fc`),
 #' matching `FilterDEGs()`.
 #'
 #' @returns A `ggplot2` object
 #' @export
+#'
+#' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#'
+#' # Differential expression with DESeq2 (Snai1_KO vs WT)
+#' dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+#' dds <- DESeq2::DESeq(dds, quiet = TRUE)
+#' res <- as.data.frame(DESeq2::results(dds))
+#' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+#' PlotMA(obj, assay = "KO_vs_WT", alpha = 0.05, l2fc = 1)
 PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
-  stopifnot(methods::is(object, "geneda"))
+    stopifnot(methods::is(object, "geneda"))
 
-  if (!assay %in% names(object@DEGs)) {
-    cli::cli_abort("Assay {assay} was not found in DEGs slot!")
-  } else {
-    df <- DEGs(object, assay)
-    if (nrow(df) == 0) {
-      cli::cli_abort("No differential expression results found in object@DEGs$DEG")
+    if (!assay %in% names(object@DEGs)) {
+        cli::cli_abort("Assay {assay} was not found in DEGs slot!")
+    } else {
+        df <- DEGs(object, assay)
+        if (nrow(df) == 0) {
+            cli::cli_abort(
+                "No differential expression results found in object@DEGs$DEG"
+            )
+        }
     }
-  }
 
-  requiredCols <- c("log2FoldChange", "baseMean")
-  if (!all(requiredCols %in% colnames(df))) {
-    cli::cli_abort("log2FoldChange or baseMean or both are missing from DEG table!")
-  }
+    requiredCols <- c("log2FoldChange", "baseMean")
+    if (!all(requiredCols %in% colnames(df))) {
+        cli::cli_abort(
+            "log2FoldChange or baseMean or both are missing from DEG table!"
+        )
+    }
 
-  df$col <- NA
-  df$col[df$padj <= alpha & abs(df$log2FoldChange) >= l2fc] <- "red"
-  df$col[is.na(df$col)] <- "black"
+    df$col <- NA
+    df$col[df$padj <= alpha & abs(df$log2FoldChange) >= l2fc] <- "red"
+    df$col[is.na(df$col)] <- "black"
 
-  df$gene <- rownames(df)
+    df$gene <- rownames(df)
 
-  cap_pos_yvalue <- max(abs(df$log2FoldChange), na.rm = TRUE) + 0.4
-  cap_neg_yvalue <- cap_pos_yvalue/-1
+    cap_pos_yvalue <- max(abs(df$log2FoldChange), na.rm = TRUE) + 0.4
+    cap_neg_yvalue <- cap_pos_yvalue / -1
 
-  resPlot <- ggplot(df, aes(x = baseMean, y = log2FoldChange, fill=col, size = -log10(padj))) +
-    geom_point(alpha = 0.5, shape = 21)  +
-    theme_classic() +
-    scale_x_continuous(trans='log2') +
-    ylab("Log2 fold change") +
-    xlab("Mean normalized counts (Log2)") +
-    geom_hline(yintercept = 0, color = "blue", linetype = "dashed", size = 0.4) +
-    labs(size = expression("-log"[10]*" adj. P-value)"), fill = "sig") +
-    scale_size(range = c(1, 12)) +
-    scale_fill_manual(name = " ",
-                      values = c(black = "black", red = "indianred"),
-                      labels = c(black = "Not. sig.", red = paste0("Adj. P<", alpha, " & |LFC| > ", l2fc))) +
-    scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
-    ylim(cap_neg_yvalue, cap_pos_yvalue) +
-    geom_label_repel(data = subset(df, log2FoldChange >= l2fc & padj <= alpha), aes(label = gene),
-                     box.padding   = 0.35,
-                     nudge_x = 0.05,
-                     nudge_y = 0.04,
-                     point.padding = 0.5,
-                     label.size = 0.15,
-                     max.overlaps = 20,
-                     segment.size = 0.3, fill = "grey90",
-                     segment.color = 'grey50', size = 3.5) +
-    geom_label_repel(data = subset(df, log2FoldChange <= -l2fc & padj <= alpha), aes(label = gene),
-                     box.padding   = 0.35,
-                     nudge_x = 0.05,
-                     nudge_y = -0.04,
-                     point.padding = 0.5,
-                     label.size = 0.15,
-                     segment.size = 0.3, fill = "grey90",
-                     max.overlaps = 20,
-                     segment.color = 'grey50', size = 3.5) +
-    geom_hline(yintercept = l2fc, colour = "black", linetype="dotted") +
-    geom_hline(yintercept = -l2fc, colour = "black", linetype="dotted") +
-    theme(legend.key.size = unit(1, "cm"),
-          title = element_text(colour="black", size = 20),
-          axis.text.x=element_text(colour="black", size = 14),
-          axis.text.y=element_text(colour="black", size = 14),
-          axis.title.x=element_text(colour="black", size = 16, face = "bold"),
-          axis.title.y=element_text(colour="black", size = 16, face = "bold"),
-          legend.text = element_text(colour="black", size = 14),
-          legend.title = element_text(colour="black", size = 14)) +
-    guides(size=guide_legend(override.aes = list(fill="black", alpha=1)))
+    resPlot <- ggplot(
+        df,
+        aes(x = baseMean, y = log2FoldChange, fill = col, size = -log10(padj))
+    ) +
+        geom_point(alpha = 0.5, shape = 21) +
+        theme_classic() +
+        scale_x_continuous(trans = "log2") +
+        ylab("Log2 fold change") +
+        xlab("Mean normalized counts (Log2)") +
+        geom_hline(
+            yintercept = 0,
+            color = "blue",
+            linetype = "dashed",
+            linewidth = 0.4
+        ) +
+        labs(size = expression("-log"[10] * " adj. P-value)"), fill = "sig") +
+        scale_size(range = c(1, 12)) +
+        scale_fill_manual(
+            name = " ",
+            values = c(black = "black", red = "indianred"),
+            labels = c(
+                black = "Not. sig.",
+                red = paste0("Adj. P<", alpha, " & |LFC| > ", l2fc)
+            )
+        ) +
+        scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
+        ylim(cap_neg_yvalue, cap_pos_yvalue) +
+        geom_label_repel(
+            data = subset(df, log2FoldChange >= l2fc & padj <= alpha), aes(
+                label = gene
+            ),
+            box.padding = 0.35,
+            nudge_x = 0.05,
+            nudge_y = 0.04,
+            point.padding = 0.5,
+            label.size = 0.15,
+            max.overlaps = 20,
+            segment.size = 0.3, fill = "grey90",
+            segment.color = "grey50", size = 3.5
+        ) +
+        geom_label_repel(
+            data = subset(df, log2FoldChange <= -l2fc & padj <= alpha), aes(
+                label = gene
+            ),
+            box.padding = 0.35,
+            nudge_x = 0.05,
+            nudge_y = -0.04,
+            point.padding = 0.5,
+            label.size = 0.15,
+            segment.size = 0.3, fill = "grey90",
+            max.overlaps = 20,
+            segment.color = "grey50", size = 3.5
+        ) +
+        geom_hline(yintercept = l2fc, colour = "black", linetype = "dotted") +
+        geom_hline(yintercept = -l2fc, colour = "black", linetype = "dotted") +
+        theme(
+            legend.key.size = unit(1, "cm"),
+            title = element_text(colour = "black", size = 20),
+            axis.text.x = element_text(colour = "black", size = 14),
+            axis.text.y = element_text(colour = "black", size = 14),
+            axis.title.x = element_text(
+                colour = "black",
+                size = 16,
+                face = "bold"
+            ),
+            axis.title.y = element_text(
+                colour = "black",
+                size = 16,
+                face = "bold"
+            ),
+            legend.text = element_text(colour = "black", size = 14),
+            legend.title = element_text(colour = "black", size = 14)
+        ) +
+        guides(
+            size = guide_legend(override.aes = list(fill = "black", alpha = 1))
+        )
 
-  if (!is.null(title)) {
-    resPlot <- resPlot + ggtitle(title)
-  }
+    if (!is.null(title)) {
+        resPlot <- resPlot + ggtitle(title)
+    }
 
-  return(resPlot)
-
+    return(resPlot)
 }
 
 

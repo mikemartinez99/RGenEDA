@@ -4,7 +4,7 @@
 
  <!-- badges: start -->
  ![status](https://img.shields.io/badge/status-stable-green)
- ![Version](https://img.shields.io/badge/version-2.1.0-blue)
+ ![Version](https://img.shields.io/badge/version-0.99.0-blue)
   [![pkgdown documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://mikemartinez99.github.io/RGenEDA/)
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
@@ -99,6 +99,14 @@ For some background on why EDA is important, see [Compute and Conquer: The Basic
 *October 29th, 2026*<br>
   - Fixed cosmetics of printing statements <br>
   - Minor bug fixes in PCA functions and accessors <br>
+
+**![Version](https://img.shields.io/badge/version-0.99.0-blue)** **![Release](https://img.shields.io/badge/Bioconductor-blue)**
+*Bioconductor submission*<br>
+  - Renumbered to 0.99.0 following Bioconductor versioning conventions (continues from 2.1.0) <br>
+  - Added biocViews, URL, and BugReports to DESCRIPTION <br>
+  - Added **as.geneda()** to create GenEDA objects directly from SummarizedExperiment, DESeqDataSet, and DESeqTransform objects <br>
+  - Added runnable examples for all exported functions using the bundled Snail1KO data <br>
+E  - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br>
 
 ## Citation
 If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**

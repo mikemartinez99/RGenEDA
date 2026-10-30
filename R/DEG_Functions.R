@@ -6,31 +6,49 @@
 #' @param assay What to name the DEG slot
 #' @return Updated `geneda` object with `DEGs[[assay]]` set
 #' @export
+#'
+#' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#'
+#' # Differential expression with DESeq2 (Snai1_KO vs WT)
+#' dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+#' dds <- DESeq2::DESeq(dds, quiet = TRUE)
+#' res <- as.data.frame(DESeq2::results(dds))
+#' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+#' obj
 SetDEGs <- function(object, deg_table, assay) {
-  stopifnot(methods::is(object, "geneda"))
-  stopifnot(is.data.frame(deg_table))
-  req_cols <- c("log2FoldChange", "padj")
-  missing_cols <- setdiff(req_cols, colnames(deg_table))
-  if (length(missing_cols) > 0L) {
-    req_str <- paste(req_cols, collapse = ", ")
-    cli::cli_abort("DEG table must contain columns: {req_str}")
-  }
-  if (is.null(rownames(deg_table))) {
-    cli::cli_abort("DEG table does not have genes as rownames!")
-  }
+    stopifnot(methods::is(object, "geneda"))
+    stopifnot(is.data.frame(deg_table))
+    req_cols <- c("log2FoldChange", "padj")
+    missing_cols <- setdiff(req_cols, colnames(deg_table))
+    if (length(missing_cols) > 0L) {
+        req_str <- paste(req_cols, collapse = ", ")
+        cli::cli_abort("DEG table must contain columns: {req_str}")
+    }
+    if (is.null(rownames(deg_table))) {
+        cli::cli_abort("DEG table does not have genes as rownames!")
+    }
 
-  if (assay %in% names(object@DEGs)) {
-    cli::cli_abort("Assay {assay} already exists!")
-  } else {
-    object@DEGs[[assay]] <- deg_table
-  }
-  validObject(object)
-  object
+    if (assay %in% names(object@DEGs)) {
+        cli::cli_abort("Assay {assay} already exists!")
+    } else {
+        object@DEGs[[assay]] <- deg_table
+    }
+    validObject(object)
+    object
 }
 
 #' Filter DEGs by padj and absolute log2FoldChange
 #'
-#' Filters the unfiltered DEGs in `DEGs[[assay]]` and stores the filtered results
+#' Filters the unfiltered DEGs in `DEGs[[assay]]` and stores the filtered
+#' results
 #' in a new named slot `DEGs[[saveAssay]]`. Multiple filtered result sets can
 #' be stored with different assay names.
 #'
@@ -38,30 +56,54 @@ SetDEGs <- function(object, deg_table, assay) {
 #' @param assay The DEG slot to filter
 #' @param alpha Adjusted p-value threshold (<=)
 #' @param l2fc Absolute log2 fold change threshold (>=)
-#' @param saveAssay Character name for the filtered result set (e.g., "padj05_lfc1")
-#' @return Updated `geneda` object with filtered results stored in `DEGs[[saveAssay]]`
+#' @param saveAssay Character name for the filtered result set (e.g.,
+#'   "padj05_lfc1")
+#' @return Updated `geneda` object with filtered results stored in
+#'   `DEGs[[saveAssay]]`
 #' @importFrom methods validObject
 #' @export
+#'
+#' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#'
+#' # Differential expression with DESeq2 (Snai1_KO vs WT)
+#' dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+#' dds <- DESeq2::DESeq(dds, quiet = TRUE)
+#' res <- as.data.frame(DESeq2::results(dds))
+#' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+#' obj <- FilterDEGs(obj,
+#'     assay = "KO_vs_WT", alpha = 0.05, l2fc = 1,
+#'     saveAssay = "KO_vs_WT_filtered"
+#' )
+#' nrow(DEGs(obj, "KO_vs_WT_filtered"))
 FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
-  stopifnot(methods::is(object, "geneda"))
-  if (is.null(object@DEGs[[assay]])) {
-    cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() first.")
-  }
-  if (missing(saveAssay) || is.null(saveAssay) || !is.character(saveAssay) || length(saveAssay) != 1L) {
-    cli::cli_abort("saveAssay must be a single character string.")
-  }
-  df <- object@DEGs[[assay]]
-  req_cols <- c("log2FoldChange", "padj")
-  missing_cols <- setdiff(req_cols, colnames(df))
-  if (length(missing_cols) > 0L) {
-    req_str <- paste(req_cols, collapse = ", ")
-    cli::cli_abort("DEG table must contain columns: {req_str}")
-  }
-  filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
-    abs(df$log2FoldChange) >= l2fc & df$padj <= alpha
-  object@DEGs[[saveAssay]] <- df[filt, , drop = FALSE]
-  validObject(object)
-  object
+    stopifnot(methods::is(object, "geneda"))
+    if (is.null(object@DEGs[[assay]])) {
+        cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() first.")
+    }
+    if (missing(saveAssay) || is.null(saveAssay) ||
+        !is.character(saveAssay) || length(saveAssay) != 1L) {
+        cli::cli_abort("saveAssay must be a single character string.")
+    }
+    df <- object@DEGs[[assay]]
+    req_cols <- c("log2FoldChange", "padj")
+    missing_cols <- setdiff(req_cols, colnames(df))
+    if (length(missing_cols) > 0L) {
+        req_str <- paste(req_cols, collapse = ", ")
+        cli::cli_abort("DEG table must contain columns: {req_str}")
+    }
+    filt <- stats::complete.cases(df$log2FoldChange, df$padj) &
+        abs(df$log2FoldChange) >= l2fc & df$padj <= alpha
+    object@DEGs[[saveAssay]] <- df[filt, , drop = FALSE]
+    validObject(object)
+    object
 }
 
 #' Find DEGs Overlapping With HVGs
@@ -69,128 +111,184 @@ FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
 #' Looks for DEGs after filtering that overlap with HVGs.
 #'
 #' @param object A `geneda` object with a DEG table set via `SetDEGs()`
-#' @param assay The DEG slot to pull results from (typically a result of `FilterDEGs`)
+#' @param assay The DEG slot to pull results from (typically a result of
+#'   `FilterDEGs`)
 #' @param direction One of positive, negative, or both (indicating the direction
 #' of DEG fold change to intersect with HVGs)
 #'
+#' @return For `direction = "positive"` or `"negative"`, a character vector of
+#'   gene IDs that are both DEGs in that direction and HVGs. For
+#'   `direction = "both"`, a list with elements `positive`, `negative`, and
+#'   `both` (all overlapping genes).
 #' @export
-FindHVDEGs <- function(object, assay, direction = c("positive", "negative", "both")) {
-  stopifnot(methods::is(object, "geneda"))
+#'
+#' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#'
+#' # Differential expression with DESeq2 (Snai1_KO vs WT)
+#' dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+#' dds <- DESeq2::DESeq(dds, quiet = TRUE)
+#' res <- as.data.frame(DESeq2::results(dds))
+#' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+#' obj <- FilterDEGs(obj, assay = "KO_vs_WT", saveAssay = "KO_vs_WT_filtered")
+#' obj <- FindVariableFeatures(obj, nfeatures = 1000)
+#' hv <- FindHVDEGs(obj, assay = "KO_vs_WT_filtered", direction = "both")
+#' lengths(hv)
+FindHVDEGs <- function(
+    object,
+    assay,
+    direction = c("positive", "negative", "both")) {
+    stopifnot(methods::is(object, "geneda"))
 
-  # Validate direction argument
-  direction <- match.arg(direction)
+    # Validate direction argument
+    direction <- match.arg(direction)
 
-  # Access DEGs
-  if (is.null(object@DEGs[[assay]])) {
-    cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() or FilterDEGs() first!")
-  } else {
-    degDF <- DEGs(object, assay)
-    degDF$Gene <- rownames(degDF)
-  }
-
-  # Access HVGs
-  if (length(object@HVGs) == 0L){
-    cli::cli_abort("HVG Slot is empty. Use FindVariableFeatures() first!")
-  } else {
-    hvgList <- HVGs(object)
-  }
-
-  # Get overlap
-  pos <- degDF[degDF$log2FoldChange > 0,]$Gene
-  neg <- degDF[degDF$log2FoldChange < 0,]$Gene
-  posInt <- intersect(pos, hvgList)
-  negInt <- intersect(neg, hvgList)
-
-  if (direction == "positive") {
-    if (length(posInt) == 1) {
-      cli::cli_inform("{length(posInt)} +log2FC hvDEG found.")
+    # Access DEGs
+    if (is.null(object@DEGs[[assay]])) {
+        cli::cli_abort(
+            "Assay {assay} is NULL. Use SetDEGs() or FilterDEGs() first!"
+        )
     } else {
-      cli::cli_inform("{length(posInt)} +log2FC hvDEGs found.")
+        degDF <- DEGs(object, assay)
+        degDF$Gene <- rownames(degDF)
     }
-    return(posInt)
 
-  } else if (direction == "negative") {
-    if (length(negInt) == 1) {
-      cli::cli_inform("{length(negInt)} -log2FC hvDEG found.")
+    # Access HVGs
+    if (length(object@HVGs) == 0L) {
+        cli::cli_abort("HVG Slot is empty. Use FindVariableFeatures() first!")
     } else {
-      cli::cli_inform("{length(negInt)} -log2FC hvDEGs found.")
+        hvgList <- HVGs(object)
     }
-    return(negInt)
 
-  } else {
-    sumhvDEGs <- length(posInt) + length(negInt)
-    cli::cli_inform(c(
-      "{length(posInt)} +log2FC hvDEGs found.",
-      "{length(negInt)} -log2FC hvDEGs found.",
-      "{sumhvDEGs} Total hvDEGs found."
-    ))
-    return(list(
-      positive = posInt,
-      negative = negInt,
-      both = c(posInt, negInt)
-    ))
+    # Get overlap
+    pos <- degDF[degDF$log2FoldChange > 0, ]$Gene
+    neg <- degDF[degDF$log2FoldChange < 0, ]$Gene
+    posInt <- intersect(pos, hvgList)
+    negInt <- intersect(neg, hvgList)
 
-  }
+    if (direction == "positive") {
+        if (length(posInt) == 1) {
+            cli::cli_inform("{length(posInt)} +log2FC hvDEG found.")
+        } else {
+            cli::cli_inform("{length(posInt)} +log2FC hvDEGs found.")
+        }
+        return(posInt)
+    } else if (direction == "negative") {
+        if (length(negInt) == 1) {
+            cli::cli_inform("{length(negInt)} -log2FC hvDEG found.")
+        } else {
+            cli::cli_inform("{length(negInt)} -log2FC hvDEGs found.")
+        }
+        return(negInt)
+    } else {
+        sumhvDEGs <- length(posInt) + length(negInt)
+        cli::cli_inform(c(
+            "{length(posInt)} +log2FC hvDEGs found.",
+            "{length(negInt)} -log2FC hvDEGs found.",
+            "{sumhvDEGs} Total hvDEGs found."
+        ))
+        return(list(
+            positive = posInt,
+            negative = negInt,
+            both = c(posInt, negInt)
+        ))
+    }
 }
 
 #' Summarize DEGs Across Selected Assays
 #'
 #' @description
-#' Summarizes the number of DEGs in each assay of a `geneda` object according to thresholds
-#' for adjusted p-value and log2 fold-change, separately reporting upregulated and downregulated genes.
-#' Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >= lfc`), matching `FilterDEGs()`.
-#' Genes with a missing `log2FoldChange` or `padj` are not counted; missing values in
+#' Summarizes the number of DEGs in each assay of a `geneda` object according
+#' to thresholds
+#' for adjusted p-value and log2 fold-change, separately reporting
+#' upregulated and downregulated genes.
+#' Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >= lfc`),
+#' matching `FilterDEGs()`.
+#' Genes with a missing `log2FoldChange` or `padj` are not counted; missing
+#' values in
 #' other columns (e.g., gene annotations) are ignored.
 #'
 #' @param object A `geneda` object containing DEGs in its `DEGs` slot.
 #' @param alpha Numeric; adjusted p-value threshold. Default is 0.05.
 #' @param lfc1 Numeric; lower log2 fold-change threshold. Default is 1.
 #' @param lfc2 Numeric; higher log2 fold-change threshold. Default is 2.
-#' @param assays Optional character vector of assay names to summarize. Defaults to all assays in `object@DEGs`.
+#' @param assays Optional character vector of assay names to summarize.
+#'   Defaults to all assays in `object@DEGs`.
 #'
 #' @return A data.frame of DEG counts by assay and criteria.
 #' @export
-SummarizeDEGs <- function(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NULL) {
-  stopifnot(methods::is(object, "geneda"))
-  if (length(object@DEGs) == 0) cli::cli_abort("No DEGs found in object.")
+#'
+#' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#'
+#' # Differential expression with DESeq2 (Snai1_KO vs WT)
+#' dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+#' dds <- DESeq2::DESeq(dds, quiet = TRUE)
+#' res <- as.data.frame(DESeq2::results(dds))
+#' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+#' SummarizeDEGs(obj, alpha = 0.05, lfc1 = 1, lfc2 = 2)
+SummarizeDEGs <- function(
+    object,
+    alpha = 0.05,
+    lfc1 = 1,
+    lfc2 = 2,
+    assays = NULL) {
+    stopifnot(methods::is(object, "geneda"))
+    if (length(object@DEGs) == 0) cli::cli_abort("No DEGs found in object.")
 
-  # Use all assays if none are specified
-  if (is.null(assays)) {
-    assays <- names(object@DEGs)
-  }
-
-  criteria <- c(
-    paste0("padj<=", alpha, " & log2FC >=", lfc1, " (Up)"),
-    paste0("padj<=", alpha, " & log2FC <=", -lfc1, " (Down)"),
-    paste0("padj<=", alpha, " & log2FC >=", lfc2, " (Up)"),
-    paste0("padj<=", alpha, " & log2FC <=", -lfc2, " (Down)")
-  )
-
-  out <- matrix(0, nrow = length(criteria), ncol = length(assays),
-                dimnames = list(criteria, assays))
-
-  for (assay in assays) {
-    if (!assay %in% names(object@DEGs)) {
-      cli::cli_warn("Assay {assay} not found in DEGs slot; skipping.")
-      next
+    # Use all assays if none are specified
+    if (is.null(assays)) {
+        assays <- names(object@DEGs)
     }
-    df <- DEGs(object, assay)
 
-    # Ensure numeric
-    lfc <- as.numeric(df$log2FoldChange)
-    padj <- as.numeric(df$padj)
+    criteria <- c(
+        paste0("padj<=", alpha, " & log2FC >=", lfc1, " (Up)"),
+        paste0("padj<=", alpha, " & log2FC <=", -lfc1, " (Down)"),
+        paste0("padj<=", alpha, " & log2FC >=", lfc2, " (Up)"),
+        paste0("padj<=", alpha, " & log2FC <=", -lfc2, " (Down)")
+    )
 
-    # Only drop genes missing the columns used for counting
-    keep <- stats::complete.cases(lfc, padj)
-    lfc <- lfc[keep]
-    padj <- padj[keep]
+    out <- matrix(0,
+        nrow = length(criteria), ncol = length(assays),
+        dimnames = list(criteria, assays)
+    )
 
-    # Count DEGs by criteria
-    out[1, assay] <- sum(padj <= alpha & lfc >= lfc1)
-    out[2, assay] <- sum(padj <= alpha & lfc <= -lfc1)
-    out[3, assay] <- sum(padj <= alpha & lfc >= lfc2)
-    out[4, assay] <- sum(padj <= alpha & lfc <= -lfc2)
-  }
+    for (assay in assays) {
+        if (!assay %in% names(object@DEGs)) {
+            cli::cli_warn("Assay {assay} not found in DEGs slot; skipping.")
+            next
+        }
+        df <- DEGs(object, assay)
 
-  return(as.data.frame(out))
+        # Ensure numeric
+        lfc <- as.numeric(df$log2FoldChange)
+        padj <- as.numeric(df$padj)
+
+        # Only drop genes missing the columns used for counting
+        keep <- stats::complete.cases(lfc, padj)
+        lfc <- lfc[keep]
+        padj <- padj[keep]
+
+        # Count DEGs by criteria
+        out[1, assay] <- sum(padj <= alpha & lfc >= lfc1)
+        out[2, assay] <- sum(padj <= alpha & lfc <= -lfc1)
+        out[3, assay] <- sum(padj <= alpha & lfc >= lfc2)
+        out[4, assay] <- sum(padj <= alpha & lfc <= -lfc2)
+    }
+
+    return(as.data.frame(out))
 }

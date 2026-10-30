@@ -25,100 +25,111 @@
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' mock_norm <- matrix(rnorm(12, mean = 0, sd = 2), nrow = 4, ncol = 3)
-#' colnames(mock_norm) <- paste0("Sample", 1:3)
-#' rownames(mock_norm) <- paste0("Gene", 1:4)
-#' mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
-#' obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-#' colorList <- list(condition = c("A" = "red", "B" = "blue"))
-#' PlotDistances(
-#'     obj,
-#'     meta_cols = c("condition"),
-#'     palettes = colorList,
-#'     return = "plot")
-#'     }
-PlotDistances <- function(object,
-                          method = "euclidean",
-                          reorder = TRUE,
-                          meta_cols = NULL,
-                          palettes = NULL,
-                          return = c("object", "plot")) {
-  stopifnot(methods::is(object, "geneda"))
-  return <- match.arg(return)
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#' colorList <- list(Genotype = c(WT = "grey40", Snai1_KO = "firebrick3"))
+#' dists <- PlotDistances(obj,
+#'     meta_cols = "Genotype", palettes = colorList,
+#'     return = "plot"
+#' )
+PlotDistances <- function(
+    object,
+    method = "euclidean",
+    reorder = TRUE,
+    meta_cols = NULL,
+    palettes = NULL,
+    return = c("object", "plot")) {
+    stopifnot(methods::is(object, "geneda"))
+    return <- match.arg(return)
 
-  MAT <- object@normalized
-  META <- object@metadata
-  stopifnot(!is.null(colnames(MAT)), !is.null(rownames(META)))
-  if (!identical(rownames(META), colnames(MAT))) {
-    cli::cli_abort("Rownames of metadata must match colnames of normalized matrix.")
-  }
-
-  # Optional metadata subset for subtitle context
-  if (!is.null(meta_cols)) {
-    missing_cols <- setdiff(meta_cols, colnames(META))
-    if (length(missing_cols) > 0L) {
-      missing_str <- paste(missing_cols, collapse = ", ")
-      cli::cli_abort("The following metadata columns were not found: {missing_str}")
+    MAT <- object@normalized
+    META <- object@metadata
+    stopifnot(!is.null(colnames(MAT)), !is.null(rownames(META)))
+    if (!identical(rownames(META), colnames(MAT))) {
+        cli::cli_abort(
+            "Rownames of metadata must match colnames of normalized matrix."
+        )
     }
-    META <- META[, meta_cols, drop = FALSE]
-  }
 
-  # Compute distances across samples (transpose to samples x features)
-  sampleDists <- stats::dist(t(MAT), method = method)
-  distMat <- as.matrix(sampleDists)
-  diag(distMat) <- 0
-
-  # Reorder by hierarchical clustering if requested
-  ord <- colnames(MAT)
-  if (isTRUE(reorder)) {
-    hc <- stats::hclust(sampleDists, method = "complete")
-    ord <- hc$labels[hc$order]
-    distMat <- distMat[ord, ord, drop = FALSE]
-  }
-
-  # Optional annotations for columns using meta_cols and palettes
-  annotation_col <- NULL
-  annotation_colors <- NULL
-  if (!is.null(meta_cols) && length(meta_cols) > 0L) {
-    annotation_col <- META[, meta_cols, drop = FALSE]
-    if (!is.null(palettes)) {
-      # palettes should be a named list mapping each metadata column to a named vector of colors
-      annotation_colors <- lapply(meta_cols, function(f) {
-        pal <- palettes[[f]]
-        if (is.null(pal)) return(NULL)
-        # Ensure levels are factors to map colors correctly
-        if (!is.factor(annotation_col[[f]])) annotation_col[[f]] <- as.factor(annotation_col[[f]])
-        pal[levels(annotation_col[[f]])]
-      })
-      names(annotation_colors) <- meta_cols
+    # Optional metadata subset for subtitle context
+    if (!is.null(meta_cols)) {
+        missing_cols <- setdiff(meta_cols, colnames(META))
+        if (length(missing_cols) > 0L) {
+            missing_str <- paste(missing_cols, collapse = ", ")
+            cli::cli_abort(
+                "The following metadata columns were not found: {missing_str}"
+            )
+        }
+        META <- META[, meta_cols, drop = FALSE]
     }
-  }
 
-  # Choose a reversed blue palette so darker = more similar (lower distance)
-  heatmap_colors <- colorRampPalette(rev(RColorBrewer::brewer.pal(9, "Blues")))(255)
+    # Compute distances across samples (transpose to samples x features)
+    sampleDists <- stats::dist(t(MAT), method = method)
+    distMat <- as.matrix(sampleDists)
+    diag(distMat) <- 0
 
-  # Build pheatmap (shows dendrograms by default)
-  ph <- pheatmap::pheatmap(
-    mat = distMat,
-    annotation_col = annotation_col,
-    annotation_colors = annotation_colors,
-    cluster_rows = TRUE,
-    cluster_cols = TRUE,
-    color = heatmap_colors,
-    legend = TRUE,
-    silent = TRUE
-  )
+    # Reorder by hierarchical clustering if requested
+    ord <- colnames(MAT)
+    if (isTRUE(reorder)) {
+        hc <- stats::hclust(sampleDists, method = "complete")
+        ord <- hc$labels[hc$order]
+        distMat <- distMat[ord, ord, drop = FALSE]
+    }
 
-  if (identical(return, "plot")) {
-    grid::grid.newpage(); grid::grid.draw(ph$gtable)
-  }
+    # Optional annotations for columns using meta_cols and palettes
+    annotation_col <- NULL
+    annotation_colors <- NULL
+    if (!is.null(meta_cols) && length(meta_cols) > 0L) {
+        annotation_col <- META[, meta_cols, drop = FALSE]
+        if (!is.null(palettes)) {
+            # palettes should be a named list mapping each metadata column to a
+            # named vector of colors
+            annotation_colors <- lapply(meta_cols, function(f) {
+                pal <- palettes[[f]]
+                if (is.null(pal)) {
+                    return(NULL)
+                }
+                # Ensure levels are factors to map colors correctly
+                if (!is.factor(annotation_col[[f]])) {
+                    annotation_col[[f]] <- as.factor(annotation_col[[f]])
+                }
+                pal[levels(annotation_col[[f]])]
+            })
+            names(annotation_colors) <- meta_cols
+        }
+    }
 
-  return(list(
-    dist_matrix = distMat,
-    order = ord,
-    heatmap = ph,
-    palettes = palettes
-  ))
+    # Choose a reversed blue palette so darker = more similar (lower distance)
+    heatmap_colors <- colorRampPalette(
+        rev(RColorBrewer::brewer.pal(9, "Blues"))
+    )(255)
+
+    # Build pheatmap (shows dendrograms by default)
+    ph <- pheatmap::pheatmap(
+        mat = distMat,
+        annotation_col = annotation_col,
+        annotation_colors = annotation_colors,
+        cluster_rows = TRUE,
+        cluster_cols = TRUE,
+        color = heatmap_colors,
+        legend = TRUE,
+        silent = TRUE
+    )
+
+    if (identical(return, "plot")) {
+        grid::grid.newpage()
+        grid::grid.draw(ph$gtable)
+    }
+
+    return(list(
+        dist_matrix = distMat,
+        order = ord,
+        heatmap = ph,
+        palettes = palettes
+    ))
 }
-

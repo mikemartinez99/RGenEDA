@@ -15,9 +15,14 @@ A list containing raw counts and metadata
 Maturi et al., 2018; ENA: ERP019920; E-MTAB-5244
 }
 \usage{
-Snail1KO
+data(Snail1KO)
 }
 \description{
 Dataset from Maturi, et al. 2018, (ENA:ERP019920, E-MTAB-5244)
+}
+\examples{
+data(Snail1KO)
+dim(Snail1KO$rawCounts)
+Snail1KO$metadata
 }
 \keyword{datasets}

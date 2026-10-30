@@ -11,7 +11,7 @@ and provides a flexible ggplot2-based visualization interface."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,8 +24,10 @@ and provides a flexible ggplot2-based visualization interface."><meta property="
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/Snail1_Vignette.html">RGenEDA Tutorial</a></li>
   </ul></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/mikemartinez99/RGenEDA/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul></div>
 
 
@@ -34,7 +36,7 @@ and provides a flexible ggplot2-based visualization interface."><meta property="
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="../logo.png" class="logo" alt=""><h1>Plot PCA results from a GenEDA object</h1>
-
+      <small class="dont-index">Source: <a href="https://github.com/mikemartinez99/RGenEDA/blob/HEAD/R/PlotPCA.R" class="external-link"><code>R/PlotPCA.R</code></a></small>
       <div class="d-none name"><code>PlotPCA.Rd</code></div>
     </div>
 
@@ -63,15 +65,18 @@ and provides a flexible ggplot2-based visualization interface.</p>
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>A <code>GenEDA</code> object containing PCA results in the <code>DimReduction</code> slot.</p></dd>
+<dd><p>A <code>GenEDA</code> object containing PCA results in the
+<code>DimReduction</code> slot.</p></dd>
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p>Numeric or character. The principal component to plot on the x-axis (e.g., 1 or "PC1").</p></dd>
+<dd><p>Numeric or character. The principal component to plot on the
+x-axis (e.g., 1 or "PC1").</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
-<dd><p>Numeric or character. The principal component to plot on the y-axis (e.g., 2 or "PC2").</p></dd>
+<dd><p>Numeric or character. The principal component to plot on the
+y-axis (e.g., 2 or "PC2").</p></dd>
 
 
 <dt id="arg-color-by">color_by<a class="anchor" aria-label="anchor" href="#arg-color-by"></a></dt>
@@ -83,30 +88,56 @@ and provides a flexible ggplot2-based visualization interface.</p>
 
 
 <dt id="arg-split-by">split_by<a class="anchor" aria-label="anchor" href="#arg-split-by"></a></dt>
-<dd><p>Character (optional). Column name in metadata used for faceting (creates separate panels).</p></dd>
+<dd><p>Character (optional). Column name in metadata used for
+faceting (creates separate panels).</p></dd>
 
 
 <dt id="arg-shape-by">shape_by<a class="anchor" aria-label="anchor" href="#arg-shape-by"></a></dt>
-<dd><p>Character (optional). Column name in metadata used to control point shape.</p></dd>
+<dd><p>Character (optional). Column name in metadata used to
+control point shape.</p></dd>
 
 
 <dt id="arg-return-data">return_data<a class="anchor" aria-label="anchor" href="#arg-return-data"></a></dt>
-<dd><p>Logical (default = FALSE), whether or not to return pca dataframe for more custom plotting.</p></dd>
+<dd><p>Logical (default = FALSE), whether or not to return pca
+dataframe for more custom plotting.</p></dd>
 
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A <code>ggplot</code> object displaying the PCA scatter plot, or a list of pca_df and plot if <code>return_data = TRUE</code></p>
+    <p>A <code>ggplot</code> object displaying the PCA scatter plot, or a list of
+pca_df and plot if <code>return_data = TRUE</code></p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu">PlotPCA</span><span class="op">(</span><span class="va">obj</span>, x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span>, color_by <span class="op">=</span> <span class="st">"condition"</span>,</span></span>
-<span class="r-in"><span>     colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"untreated"</span> <span class="op">=</span> <span class="st">"red"</span>, <span class="st">"treated"</span> <span class="op">=</span> <span class="st">"blue"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>     split_by <span class="op">=</span> <span class="st">"library"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">p</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">Snail1KO</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">Snail1KO</span><span class="op">$</span><span class="va">rawCounts</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">counts</span> <span class="op">&lt;-</span> <span class="va">counts</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">rowSums</a></span><span class="op">(</span><span class="va">counts</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">3</span>, <span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">meta</span> <span class="op">&lt;-</span> <span class="va">Snail1KO</span><span class="op">$</span><span class="va">metadata</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">meta</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span></span></span>
+<span class="r-in"><span><span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1e6</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="GenEDA.html">GenEDA</a></span><span class="op">(</span>normalized <span class="op">=</span> <span class="va">norm</span>, metadata <span class="op">=</span> <span class="va">meta</span>, counts <span class="op">=</span> <span class="va">counts</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">obj</span>, nfeatures <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating principal components from top 1000 HVGs</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variations:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.9 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0 %</span>
+<span class="r-in"><span><span class="fu">PlotPCA</span><span class="op">(</span><span class="va">obj</span>,</span></span>
+<span class="r-in"><span>    x <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">2</span>, color_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span></span>
+<span class="r-in"><span>    colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>WT <span class="op">=</span> <span class="st">"grey40"</span>, Snai1_KO <span class="op">=</span> <span class="st">"firebrick3"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>`aes_string()` was deprecated in ggplot2 3.0.0.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Please use tidy evaluation idioms with `aes()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">RGenEDA</span> package.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   Please report the issue at</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span>   <span style="color: #0000BB; font-style: italic;">&lt;</span><a href="https://github.com/mikemartinez99/RGenEDA/issues" class="external-link"><span style="color: #0000BB; font-style: italic;">https://github.com/mikemartinez99/RGenEDA/issues</span></a><span style="color: #0000BB; font-style: italic;">&gt;</span>.</span>
+<span class="r-plt img"><img src="PlotPCA-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

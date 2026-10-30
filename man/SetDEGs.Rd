@@ -20,3 +20,22 @@ Updated \code{geneda} object with \code{DEGs[[assay]]} set
 \description{
 Set unfiltered DEGs on the object
 }
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+obj
+\dontshow{\}) # examplesIf}
+}

@@ -7,24 +7,29 @@
 extractEigen(object, component)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the \code{DimReduction} slot}
+\item{object}{A \code{geneda} object containing PCA results in the
+\code{DimReduction} slot}
 
 \item{component}{Principal component to use (i.e., PC1)}
 }
 \value{
-A data-frame containing gene loading information and percent variation per gene
+A data-frame containing gene loading information and percent
+variation per gene
 }
 \description{
-Extract gene-level Eigen-vectors for PCs of interest and calculate percent variance.
+Extract gene-level Eigen-vectors for PCs of interest and
+calculate percent variance.
 }
 \examples{
-\donttest{
-mock_norm <- matrix(rnorm(12, mean = 0, sd = 2), nrow = 4, ncol = 3)
-colnames(mock_norm) <- paste0("Sample", 1:3)
-rownames(mock_norm) <- paste0("Gene", 1:4)
-mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
 obj <- RunPCA(obj)
-extractEigen(object = obj, component = "PC1")
-}
+pc1 <- extractEigen(obj, component = "PC1")
+head(pc1[order(-abs(pc1$EigenVector)), ])
 }

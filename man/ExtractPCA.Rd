@@ -7,12 +7,15 @@
 ExtractPCA(object)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the \code{DimReduction} slot
+\item{object}{A \code{geneda} object containing PCA results in the
+\code{DimReduction} slot
 and sample-level metadata in the \code{metadata} slot.}
 }
 \value{
-A \code{data.frame} combining PCA loadings and sample metadata, where rows correspond
-to samples and columns include principal component loadings and metadata fields.
+A \code{data.frame} combining PCA loadings and sample metadata, where rows
+correspond
+to samples and columns include principal component loadings and metadata
+fields.
 }
 \description{
 This function extracts PCA loadings stored in the \code{DimReduction} slot of a
@@ -31,10 +34,15 @@ The function performs several checks:
 If metadata rownames are missing or invalid, the function throws an error.
 }
 \examples{
-\dontrun{
-# Example usage:
-pca_results <- ExtractPCA(my_geneda_object)
-head(pca_results)
-}
-
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+obj <- RunPCA(obj)
+pca_df <- ExtractPCA(obj)
+head(pca_df[, c("PC1", "PC2", "Genotype")])
 }

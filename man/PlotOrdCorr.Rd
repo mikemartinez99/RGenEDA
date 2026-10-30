@@ -11,7 +11,8 @@ PlotOrdCorr(object, num_mds = 10, meta_cols = NULL, distance = "bray")
 
 \item{num_mds}{Number of NMDS axes to correlate. Default = 10}
 
-\item{meta_cols}{Optional character vector of metadata column names to include.
+\item{meta_cols}{Optional character vector of metadata column names to
+include.
 Defaults to all metadata columns.}
 
 \item{distance}{Distance metric for \code{vegdist} (default "bray").}
@@ -35,9 +36,23 @@ of the correlation follows the level order. Categorical variables with more
 than two levels are summarized by the multiple correlation R (the square root
 of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 and its p-value comes from the model F-test, so results do not depend on how
-levels are labelled. Variables that cannot be tested (a single level, constant
-values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+levels are labelled. Variables that cannot be tested (a single level,
+constant
+values, or no residual degrees of freedom, e.g. a sample ID column) are
+dropped.
 
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples.
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+set.seed(42)
+oc <- PlotOrdCorr(obj, num_mds = 3, meta_cols = "Genotype")
+oc$plot
 }

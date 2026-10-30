@@ -9,13 +9,28 @@ generatePCs(mat, vars, nFeatures)
 \arguments{
 \item{mat}{A data matrix where rows are features and columns are samples}
 
-\item{vars}{A vector of gene variances (can calculate using RGenEDA::plotVariance) or gene names}
+\item{vars}{A vector of gene variances (can calculate using
+RGenEDA::plotVariance) or gene names}
 
 \item{nFeatures}{Number of top features to generate principal components on.}
 }
 \value{
-A list consisting of 3 slots: Loadings, Eigenvectors, and percent_var
+A list consisting of 3 slots: Loadings, Eigenvectors, and
+percent_var
 }
 \description{
-Generate principal component analysis data that can be used in downstream analyses.
+Generate principal component analysis data that can be used
+in downstream analyses.
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+vars <- apply(norm, 1, var)
+pcs <- generatePCs(norm, vars, nFeatures = 1000)
+pcs$percent_var
 }
