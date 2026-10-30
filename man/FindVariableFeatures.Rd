@@ -19,3 +19,14 @@ Computes per-feature variance on \code{normalized(object)}, ranks genes by
 decreasing variance, and stores the top \code{nfeatures} gene IDs into the \code{HVGs}
 slot. Returns the updated object.
 }
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+length(HVGs(obj))
+}

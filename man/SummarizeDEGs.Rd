@@ -15,15 +15,39 @@ SummarizeDEGs(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NULL)
 
 \item{lfc2}{Numeric; higher log2 fold-change threshold. Default is 2.}
 
-\item{assays}{Optional character vector of assay names to summarize. Defaults to all assays in \code{object@DEGs}.}
+\item{assays}{Optional character vector of assay names to summarize.
+Defaults to all assays in \code{object@DEGs}.}
 }
 \value{
 A data.frame of DEG counts by assay and criteria.
 }
 \description{
-Summarizes the number of DEGs in each assay of a \code{geneda} object according to thresholds
-for adjusted p-value and log2 fold-change, separately reporting upregulated and downregulated genes.
-Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= lfc}), matching \code{FilterDEGs()}.
-Genes with a missing \code{log2FoldChange} or \code{padj} are not counted; missing values in
+Summarizes the number of DEGs in each assay of a \code{geneda} object according
+to thresholds
+for adjusted p-value and log2 fold-change, separately reporting
+upregulated and downregulated genes.
+Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= lfc}),
+matching \code{FilterDEGs()}.
+Genes with a missing \code{log2FoldChange} or \code{padj} are not counted; missing
+values in
 other columns (e.g., gene annotations) are ignored.
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+SummarizeDEGs(obj, alpha = 0.05, lfc1 = 1, lfc2 = 2)
+\dontshow{\}) # examplesIf}
 }

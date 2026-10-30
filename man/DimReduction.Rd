@@ -15,3 +15,17 @@ List with \code{Loadings}, \code{Eigenvectors}, \code{percent_var}
 \description{
 Access dimensional reduction results list
 }
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+obj <- RunPCA(obj)
+pca <- DimReduction(obj)
+names(pca)
+head(pca$Scores[, 1:3])
+}

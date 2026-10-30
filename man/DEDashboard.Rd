@@ -11,25 +11,53 @@ DEDashboard(object, assay, alpha = 0.05, l2fc = 1, num = NULL, den = NULL)
 
 \item{assay}{Character. Name of the assay to visualize.}
 
-\item{alpha}{Numeric. Significance threshold for highlighting p-values and DEGs (default 0.05).}
+\item{alpha}{Numeric. Significance threshold for highlighting p-values and
+DEGs (default 0.05).}
 
 \item{l2fc}{Numeric. Log2 fold-change threshold for MA and volcano plots.}
 
 \item{num}{Character. Name of the numerator group for volcano plot labeling.
 If \code{NULL} (default), the legend uses "numerator".}
 
-\item{den}{Character. Name of the denominator group for volcano plot labeling.
+\item{den}{Character. Name of the denominator group for volcano plot
+labeling.
 If \code{NULL} (default), the legend uses "denominator".}
 }
 \value{
 A \code{patchwork} object combining plots.
 }
 \description{
-Generate a multi-panel differential expression dashboard for a single assay in a \code{geneda} object.
+Generate a multi-panel differential expression dashboard for a single
+assay in a \code{geneda} object.
 The dashboard includes:
 \enumerate{
 \item P-value histogram
 \item MA plot
 \item Volcano plot
 }
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+db <- DEDashboard(obj,
+    assay = "KO_vs_WT", alpha = 0.05, l2fc = 1,
+    num = "Snai1_KO", den = "WT"
+)
+# The dashboard needs a large device, e.g.
+# ggplot2::ggsave("dashboard.png", db, width = 14, height = 10)
+class(db)
+\dontshow{\}) # examplesIf}
 }

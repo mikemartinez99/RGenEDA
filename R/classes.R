@@ -11,77 +11,119 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @slot normalized Normalized expression matrix (features x samples).
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
-#' @slot DimReduction List for PCA results with `Scores`, `Eigenvectors`, `percent_var`.
+#' @slot DimReduction List for PCA results with `Scores`, `Eigenvectors`,
+#'   `percent_var`.
 #' @slot DEGs List container for differential expression results.
 #'
 #' @exportClass geneda
-
+#'
+#' @examples
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#' is(obj, "geneda")
 setClass(
-  "geneda",
-  slots = list(
-    counts = "matrixOrNULL",
-    normalized = "matrix",
-    metadata = "data.frame",
-    HVGs = "character",
-    DimReduction = "list",
-    DEGs = "list"
-  )
+    "geneda",
+    slots = list(
+        counts = "matrixOrNULL",
+        normalized = "matrix",
+        metadata = "data.frame",
+        HVGs = "character",
+        DimReduction = "list",
+        DEGs = "list"
+    )
 )
 
 
 .valid_geneda <- function(object) {
-  errors <- character()
+    errors <- character()
 
-  # Check dimensions and naming consistency
-  if (is.null(colnames(object@normalized))) {
-    errors <- c(errors, "'normalized' must have column names (sample IDs).")
-  }
-  if (is.null(rownames(object@normalized))) {
-    errors <- c(errors, "'normalized' must have row names (feature IDs).")
-  }
-  if (nrow(object@metadata) == 0L) {
-    errors <- c(errors, "'metadata' must have rows (samples).")
-  }
-  if (!is.null(colnames(object@normalized)) && !is.null(rownames(object@metadata))) {
-    if (!identical(rownames(object@metadata), colnames(object@normalized))) {
-      errors <- c(errors, "Row names of 'metadata' must match column names of 'normalized' (same order).")
+    # Check dimensions and naming consistency
+    if (is.null(colnames(object@normalized))) {
+        errors <- c(errors, "'normalized' must have column names (sample IDs).")
     }
-  }
-  if (!is.null(object@counts)) {
-    if (!is.matrix(object@counts)) {
-      errors <- c(errors, "'counts' must be a matrix or NULL.")
-    } else {
-      if (!identical(colnames(object@counts), colnames(object@normalized))) {
-        errors <- c(errors, "Column names of 'counts' must match 'normalized'.")
-      }
-      if (is.null(rownames(object@counts))) {
-        errors <- c(errors, "'counts' must have row names (feature IDs).")
-      }
+    if (is.null(rownames(object@normalized))) {
+        errors <- c(errors, "'normalized' must have row names (feature IDs).")
     }
-  }
-  if (length(object@HVGs) > 0L) {
-    missing_feats <- setdiff(object@HVGs, rownames(object@normalized))
-    if (length(missing_feats) > 0L) {
-      errors <- c(errors, "All 'HVGs' must be present in row names of 'normalized'.")
+    if (nrow(object@metadata) == 0L) {
+        errors <- c(errors, "'metadata' must have rows (samples).")
     }
-  }
-  if (length(object@DimReduction) > 0L) {
-    needed_pcs <- c("Scores", "Eigenvectors", "percent_var")
-    if (!all(needed_pcs %in% names(object@DimReduction))) {
-      errors <- c(errors, "'DimReduction' must contain names: Loadings, Eigenvectors, percent_var.")
+    if (
+        !is.null(colnames(object@normalized)) && !is.null(
+            rownames(object@metadata)
+        )
+    ) {
+        if (
+            !identical(rownames(object@metadata), colnames(object@normalized))
+        ) {
+            errors <- c(
+                errors,
+                paste0(
+                    "Row names of 'metadata' must match column names of ",
+                    "'normalized' (same order)."
+                )
+            )
+        }
     }
-  }
+    if (!is.null(object@counts)) {
+        if (!is.matrix(object@counts)) {
+            errors <- c(errors, "'counts' must be a matrix or NULL.")
+        } else {
+            if (
+                !identical(colnames(object@counts), colnames(object@normalized))
+            ) {
+                errors <- c(
+                    errors,
+                    "Column names of 'counts' must match 'normalized'."
+                )
+            }
+            if (is.null(rownames(object@counts))) {
+                errors <- c(
+                    errors,
+                    "'counts' must have row names (feature IDs)."
+                )
+            }
+        }
+    }
+    if (length(object@HVGs) > 0L) {
+        missing_feats <- setdiff(object@HVGs, rownames(object@normalized))
+        if (length(missing_feats) > 0L) {
+            errors <- c(
+                errors,
+                "All 'HVGs' must be present in row names of 'normalized'."
+            )
+        }
+    }
+    if (length(object@DimReduction) > 0L) {
+        needed_pcs <- c("Scores", "Eigenvectors", "percent_var")
+        if (!all(needed_pcs %in% names(object@DimReduction))) {
+            errors <- c(
+                errors,
+                paste0(
+                    "'DimReduction' must contain names: Loadings, ",
+                    "Eigenvectors, percent_var."
+                )
+            )
+        }
+    }
 
-  if (length(object@DEGs) > 0L) {
-    for (nm in names(object@DEGs)) {
-      elem <- object@DEGs[[nm]]
-      if (!is.null(elem) && !is.data.frame(elem)) {
-        errors <- c(errors, sprintf("'DEGs$%s' must be a data.frame or NULL.", nm))
-      }
+    if (length(object@DEGs) > 0L) {
+        for (nm in names(object@DEGs)) {
+            elem <- object@DEGs[[nm]]
+            if (!is.null(elem) && !is.data.frame(elem)) {
+                errors <- c(
+                    errors,
+                    sprintf("'DEGs$%s' must be a data.frame or NULL.", nm)
+                )
+            }
+        }
     }
-  }
 
-  if (length(errors)) errors else TRUE
+    if (length(errors)) errors else TRUE
 }
 
 setValidity("geneda", .valid_geneda)
@@ -89,36 +131,53 @@ setValidity("geneda", .valid_geneda)
 #' Construct a geneda object
 #'
 #' @param normalized Normalized expression matrix (features x samples).
-#' @param metadata Sample metadata `data.frame` with row names matching `colnames(normalized)`.
+#' @param metadata Sample metadata `data.frame` with row names matching
+#'   `colnames(normalized)`.
 #' @param counts Optional counts matrix (features x samples).
-#' @param DEGs Optional DEG results from `DESeq2`
-#' Note: This constructor does not compute HVGs or PCA. Use
+#' @param DEGs Optional named list of DEG tables (`data.frame` or
+#'   `DESeqResults`), stored with `SetDEGs()` using the list names as assay
+#'   names. Each table needs `log2FoldChange` and `padj` columns.
+#'
+#' @details This constructor does not compute HVGs or PCA. Use
 #' `FindVariableFeatures()` and `RunPCA()` afterward.
 #'
 #' @return A `geneda` object.
 #' @importFrom methods new
 #' @export
-GenEDA <- function(normalized,
-                   metadata,
-                   counts = NULL,
-                   DEGs = NULL) {
-  stopifnot(is.matrix(normalized))
-  stopifnot(is.data.frame(metadata))
-  if (!is.null(counts)) stopifnot(is.matrix(counts))
+#'
+#' @examples
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#' obj
+GenEDA <- function(
+    normalized,
+    metadata,
+    counts = NULL,
+    DEGs = NULL) {
+    stopifnot(is.matrix(normalized))
+    stopifnot(is.data.frame(metadata))
+    if (!is.null(counts)) stopifnot(is.matrix(counts))
 
-  # Align metadata rows to normalized sample order if identical set
-  if (!is.null(rownames(metadata)) && !is.null(colnames(normalized))) {
-    if (setequal(rownames(metadata), colnames(normalized)) &&
-        !identical(rownames(metadata), colnames(normalized))) {
-      metadata <- metadata[colnames(normalized), , drop = FALSE]
+    # Align metadata rows to normalized sample order if identical set
+    if (!is.null(rownames(metadata)) && !is.null(colnames(normalized))) {
+        if (setequal(rownames(metadata), colnames(normalized)) &&
+            !identical(rownames(metadata), colnames(normalized))) {
+            metadata <- metadata[colnames(normalized), , drop = FALSE]
+        }
     }
-  }
 
-  new("geneda",
-      counts = counts,
-      normalized = normalized,
-      metadata = metadata,
-      HVGs = character(0L),
-      DimReduction = list(),
-      DEGs = list())
+    obj <- new("geneda",
+        counts = counts,
+        normalized = normalized,
+        metadata = metadata,
+        HVGs = character(0L),
+        DimReduction = list(),
+        DEGs = list()
+    )
+    .addDEGList(obj, DEGs)
 }

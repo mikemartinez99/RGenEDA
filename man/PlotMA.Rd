@@ -13,7 +13,8 @@ PlotMA(object, assay, alpha, l2fc, title = NULL)
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
-\item{l2fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
+\item{l2fc}{Absolute value log2Fold-change magnitude threshold
+(log2FoldChange column)}
 
 \item{title}{Optional character vector of what plot should be titled.}
 }
@@ -27,4 +28,23 @@ Plot MA plot from a \code{geneda} object. Requires that you have ran
 \details{
 Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}),
 matching \code{FilterDEGs()}.
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+PlotMA(obj, assay = "KO_vs_WT", alpha = 0.05, l2fc = 1)
+\dontshow{\}) # examplesIf}
 }

@@ -11,8 +11,10 @@
 #' than two levels are summarized by the multiple correlation R (the square root
 #' of R^2 from a one-way linear model, score ~ variable). R is unsigned (0 to 1)
 #' and its p-value comes from the model F-test, so results do not depend on how
-#' levels are labelled. Variables that cannot be tested (a single level, constant
-#' values, or no residual degrees of freedom, e.g. a sample ID column) are dropped.
+#' levels are labelled. Variables that cannot be tested (a single level,
+#' constant
+#' values, or no residual degrees of freedom, e.g. a sample ID column) are
+#' dropped.
 #'
 #' Requires PCA scores in `DimReduction(object)`; does not recompute PCA.
 #'
@@ -24,126 +26,147 @@
 #' @param object A `geneda` object containing `normalized` and `metadata`, and
 #'   optionally `DimReduction` scores.
 #' @param num_pcs Number of principal components to correlate.
-#' @param meta_cols Optional character vector of metadata column names to include.
+#' @param meta_cols Optional character vector of metadata column names to
+#'   include.
 #'   Defaults to all metadata columns.
 #'
 #' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
 #' @export
 #'
 #' @examples
-#' \donttest{
-#' mock_norm <- matrix(rnorm(5000 * 6, mean = 0, sd = 2), nrow = 5000, ncol = 6)
-#' colnames(mock_norm) <- paste0("Sample", 1:6)
-#' rownames(mock_norm) <- paste0("Gene", 1:5000)
-#'
-#' # Sample metadata
-#' mock_meta <- data.frame(condition = c("A","B","A","B","A","B"),
-#' row.names = colnames(mock_norm))
-#'
-#' # Construct GenEDA object
-#' obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-#'
-#' # Run PCA
+#' data(Snail1KO)
+#' counts <- as.matrix(Snail1KO$rawCounts)
+#' counts <- counts[rowSums(counts >= 10) >= 3, ]
+#' meta <- Snail1KO$metadata
+#' rownames(meta) <- meta$Sample
+#' norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+#' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+#' obj <- FindVariableFeatures(obj, nfeatures = 1000)
 #' obj <- RunPCA(obj)
-#'
-#' # Compute eigencorrelation plot using first 5 PCs
-#' ec <- PlotEigenCorr(obj, num_pcs = 5)
+#' ec <- PlotEigenCorr(obj, num_pcs = 5, meta_cols = "Genotype")
 #' ec$plot
-#' }
 PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
-  stopifnot(methods::is(object, "geneda"))
+    stopifnot(methods::is(object, "geneda"))
 
-  MAT <- object@normalized
-  META <- object@metadata
+    MAT <- object@normalized
+    META <- object@metadata
 
-  #----- Copy metadata (categorical columns are handled in .assocTest)
-  META_num <- META
+    #----- Copy metadata (categorical columns are handled in .assocTest)
+    META_num <- META
 
-  #----- Optionally subset metadata columns
-  if (!is.null(meta_cols)) {
-    missing_cols <- setdiff(meta_cols, colnames(META_num))
-    if (length(missing_cols) > 0L) {
-      missing_str <- paste(missing_cols, collapse = ", ")
-      cli::cli_abort("The following metadata columns were not found: {missing_str}")
+    #----- Optionally subset metadata columns
+    if (!is.null(meta_cols)) {
+        missing_cols <- setdiff(meta_cols, colnames(META_num))
+        if (length(missing_cols) > 0L) {
+            missing_str <- paste(missing_cols, collapse = ", ")
+            cli::cli_abort(
+                "The following metadata columns were not found: {missing_str}"
+            )
+        }
+        META_num <- META_num[, meta_cols, drop = FALSE]
     }
-    META_num <- META_num[, meta_cols, drop = FALSE]
-  }
 
-  #----- Ensure META rownames match those of MAT
-  if (!all(rownames(META_num) == colnames(MAT))) {
-    cli::cli_abort("Rownames of metadata must match the colnames of normalized matrix.")
-  }
-
-  #----- Obtain PCs from stored DimReduction (required)
-  if (!(length(object@DimReduction) > 0L && "Scores" %in% names(object@DimReduction))) {
-    cli::cli_abort("DimReduction slot is empty. Please run RunPCA() before calling PlotEigenCorr().")
-  }
-  pcs_mat <- as.data.frame(object@DimReduction[["Scores"]])
-  # Align PCs to metadata order if necessary
-  if (!identical(rownames(pcs_mat), rownames(META_num))) {
-    pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]
-  }
-  pcs <- pcs_mat[, seq_len(min(ncol(pcs_mat), num_pcs)), drop = FALSE]
-
-  #----- Create empty matrices to store correlations and p-values
-  cor_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
-  pval_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
-  rownames(cor_matrix) <- rownames(pval_matrix) <- colnames(META_num)
-  colnames(cor_matrix) <- colnames(pval_matrix) <- colnames(pcs)
-
-  #----- Loop through META variables and calculate correlation for each PC
-  for (meta_var in colnames(META_num)) {
-    for (pc in colnames(pcs)) {
-      test <- .assocTest(pcs[[pc]], META_num[[meta_var]])
-      cor_matrix[meta_var, pc] <- test[["estimate"]]
-      pval_matrix[meta_var, pc] <- test[["p.value"]]
+    #----- Ensure META rownames match those of MAT
+    if (!all(rownames(META_num) == colnames(MAT))) {
+        cli::cli_abort(
+            "Rownames of metadata must match the colnames of normalized matrix."
+        )
     }
-  }
 
-  #----- Remove variables that could not be tested (drop the same rows from both)
-  keep <- stats::complete.cases(cor_matrix) & stats::complete.cases(pval_matrix)
-  cor_matrix <- cor_matrix[keep, , drop = FALSE]
-  pval_matrix <- pval_matrix[keep, , drop = FALSE]
+    #----- Obtain PCs from stored DimReduction (required)
+    if (
+        !(
+            length(object@DimReduction) > 0L && "Scores" %in% names(
+                object@DimReduction
+            )
+        )
+    ) {
+        cli::cli_abort(
+            paste0(
+                "DimReduction slot is empty. Please run RunPCA() before ",
+                "calling PlotEigenCorr()."
+            )
+        )
+    }
+    pcs_mat <- as.data.frame(object@DimReduction[["Scores"]])
+    # Align PCs to metadata order if necessary
+    if (!identical(rownames(pcs_mat), rownames(META_num))) {
+        pcs_mat <- pcs_mat[rownames(META_num), , drop = FALSE]
+    }
+    pcs <- pcs_mat[, seq_len(min(ncol(pcs_mat), num_pcs)), drop = FALSE]
 
-  #----- Create significance stars based on p-value thresholds
-  stars <- ifelse(pval_matrix < 0.001, "***",
-                  ifelse(pval_matrix < 0.01, "**",
-                         ifelse(pval_matrix < 0.05, "*", "")))
+    #----- Create empty matrices to store correlations and p-values
+    cor_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
+    pval_matrix <- matrix(NA, ncol = ncol(pcs), nrow = ncol(META_num))
+    rownames(cor_matrix) <- rownames(pval_matrix) <- colnames(META_num)
+    colnames(cor_matrix) <- colnames(pval_matrix) <- colnames(pcs)
 
-  #----- Prepare data for ggplot (long format)
-  df <- expand.grid(Meta = rownames(cor_matrix), PC = colnames(cor_matrix), stringsAsFactors = FALSE)
-  # Element-wise matrix lookup using paired row/col indices (avoids outer product)
-  row_idx <- match(df$Meta, rownames(cor_matrix))
-  col_idx <- match(df$PC, colnames(cor_matrix))
-  df$Correlation <- cor_matrix[cbind(row_idx, col_idx)]
-  df$PValue <- pval_matrix[cbind(row_idx, col_idx)]
-  df$Stars <- stars[cbind(row_idx, col_idx)]
+    #----- Loop through META variables and calculate correlation for each PC
+    for (meta_var in colnames(META_num)) {
+        for (pc in colnames(pcs)) {
+            test <- .assocTest(pcs[[pc]], META_num[[meta_var]])
+            cor_matrix[meta_var, pc] <- test[["estimate"]]
+            pval_matrix[meta_var, pc] <- test[["p.value"]]
+        }
+    }
 
-  #----- Set colors similar to RdBu reversed
-  heatmap_colors <- colorRampPalette(rev(RColorBrewer::brewer.pal(9, "RdBu")))(255)
+    #----- Remove variables that could not be tested (drop the same rows from
+    #----- both)
+    keep <- stats::complete.cases(cor_matrix) & stats::complete.cases(
+        pval_matrix
+    )
+    cor_matrix <- cor_matrix[keep, , drop = FALSE]
+    pval_matrix <- pval_matrix[keep, , drop = FALSE]
 
-  #----- Build heatmap with labels and stars
-  p <- ggplot2::ggplot(df, aes(x = PC, y = Meta, fill = Correlation)) +
-    geom_tile(color = NA) +
-    scale_fill_gradientn(colors = heatmap_colors, limits = c(-1, 1), name = "Correlation") +
-    geom_text(aes(label = sprintf("%.2f", Correlation)), size = 4) +
-    geom_text(aes(label = Stars), nudge_y = -0.30, size = 5) +
-    theme_minimal(base_size = 16) +
-    theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
-      axis.text.y = element_text(face = "bold"),
-      axis.title.x = element_blank(),
-      axis.title.y = element_blank(),
+    #----- Create significance stars based on p-value thresholds
+    stars <- ifelse(pval_matrix < 0.001, "***",
+        ifelse(pval_matrix < 0.01, "**",
+            ifelse(pval_matrix < 0.05, "*", "")
+        )
     )
 
-  #----- Return eigencorrelation data and plot
-  return(list(
-    cor_matrix = cor_matrix,
-    pval_matrix = pval_matrix,
-    stars = stars,
-    plot = p
-  ))
+    #----- Prepare data for ggplot (long format)
+    df <- expand.grid(
+        Meta = rownames(cor_matrix),
+        PC = colnames(cor_matrix),
+        stringsAsFactors = FALSE
+    )
+    # Element-wise matrix lookup using paired row/col indices (avoids outer
+    # product)
+    row_idx <- match(df$Meta, rownames(cor_matrix))
+    col_idx <- match(df$PC, colnames(cor_matrix))
+    df$Correlation <- cor_matrix[cbind(row_idx, col_idx)]
+    df$PValue <- pval_matrix[cbind(row_idx, col_idx)]
+    df$Stars <- stars[cbind(row_idx, col_idx)]
+
+    #----- Set colors similar to RdBu reversed
+    heatmap_colors <- colorRampPalette(
+        rev(RColorBrewer::brewer.pal(9, "RdBu"))
+    )(255)
+
+    #----- Build heatmap with labels and stars
+    p <- ggplot2::ggplot(df, aes(x = PC, y = Meta, fill = Correlation)) +
+        geom_tile(color = NA) +
+        scale_fill_gradientn(
+            colors = heatmap_colors,
+            limits = c(-1, 1),
+            name = "Correlation"
+        ) +
+        geom_text(aes(label = sprintf("%.2f", Correlation)), size = 4) +
+        geom_text(aes(label = Stars), nudge_y = -0.30, size = 5) +
+        theme_minimal(base_size = 16) +
+        theme(
+            axis.text.x = element_text(angle = 45, hjust = 1, face = "bold"),
+            axis.text.y = element_text(face = "bold"),
+            axis.title.x = element_blank(),
+            axis.title.y = element_blank(),
+        )
+
+    #----- Return eigencorrelation data and plot
+    return(list(
+        cor_matrix = cor_matrix,
+        pval_matrix = pval_matrix,
+        stars = stars,
+        plot = p
+    ))
 }
-
-
-

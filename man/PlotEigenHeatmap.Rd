@@ -14,20 +14,26 @@ PlotEigenHeatmap(
 )
 }
 \arguments{
-\item{object}{A \code{geneda} object containing normalized expression data and PCA in \code{DimReduction}.}
+\item{object}{A \code{geneda} object containing normalized expression data and
+PCA in \code{DimReduction}.}
 
 \item{pc}{Character. Principal component to visualize (e.g., "PC1").}
 
-\item{n}{Integer. Number of genes to select by absolute loading (default: 25).}
+\item{n}{Integer. Number of genes to select by absolute loading (default:
+25).}
 
-\item{annotate_by}{Character vector of metadata column names for column annotations (optional).}
+\item{annotate_by}{Character vector of metadata column names for column
+annotations (optional).}
 
-\item{annotate_colors}{Named list of color vectors for metadata columns. Names should match \code{annotate_by}.}
+\item{annotate_colors}{Named list of color vectors for metadata columns.
+Names should match \code{annotate_by}.}
 
-\item{return}{One of c("object","plot"). If "plot", draws the heatmap via grid.}
+\item{return}{One of c("object","plot"). If "plot", draws the heatmap via
+grid.}
 }
 \value{
-A list with \code{topGenes} (data.frame with EigenVector and PctVar), \code{expression} (scaled matrix), and \code{heatmap} (pheatmap object)
+A list with \code{topGenes} (data.frame with EigenVector and PctVar),
+\code{expression} (scaled matrix), and \code{heatmap} (pheatmap object)
 }
 \description{
 Generates a pheatmap of the top genes contributing to a specific principal
@@ -37,16 +43,22 @@ Optionally annotate columns with metadata variables and add row annotations
 showing gene-level percent variance.
 }
 \examples{
-\dontrun{
-mock_norm <- matrix(rnorm(12, mean = 0, sd = 2), nrow = 4, ncol = 3)
-colnames(mock_norm) <- paste0("Sample", 1:3)
-rownames(mock_norm) <- paste0("Gene", 1:4)
-mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-res <- PlotEigenHeatmap(obj, pc = "PC1", n = 25,
-                        annotate_by = c("Condition"),
-                        annotate_colors = list(Condition = c("A" = "#1b9e77", "B" = "#d95f02")))
-grid::grid.newpage(); grid::grid.draw(res$heatmap$gtable)
-}
-
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+obj <- RunPCA(obj)
+res <- PlotEigenHeatmap(obj,
+    pc = "PC1", n = 25,
+    annotate_by = "Genotype",
+    annotate_colors = list(Genotype = c(
+        WT = "grey40", Snai1_KO =
+            "firebrick3"
+    )),
+    return = "plot"
+)
 }
