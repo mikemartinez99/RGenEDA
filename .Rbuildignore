@@ -1,4 +1,4 @@
-^DACExploreR\.Rproj$
+^.*\.Rproj$
 ^\.Rproj\.user$
 ^doc$
 ^Meta$
@@ -7,3 +7,11 @@
 ^codecov\.yml$
 ^pkgdown$
 ^_pkgdown\.yml$
+^docs$
+^figure$
+^RGenEDA-manual\.pdf$
+^RGenEDA\.BiocCheck$
+^\.gitattributes$
+^vignettes/.*\.html$
+^vignettes/.*\.md$
+^vignettes/.*_files$

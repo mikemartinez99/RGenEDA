@@ -15,18 +15,22 @@ GenSave(
 )
 }
 \arguments{
-\item{pheatmap_obj}{A \code{pheatmap} object returned by an RGenEDA or pheatmap function.}
+\item{pheatmap_obj}{A \code{pheatmap} object returned by an RGenEDA or pheatmap
+function.}
 
-\item{filename}{Character string specifying the path and filename where the heatmap should be saved.}
+\item{filename}{Character string specifying the path and filename where
+the heatmap should be saved.}
 
 \item{width}{Numeric, the width of the output image. Default is 8.}
 
 \item{height}{Numeric, the height of the output image. Default is 6.}
 
-\item{units}{Character, units for width and height: one of "in", "cm", "mm", or "px".
+\item{units}{Character, units for width and height: one of "in", "cm",
+"mm", or "px".
 Default is "in". Values are converted to inches for PDF and SVG output.}
 
-\item{res}{Numeric, the resolution (in dpi) for raster images. Default is 300.}
+\item{res}{Numeric, the resolution (in dpi) for raster images. Default is
+300.}
 
 \item{...}{Additional arguments passed to the graphics device function.}
 }
@@ -34,18 +38,24 @@ Default is "in". Values are converted to inches for PDF and SVG output.}
 Invisibly returns the filename of the saved heatmap.
 }
 \description{
-Saves a \code{pheatmap} derived \code{RGenEDA} heatmap object to a file in various formats
+Saves a \code{pheatmap} derived \code{RGenEDA} heatmap object to a file in various
+formats
 including PNG, JPEG, TIFF, BMP, PDF, and SVG.
 }
 \details{
-This function is similar in spirit to \code{ggsave()} but works specifically with \code{pheatmap} objects.
+This function is similar in spirit to \code{ggsave()} but works specifically
+with \code{pheatmap} objects.
 }
 \examples{
-\dontrun{
-library(pheatmap)
-mat <- matrix(rnorm(100), 10, 10)
-hm <- pheatmap(mat)
-GenSave(hm, "heatmap.png")
-}
-
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+dists <- PlotDistances(obj, meta_cols = "Genotype")
+out <- tempfile(fileext = ".png")
+GenSave(dists, out, width = 6, height = 5)
+file.exists(out)
 }

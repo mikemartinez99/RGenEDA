@@ -7,7 +7,8 @@
 PlotCountDist(object, split_by = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing normalized expression values in \verb{@normalized}
+\item{object}{A \code{geneda} object containing normalized expression values in
+\verb{@normalized}
 and sample metadata in \verb{@metadata}.}
 
 \item{split_by}{Character. Optional column name from \code{object@metadata} used
@@ -22,20 +23,13 @@ of normalized or VST-transformed RNA-Seq counts for each sample in a
 \code{geneda} object. Optionally, plots can be faceted by a metadata variable.
 }
 \examples{
-\dontrun{
-# Basic plot without faceting
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
 PlotCountDist(obj)
-
-# Facet by a metadata variable "condition"
-PlotCountDist(obj, split_by = "condition")
-}
-
-\donttest{
-mock_norm <- matrix(rnorm(12, mean = 0, sd = 2), nrow = 4, ncol = 3)
-colnames(mock_norm) <- paste0("Sample", 1:3)
-rownames(mock_norm) <- paste0("Gene", 1:4)
-mock_meta <- data.frame(condition = c("A","B","A"), row.names = colnames(mock_norm))
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-PlotCountDist(obj)
-}
+PlotCountDist(obj, split_by = "Genotype")
 }

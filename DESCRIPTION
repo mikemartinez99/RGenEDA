@@ -1,23 +1,32 @@
 Package: RGenEDA
 Title: Genomic Exploratory Data Analysis
-Version: 2.1.0
-Authors@R: 
-    person("Michael", "Martinez", , "f007qps@dartmouth.edu", role = c("aut", "cre"))
-Description: Provides a unified and reproducible framework for performing genomic exploratory data analysis (EDA). Highly repetitive functions and analyses have been collated into an easy-to-use S4 object that produces quick results and customizable visualizations to assess variation in your data. See <https://github.com/mikemartinez99/RGenEDA>.
+Version: 0.99.0
+Authors@R:
+    person("Michael", "Martinez", , "f007qps@dartmouth.edu",
+           role = c("aut", "cre"))
+Description: Provides a unified and reproducible framework for performing
+    genomic exploratory data analysis (EDA). Highly repetitive functions and
+    analyses have been collated into an easy-to-use S4 object that produces
+    quick results and customizable visualizations to assess variation in your
+    data. See <https://github.com/mikemartinez99/RGenEDA>.
 License: GPL-3
+URL: https://github.com/mikemartinez99/RGenEDA,
+    https://mikemartinez99.github.io/RGenEDA/
+BugReports: https://github.com/mikemartinez99/RGenEDA/issues
+biocViews: Software, RNASeq, GeneExpression, Transcriptomics, Sequencing,
+    DifferentialExpression, PrincipalComponent, QualityControl, Visualization
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Depends:
     methods,
-    R (>= 4.1.0)
+    R (>= 4.4.0)
 Imports:
     cli,
     pheatmap,
     RColorBrewer,
     dplyr,
-    ggplot2,
-    ggpubr,
+    ggplot2 (>= 3.4.0),
     ggrepel,
     grid,
     patchwork,
@@ -25,9 +34,10 @@ Imports:
     tidyr,
     vegan,
     stats,
+    SummarizedExperiment,
     tools,
     utils
-Suggests: 
+Suggests:
     DESeq2,
     ggtext,
     pasilla,
@@ -38,4 +48,3 @@ Suggests:
     withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
-LazyData: true

@@ -15,13 +15,39 @@ FilterDEGs(object, assay, alpha = 0.05, l2fc = 1, saveAssay)
 
 \item{l2fc}{Absolute log2 fold change threshold (>=)}
 
-\item{saveAssay}{Character name for the filtered result set (e.g., "padj05_lfc1")}
+\item{saveAssay}{Character name for the filtered result set (e.g.,
+"padj05_lfc1")}
 }
 \value{
-Updated \code{geneda} object with filtered results stored in \code{DEGs[[saveAssay]]}
+Updated \code{geneda} object with filtered results stored in
+\code{DEGs[[saveAssay]]}
 }
 \description{
-Filters the unfiltered DEGs in \code{DEGs[[assay]]} and stores the filtered results
+Filters the unfiltered DEGs in \code{DEGs[[assay]]} and stores the filtered
+results
 in a new named slot \code{DEGs[[saveAssay]]}. Multiple filtered result sets can
 be stored with different assay names.
+}
+\examples{
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+obj <- FilterDEGs(obj,
+    assay = "KO_vs_WT", alpha = 0.05, l2fc = 1,
+    saveAssay = "KO_vs_WT_filtered"
+)
+nrow(DEGs(obj, "KO_vs_WT_filtered"))
+\dontshow{\}) # examplesIf}
 }

@@ -9,7 +9,8 @@ RunPCA(object, nfeatures = 2000)
 \arguments{
 \item{object}{A \code{geneda} object}
 
-\item{nfeatures}{Number of features to use when HVGs are empty. Default = 2000}
+\item{nfeatures}{Number of features to use when HVGs are empty. Default =
+2000}
 }
 \value{
 Updated \code{geneda} object with \code{DimReduction} filled
@@ -18,6 +19,18 @@ Updated \code{geneda} object with \code{DimReduction} filled
 Uses \code{generatePCs()} under the hood.
 If \code{HVGs} are empty, selects HVGs via \code{FindVariableFeatures(object, nfeatures)}
 with default \code{nfeatures = 2000}. If \code{HVGs} are present, the PCA uses
-\code{NFEATURES = length(HVGs(object))}. This aligns the PCA feature count with the
+\code{NFEATURES = length(HVGs(object))}. This aligns the PCA feature count with
+the
 HVG selection while allowing an explicit override of \code{nfeatures} when empty.
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- RunPCA(obj, nfeatures = 1000)
+DimReduction(obj)$percent_var
 }

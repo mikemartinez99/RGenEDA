@@ -7,11 +7,24 @@
 PlotScree(object)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the DimReduction slot.}
+\item{object}{A \code{geneda} object containing PCA results in the DimReduction
+slot.}
 }
 \value{
 A ggplot2 object
 }
 \description{
 Generate a scree plot
+}
+\examples{
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+obj <- RunPCA(obj)
+PlotScree(obj)
 }

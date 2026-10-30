@@ -13,7 +13,8 @@ PlotVolcano(object, assay, alpha, l2fc, den = NULL, num = NULL, title = NULL)
 
 \item{alpha}{Threshold for adjusted p-values (padj column from \code{DESeq2})}
 
-\item{l2fc}{Absolute value log2Fold-change magnitude threshold (log2FoldChange column)}
+\item{l2fc}{Absolute value log2Fold-change magnitude threshold
+(log2FoldChange column)}
 
 \item{den}{Denominator (reference level for comparison, num vs. den).
 If \code{NULL}, the legend uses "denominator".}
@@ -27,38 +28,34 @@ If \code{NULL}, the legend uses "numerator".}
 A \code{ggplot2} object
 }
 \description{
-Plot volcano plot from a \code{geneda} object. Requires that you have ran
+Plot volcano plot from a \code{geneda} object. Requires that you
+have ran
 \code{SetDEGs} on your object following differential expression in \code{DESeq2}.
 }
 \details{
 Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}),
-matching \code{FilterDEGs()}. Genes with a missing \code{log2FoldChange} or \code{padj} are not plotted.
+matching \code{FilterDEGs()}. Genes with a missing \code{log2FoldChange} or \code{padj}
+are not plotted.
 }
 \examples{
-\donttest{
-mock_norm <- matrix(rnorm(5000 * 6, mean = 0, sd = 2), nrow = 5000, ncol = 6)
-colnames(mock_norm) <- paste0("Sample", 1:6)
-rownames(mock_norm) <- paste0("Gene", 1:5000)
+\dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+meta$Genotype <- factor(meta$Genotype, levels = c("WT", "Snai1_KO"))
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
 
-# Sample metadata
-mock_meta <- data.frame(condition = c("A","B","A","B","A","B"),
-row.names = colnames(mock_norm))
-
-# Construct GenEDA object
-obj <- GenEDA(normalized = mock_norm, metadata = mock_meta)
-
-# make dummy DEG table
-n <- 1000
-genes <- paste0("Gene", 1:n)
-log2FoldChange <- runif(n, min = -5, max = 5)
-padj <- runif(n, min = 0, max = 1)
-df <- data.frame(
- log2FoldChange = log2FoldChange,
- padj = padj,
- stringsAsFactors = FALSE)
-rownames(df) <- genes
-obj <- SetDEGs(obj, df, "DEGs")
-
-PlotVolcano(obj, "DEGs", 0.05, 1, "Denominator Group", "Numerator Group", "Test")
-}
+# Differential expression with DESeq2 (Snai1_KO vs WT)
+dds <- DESeq2::DESeqDataSetFromMatrix(counts, meta, design = ~Genotype)
+dds <- DESeq2::DESeq(dds, quiet = TRUE)
+res <- as.data.frame(DESeq2::results(dds))
+obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
+PlotVolcano(obj,
+    assay = "KO_vs_WT", alpha = 0.05, l2fc = 1,
+    den = "WT", num = "Snai1_KO"
+)
+\dontshow{\}) # examplesIf}
 }

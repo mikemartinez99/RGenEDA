@@ -20,4 +20,9 @@ Snail1KO
 \description{
 Dataset from Maturi, et al. 2018, (ENA:ERP019920, E-MTAB-5244)
 }
+\examples{
+data(Snail1KO)
+dim(Snail1KO$rawCounts)
+Snail1KO$metadata
+}
 \keyword{datasets}

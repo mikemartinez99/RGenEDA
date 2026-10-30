@@ -16,24 +16,31 @@ PlotPCA(
 )
 }
 \arguments{
-\item{object}{A \code{GenEDA} object containing PCA results in the \code{DimReduction} slot.}
+\item{object}{A \code{GenEDA} object containing PCA results in the
+\code{DimReduction} slot.}
 
-\item{x}{Numeric or character. The principal component to plot on the x-axis (e.g., 1 or "PC1").}
+\item{x}{Numeric or character. The principal component to plot on the
+x-axis (e.g., 1 or "PC1").}
 
-\item{y}{Numeric or character. The principal component to plot on the y-axis (e.g., 2 or "PC2").}
+\item{y}{Numeric or character. The principal component to plot on the
+y-axis (e.g., 2 or "PC2").}
 
 \item{color_by}{Character. Column name in the metadata used to color points.}
 
 \item{colors}{Vector. Custom colors to use for plotting}
 
-\item{split_by}{Character (optional). Column name in metadata used for faceting (creates separate panels).}
+\item{split_by}{Character (optional). Column name in metadata used for
+faceting (creates separate panels).}
 
-\item{shape_by}{Character (optional). Column name in metadata used to control point shape.}
+\item{shape_by}{Character (optional). Column name in metadata used to
+control point shape.}
 
-\item{return_data}{Logical (default = FALSE), whether or not to return pca dataframe for more custom plotting.}
+\item{return_data}{Logical (default = FALSE), whether or not to return pca
+dataframe for more custom plotting.}
 }
 \value{
-A \code{ggplot} object displaying the PCA scatter plot, or a list of pca_df and plot if \code{return_data = TRUE}
+A \code{ggplot} object displaying the PCA scatter plot, or a list of
+pca_df and plot if \code{return_data = TRUE}
 }
 \description{
 Visualize principal component analysis (PCA) results stored within a
@@ -41,10 +48,17 @@ Visualize principal component analysis (PCA) results stored within a
 and provides a flexible ggplot2-based visualization interface.
 }
 \examples{
-\dontrun{
-p <- PlotPCA(obj, x = 1, y = 2, color_by = "condition",
-     colors = c("untreated" = "red", "treated" = "blue"),
-     split_by = "library")
-p
-}
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+obj <- FindVariableFeatures(obj, nfeatures = 1000)
+obj <- RunPCA(obj)
+PlotPCA(obj,
+    x = 1, y = 2, color_by = "Genotype",
+    colors = c(WT = "grey40", Snai1_KO = "firebrick3")
+)
 }

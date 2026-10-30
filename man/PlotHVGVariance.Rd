@@ -9,18 +9,26 @@ PlotHVGVariance(object, transform = NULL, dropTopN = 0)
 \arguments{
 \item{object}{A \code{geneda} object created by \code{GenEDA()}.}
 
-\item{transform}{One of c("log") to log-transform variance, or NULL for none. Default = NULL}
+\item{transform}{One of c("log") to log-transform variance, or NULL for
+none. Default = NULL}
 
-\item{dropTopN}{Number of top-most variable genes to drop prior to plotting. Default = 0}
+\item{dropTopN}{Number of top-most variable genes to drop prior to
+plotting. Default = 0}
 }
 \value{
 A ggplot2 object visualizing the variance of HVGs
 }
 \description{
-Plot variance for all genes (features) on a \code{geneda} object using ggplot2.
+Plot variance for all genes (features) on a \code{geneda} object
+using ggplot2.
 }
 \examples{
-# obj <- GenEDA(vsd, meta)
-# p <- PlotHVGVariance(obj, transform = "log")
-# print(p)
+data(Snail1KO)
+counts <- as.matrix(Snail1KO$rawCounts)
+counts <- counts[rowSums(counts >= 10) >= 3, ]
+meta <- Snail1KO$metadata
+rownames(meta) <- meta$Sample
+norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
+obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
+PlotHVGVariance(obj, transform = "log")
 }
