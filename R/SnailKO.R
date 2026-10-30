@@ -7,6 +7,7 @@
 #'   \item{metadata}{A dataframe of associated metadata}
 #' }
 #' @source Maturi et al., 2018; ENA: ERP019920; E-MTAB-5244
+#' @usage data(Snail1KO)
 #'
 #' @examples
 #' data(Snail1KO)
