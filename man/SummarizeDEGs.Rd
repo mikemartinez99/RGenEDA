@@ -7,7 +7,8 @@
 SummarizeDEGs(object, alpha = 0.05, lfc1 = 1, lfc2 = 2, assays = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing DEGs in its \code{DEGs} slot.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing DEGs in its \code{DEGs} slot.}
 
 \item{alpha}{Numeric; adjusted p-value threshold. Default is 0.05.}
 
