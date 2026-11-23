@@ -7,7 +7,8 @@
 PlotScree(object)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the DimReduction
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing PCA results in the DimReduction
 slot.}
 }
 \value{

@@ -214,3 +214,22 @@ test_that("SummarizeDEGs warns and skips assays that do not exist", {
         "Assay nope not found in DEGs slot; skipping."
     )
 })
+
+#----- SetDEGs requires genes as row names
+test_that("SetDEGs errors when the DEG table has automatic row names", {
+    obj <- GenEDA(
+        normalized = matrix(1:4, 2, dimnames = list(c("g1", "g2"),
+            c("S1", "S2"))),
+        metadata = data.frame(x = 1:2, row.names = c("S1", "S2"))
+    )
+    deg <- data.frame(
+        gene = c("g1", "g2"),
+        log2FoldChange = c(1, -1),
+        padj = c(0.01, 0.5)
+    )
+    expect_error(SetDEGs(obj, deg, "DEG"), "genes as rownames")
+
+    rownames(deg) <- deg$gene
+    expect_silent(obj2 <- SetDEGs(obj, deg, "DEG"))
+    expect_equal(rownames(DEGs(obj2, "DEG")), c("g1", "g2"))
+})

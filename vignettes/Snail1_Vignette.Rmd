@@ -30,16 +30,18 @@ suppressPackageStartupMessages({
 # Overview
 
 `RGenEDA` is designed to provide a streamlined, unified and reproducible
-framework for exploratory data analysis across multiple omics data types. This
-vignette introduces the key components of the `RGenEDA` package using bulk
-RNA-seq data from the paper [Genomewide binding of transcription factor Snail1
-in triple-negative breast cancer
+framework for exploratory data analysis of bulk RNA-seq data. It works on a
+normalized expression matrix with sample metadata, and is built around the
+`DESeq2` workflow (`DESeqDataSet`, `vst()` / `rlog()` output and `results()`
+tables). This vignette introduces the key components of the `RGenEDA` package
+using bulk RNA-seq data from the paper [Genomewide binding of transcription
+factor Snail1 in triple-negative breast cancer
 cell](https://pubmed.ncbi.nlm.nih.gov/29729076/) (Maturi, et al. 2018). Raw
 counts and metadata were obtained from [The Gene Expression
 Atlas](https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads) under
 ENA:ERP019920, E-MTAB-5244.
 
-The data has be pre-wrangled but the standard [deseq2
+The data have been pre-wrangled, but the standard [deseq2
 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
 will be applied here to demonstrate the functionality of `RGenEDA`.
 
@@ -52,8 +54,9 @@ knock-out of the Snail1 transcription factor and compare these with wild-type
 - [Define metadata](#define-metadata)
 - [Processing and normalization](#processing-and-normalization)
 - [Create a GenEDA object](#create-a-geneda-object)
-- [Count distrubutions across samples](#count-distributions-across-samples)
-- [Sample Eucliden distances with hierarchical
+- [Why a separate class?](#why-a-separate-class)
+- [Count distributions across samples](#count-distributions-across-samples)
+- [Sample Euclidean distances with hierarchical
     clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 - [Identify highly variable genes](#identify-highly-variable-genes)
 - [Principal component analysis](#principal-component-analysis)
@@ -62,6 +65,8 @@ knock-out of the Snail1 transcription factor and compare these with wild-type
     PCs](#explore-eigen-vectors-of-individual-pcs)
 - [Correlate PCs with metadata](#correlate-pcs-with-metadata)
 - [Explore DEGs](#explore-degs)
+- [Moving results back to a
+    SummarizedExperiment](#moving-results-back-to-a-summarizedexperiment)
 
 ## Load and inspect the data
 
@@ -163,6 +168,57 @@ obj_from_dds <- as.geneda(dds, normalized = rld)
 obj_from_dds
 ```
 
+### Why a separate class?
+
+A `geneda` object holds the same kinds of data as a `SummarizedExperiment`.
+Each slot maps to a standard place:
+
+| `geneda` slot  | `SummarizedExperiment`                                |
+|----------------|-------------------------------------------------------|
+| `counts`       | `assay(se, "counts")`                                 |
+| `normalized`   | `assay(se, "normalized")`                             |
+| `metadata`     | `colData(se)`                                         |
+| `HVGs`         | `rowData(se)$isHVG`, `rowData(se)$hvgRank`            |
+| `DimReduction` | `metadata(se)$RGenEDA$DimReduction`                   |
+| `DEGs`         | `metadata(se)$RGenEDA$DEGs`                           |
+
+`RGenEDA` still uses its own small class because every function needs the
+same few things, and needs them to agree with each other:
+
+- **One normalized matrix.** All plots, HVG selection and PCA use the same
+    normalized values. In a `SummarizedExperiment` each function would need an
+    assay-name argument, and two plots could use different assays by mistake.
+- **Checked links between the parts.** The `geneda` validity check makes sure
+    that the metadata rows match the samples, that the HVGs are genes in the
+    matrix, that the PCA results have scores, loadings and numeric percent
+    variance, and that every DEG table is a `data.frame`. `metadata()` in a
+    `SummarizedExperiment` is an unchecked list.
+- **DEG tables of any size.** Filtered DEG tables have fewer genes than the
+    assays, so they cannot be stored as `rowData` columns.
+- **Bulk RNA-seq scale.** `RGenEDA` is built for bulk experiments, where a
+    dense matrix is small. PCA (`prcomp()`) and the plots need dense values,
+    so `as.geneda()` converts only the counts and normalized assays with
+    `as.matrix()` and does not touch the other assays.
+
+You do not have to choose one class. Every main function also accepts a
+`SummarizedExperiment` (including a `DESeqDataSet` or `DESeqTransform`)
+directly. Functions that add results (`FindVariableFeatures()`, `RunPCA()`,
+`SetDEGs()`, `FilterDEGs()`) return your own object, of the same class, with
+the results added in the layout above. Normalized values are taken from an
+assay named `"normalized"` if there is one; a `DESeqTransform` uses its own
+values; otherwise they are computed from the counts, as in `as.geneda()`.
+
+```{r se-direct}
+# Run PCA directly on the rlog DESeqTransform: the result is still a
+# DESeqTransform, now with RGenEDA results stored in it
+rld_pca <- RunPCA(rld, nfeatures = 2000)
+class(rld_pca)
+names(S4Vectors::metadata(rld_pca)$RGenEDA)
+
+# Plotting and extraction functions work on it the same way
+head(ExtractPCA(rld_pca)[, c("PC1", "PC2", "Genotype")])
+```
+
 ## Count distributions across samples
 
 To visualize normalized count distributions across samples, the
@@ -178,7 +234,7 @@ PlotCountDist(obj, split_by = "Genotype")
 ```
 
 
-## Sample Eucliden distances with hierarchical clustering
+## Sample Euclidean distances with hierarchical clustering
 
 To visualize replicate similarity, Euclidean distances between samples can be
 calculated and plotted as a `pheatmap` heatmap using the `PlotDistances()`
@@ -198,7 +254,7 @@ hm <- PlotDistances(
 )
 hm$heatmap
 
-# GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+# GenSave(hm, "/path/to/EuclideanDistance_Heatmap.png", width = 6, height = 8)
 ```
 
 
@@ -206,7 +262,7 @@ hm$heatmap
 
 Next, genes are ranked by decreasing variance to find highly variable genes
 (HVGs) which most-likely drive biological differences. The full variance profile
-curve for all genes profiled with `plotHVGVariance()` as a means to pick a
+curve for all genes can be plotted with `PlotHVGVariance()` as a means to pick a
 meaningful number of HVGs to retain for calculating principal components in the
 next section.
 
@@ -233,15 +289,16 @@ Using the identified HVGs, principal components can be calculated using
 `RunPCA()`
 This function stores PCA results in the DimReduction slot, including:
 
-- `$Scores` (sample scores)
+- `$Scores` (sample scores: one row per sample, one column per PC)
 
-- `$Eigenvectors` (gene contributions)
+- `$Eigenvectors` (gene loadings, i.e. the rotation matrix: one row per gene,
+    one column per PC)
 
-- `$percent_var` (Percent variance explained per component, up to PC5)
+- `$percent_var` (numeric percent of total variance explained by each PC)
 
-If `FindVariableFeatures()` was not ran beforehand, `RunPCA` will calculate HVGs
-by default with 2000 features. This argument can be overriden directly using the
-`nfeatures` argument.
+If `FindVariableFeatures()` was not run beforehand, `RunPCA` will calculate HVGs
+by default with 2000 features. This argument can be overridden directly using
+the `nfeatures` argument.
 
 ```{r run-pca}
 obj <- RunPCA(obj)
@@ -250,7 +307,7 @@ obj <- RunPCA(obj)
 pca <- DimReduction(obj)
 head(pca$Scores)
 head(pca$Eigenvectors)
-head(pca$percent_var)
+round(head(pca$percent_var), 2)
 
 
 # Visualize a scree plot
@@ -280,9 +337,14 @@ PlotPCA(
 ## Explore Eigen vectors of individual PCs
 
 The individual Eigenvectors (genes) that comprise a particular component of
-interest can be extracted and their Z-scaled normalized expression visualized as
-a heatmap annotated by the percent variation explained using `extractEigen()`
-and `PlotEigenHeatmap()`. This can again identify sample-to-sample differences.
+interest can be extracted with `extractEigen()`, which returns each gene's
+loading (`EigenVector`) and its percent contribution to the PC
+(`Contribution`). The contribution is the gene's share of the PC's squared
+loadings, \(100 \cdot v_i^2 / \sum_j v_j^2\), so contributions sum to 100
+within a PC. It is not the percent of total variance explained by the gene.
+`PlotEigenHeatmap()` shows the Z-scaled normalized expression of the top genes
+as a heatmap, with `Contribution` as a row annotation. This can again identify
+sample-to-sample differences.
 
 ```{r eigenvecs, fig.width = 8, fig.height = 6}
 pc1_eigen <- extractEigen(
@@ -300,7 +362,7 @@ hm2 <- PlotEigenHeatmap(obj,
 )
 hm2$heatmap
 
-# GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+# GenSave(hm2, "/path/to/EuclideanDistance_Heatmap.png", width = 6, height = 8)
 ```
 ## Correlate PCs with metadata
 
@@ -313,21 +375,33 @@ correlation; categorical variables with more than two levels (such as batch) are
 summarized by the unsigned multiple correlation R from a one-way linear model,
 so results do not depend on how levels are labelled. Variables that cannot be
 tested, such as columns with a single value or a unique value per sample (here,
-Disease, CellLine_CellType, and Sample), are dropped. This function returns a
-list of 4 elements:
+Disease, CellLine_CellType, and Sample), are dropped.
+
+Each PC x covariate cell is a separate test, so the p-values are adjusted for
+multiple testing with `p.adjust()` (Benjamini-Hochberg by default; set with
+`p_adjust_method`). The stars on the heatmap use the adjusted p-values. With
+only 6 samples here, these tests have very little power, so read the heatmap
+as exploratory. This function returns a list of 6 elements:
 
 - `$cor_matrix` (Pearson correlation values, or multiple correlation R for
     variables with more than two levels)
 
-- `$pval_matrix` (Associated correlation p-values)
+- `$padj_matrix` (adjusted p-values, used for the stars and the plot)
 
-- `$stars` (asterisk representations of p-values)
+- `$pval_matrix` (unadjusted p-values, for reference)
+
+- `$stars` (asterisk representations of the adjusted p-values)
+
+- `$p_adjust_method` (the correction method used)
 
 - `$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved with
     `ggsave`)
 
-**Note:** `PlotOrdCorr()` can be used for microbiome data as it correlates
-metadata features with NMDS beta values rather than PCs.
+**Note:** `PlotOrdCorr()` works like `PlotEigenCorr()`, but correlates metadata
+features with non-metric multidimensional scaling (NMDS) axes of a sample
+dissimilarity matrix (Bray-Curtis by default) instead of PCs. It applies the
+same multiple-testing correction (`p_adjust_method`) and returns the same
+`$padj_matrix`, `$pval_matrix` and `$stars` elements.
 
 
 ```{r eigencorr, fig.show='hold', out.width='70%'}
@@ -455,6 +529,25 @@ FindHVDEGs(obj,
     assay = "padj05_lfc1",
     direction = "negative"
 )
+```
+
+## Moving results back to a SummarizedExperiment
+
+Use `as(obj, "SummarizedExperiment")` to move a `geneda` object, with its
+HVGs, PCA and DEG tables, into a `SummarizedExperiment` for other
+Bioconductor tools. `as.geneda()` reads the same layout back, so no
+information is lost.
+
+```{r to-se}
+se <- as(obj, "SummarizedExperiment")
+se
+
+# HVGs are flagged in rowData; PCA and DEG tables are in metadata()
+table(SummarizedExperiment::rowData(se)$isHVG)
+names(S4Vectors::metadata(se)$RGenEDA$DEGs)
+
+# Round trip back to a geneda object
+identical(as.geneda(se), obj)
 ```
 
 # Session information

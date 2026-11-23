@@ -3,11 +3,13 @@
 component from a geneda object. Genes are selected by absolute eigenvector
 loading for the chosen PC, and expression values are Z-score scaled per gene.
 Optionally annotate columns with metadata variables and add row annotations
-showing gene-level percent variance."><meta property="og:description" content="Generates a pheatmap of the top genes contributing to a specific principal
+showing each gene's percent contribution to the PC (see
+extractEigen())."><meta property="og:description" content="Generates a pheatmap of the top genes contributing to a specific principal
 component from a geneda object. Genes are selected by absolute eigenvector
 loading for the chosen PC, and expression values are Z-score scaled per gene.
 Optionally annotate columns with metadata variables and add row annotations
-showing gene-level percent variance."><meta property="og:image" content="https://mikemartinez99.github.io/RGenEDA/logo.png"></head><body>
+showing each gene's percent contribution to the PC (see
+extractEigen())."><meta property="og:image" content="https://mikemartinez99.github.io/RGenEDA/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +17,7 @@ showing gene-level percent variance."><meta property="og:image" content="https:/
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +51,8 @@ showing gene-level percent variance."><meta property="og:image" content="https:/
 component from a <code>geneda</code> object. Genes are selected by absolute eigenvector
 loading for the chosen PC, and expression values are Z-score scaled per gene.
 Optionally annotate columns with metadata variables and add row annotations
-showing gene-level percent variance.</p>
+showing each gene's percent contribution to the PC (see
+<code><a href="extractEigen.html">extractEigen()</a></code>).</p>
     </div>
 
     <div class="section level2">
@@ -69,7 +72,8 @@ showing gene-level percent variance.</p>
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>A <code>geneda</code> object containing normalized expression data and
+<dd><p>A <code>geneda</code> object (or a <code>SummarizedExperiment</code>; see
+<a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>) containing normalized expression data and
 PCA in <code>DimReduction</code>.</p></dd>
 
 
@@ -99,7 +103,8 @@ grid.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list with <code>topGenes</code> (data.frame with EigenVector and PctVar),
+    <p>A list with <code>topGenes</code> (data.frame with EigenVector and
+Contribution),
 <code>expression</code> (scaled matrix), and <code>heatmap</code> (pheatmap object)</p>
     </div>
 
@@ -115,13 +120,13 @@ grid.</p></dd>
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="FindVariableFeatures.html">FindVariableFeatures</a></span><span class="op">(</span><span class="va">obj</span>, nfeatures <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="RunPCA.html">RunPCA</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating principal components from top 1000 HVGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variations:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.9 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variance explained:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.90%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0.00%</span>
 <span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">PlotEigenHeatmap</span><span class="op">(</span><span class="va">obj</span>,</span></span>
 <span class="r-in"><span>    pc <span class="op">=</span> <span class="st">"PC1"</span>, n <span class="op">=</span> <span class="fl">25</span>,</span></span>
 <span class="r-in"><span>    annotate_by <span class="op">=</span> <span class="st">"Genotype"</span>,</span></span>

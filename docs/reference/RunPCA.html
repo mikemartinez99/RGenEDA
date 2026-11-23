@@ -17,7 +17,7 @@ HVG selection while allowing an explicit override of nfeatures when empty."><met
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -65,7 +65,8 @@ HVG selection while allowing an explicit override of <code>nfeatures</code> when
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>A <code>geneda</code> object</p></dd>
+<dd><p>A <code>geneda</code> object (or a <code>SummarizedExperiment</code>; see
+<a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>).</p></dd>
 
 
 <dt id="arg-nfeatures">nfeatures<a class="anchor" aria-label="anchor" href="#arg-nfeatures"></a></dt>
@@ -75,7 +76,9 @@ HVG selection while allowing an explicit override of <code>nfeatures</code> when
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Updated <code>geneda</code> object with <code>DimReduction</code> filled</p>
+    <p>Updated <code>geneda</code> object with <code>DimReduction</code> filled.
+If <code>object</code> is a <code>SummarizedExperiment</code>, the same object with the
+results added (see <a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>).</p>
     </div>
 
     <div class="section level2">
@@ -90,16 +93,16 @@ HVG selection while allowing an explicit override of <code>nfeatures</code> when
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu">RunPCA</span><span class="op">(</span><span class="va">obj</span>, nfeatures <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> HVG slot is empty. Running FindVariableFeatures with top 1000 genes</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Calculating principal components from top 1000 HVGs</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variations:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.9 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variance explained:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.90%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0.00%</span>
 <span class="r-in"><span><span class="fu"><a href="DimReduction.html">DimReduction</a></span><span class="op">(</span><span class="va">obj</span><span class="op">)</span><span class="op">$</span><span class="va">percent_var</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       PC1       PC2       PC3       PC4       PC5       PC6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "88.56 %"   "5.9 %"  "2.91 %"  "1.55 %"  "1.08 %"     "0 %" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          PC1          PC2          PC3          PC4          PC5          PC6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8.856057e+01 5.897930e+00 2.912694e+00 1.549480e+00 1.079328e+00 1.330269e-29 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

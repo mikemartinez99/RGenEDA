@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{getMetadata}
 \alias{getMetadata}
-\title{Access metadata (avoid name clash with S4 generics)}
+\title{Access the sample metadata}
 \usage{
 getMetadata(object)
 }
@@ -13,7 +13,7 @@ getMetadata(object)
 data.frame
 }
 \description{
-Access metadata (avoid name clash with S4 generics)
+Access the sample metadata
 }
 \examples{
 data(Snail1KO)

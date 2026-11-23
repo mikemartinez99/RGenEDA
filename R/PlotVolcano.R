@@ -4,12 +4,10 @@
 #'   have ran
 #' `SetDEGs` on your object following differential expression in `DESeq2`.
 #'
-#' @import ggplot2
-#' @import ggrepel
-#' @import RColorBrewer
 #' @importFrom stats setNames
 #'
-#' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
 #' @param l2fc Absolute value log2Fold-change magnitude threshold
@@ -56,7 +54,7 @@ PlotVolcano <- function(
     den = NULL,
     num = NULL,
     title = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     if (!assay %in% names(object@DEGs)) {
         cli::cli_abort("Assay {assay} was not found in DEGs slot!")

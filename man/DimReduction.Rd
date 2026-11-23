@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{DimReduction}
 \alias{DimReduction}
-\title{Access dimensional reduction results list}
+\title{Access the PCA results}
 \usage{
 DimReduction(object)
 }
@@ -10,10 +10,12 @@ DimReduction(object)
 \item{object}{A \code{geneda} object}
 }
 \value{
-List with \code{Loadings}, \code{Eigenvectors}, \code{percent_var}
+List with \code{Scores} (sample scores), \code{Eigenvectors} (gene
+loadings, i.e. the rotation matrix) and \code{percent_var} (numeric percent
+of variance explained per PC). See \code{\link[=generatePCs]{generatePCs()}}.
 }
 \description{
-Access dimensional reduction results list
+Access the PCA results
 }
 \examples{
 data(Snail1KO)

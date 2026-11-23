@@ -9,14 +9,23 @@ generatePCs(mat, vars, nFeatures)
 \arguments{
 \item{mat}{A data matrix where rows are features and columns are samples}
 
-\item{vars}{A vector of gene variances (can calculate using
-RGenEDA::plotVariance) or gene names}
+\item{vars}{Either a named numeric vector of gene variances (for example
+from \code{MatrixGenerics::rowVars(mat)}), from which the top \code{nFeatures}
+genes are used, or a character vector of gene names to use directly
+(for example \code{HVGs(object)}).}
 
 \item{nFeatures}{Number of top features to generate principal components on.}
 }
 \value{
-A list consisting of 3 slots: Loadings, Eigenvectors, and
-percent_var
+A list with three elements:
+\describe{
+\item{\code{Scores}}{data.frame of sample scores (samples x PCs), i.e.
+\code{prcomp()$x}.}
+\item{\code{Eigenvectors}}{data.frame of gene loadings (genes x PCs), i.e.
+the rotation matrix \code{prcomp()$rotation}.}
+\item{\code{percent_var}}{named numeric vector of the percent of total
+variance explained by each PC (0-100; sums to 100).}
+}
 }
 \description{
 Generate principal component analysis data that can be used
@@ -30,7 +39,7 @@ meta <- Snail1KO$metadata
 rownames(meta) <- meta$Sample
 norm <- log2(t(t(counts) / colSums(counts)) * 1e6 + 1)
 obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
-vars <- apply(norm, 1, var)
+vars <- MatrixGenerics::rowVars(norm)
 pcs <- generatePCs(norm, vars, nFeatures = 1000)
 pcs$percent_var
 }

@@ -7,9 +7,9 @@
 PlotCountDist(object, split_by = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing normalized expression values in
-\verb{@normalized}
-and sample metadata in \verb{@metadata}.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing normalized expression values in
+\verb{@normalized} and sample metadata in \verb{@metadata}.}
 
 \item{split_by}{Character. Optional column name from \code{object@metadata} used
 for faceting (default: NULL, no faceting).}

@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{HVGs}
 \alias{HVGs}
-\title{Access HVG IDs}
+\title{Access the highly variable gene IDs}
 \usage{
 HVGs(object)
 }
@@ -13,7 +13,7 @@ HVGs(object)
 Character vector
 }
 \description{
-Access HVG IDs
+Access the highly variable gene IDs
 }
 \examples{
 data(Snail1KO)

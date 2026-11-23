@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,12 +50,15 @@
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>A <code>geneda</code> object</p></dd>
+<dd><p>A <code>geneda</code> object (or a <code>SummarizedExperiment</code>; see
+<a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>).</p></dd>
 
 
 <dt id="arg-deg-table">deg_table<a class="anchor" aria-label="anchor" href="#arg-deg-table"></a></dt>
 <dd><p>A data.frame of DESeq2-like results containing at least
-columns <code>log2FoldChange</code> and <code>padj</code></p></dd>
+columns <code>log2FoldChange</code> and <code>padj</code>, with gene IDs as row names (as in
+<code>as.data.frame(DESeq2::results(dds))</code>). Tables with automatic row names
+(<code>1</code>, <code>2</code>, ...) are rejected.</p></dd>
 
 
 <dt id="arg-assay">assay<a class="anchor" aria-label="anchor" href="#arg-assay"></a></dt>
@@ -64,7 +67,9 @@ columns <code>log2FoldChange</code> and <code>padj</code></p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>Updated <code>geneda</code> object with <code>DEGs[[assay]]</code> set</p>
+    <p>Updated <code>geneda</code> object with <code>DEGs[[assay]]</code> set.
+If <code>object</code> is a <code>SummarizedExperiment</code>, the same object with the
+results added (see <a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>).</p>
     </div>
 
     <div class="section level2">

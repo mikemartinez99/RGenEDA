@@ -4,10 +4,11 @@
 \alias{PlotEigenCorr}
 \title{Plot Eigen-Correlation With Metadata Heatmap}
 \usage{
-PlotEigenCorr(object, num_pcs = 10, meta_cols = NULL)
+PlotEigenCorr(object, num_pcs = 10, meta_cols = NULL, p_adjust_method = "BH")
 }
 \arguments{
-\item{object}{A \code{geneda} object containing \code{normalized} and \code{metadata}, and
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing \code{normalized} and \code{metadata}, and
 optionally \code{DimReduction} scores.}
 
 \item{num_pcs}{Number of principal components to correlate.}
@@ -15,16 +16,37 @@ optionally \code{DimReduction} scores.}
 \item{meta_cols}{Optional character vector of metadata column names to
 include.
 Defaults to all metadata columns.}
+
+\item{p_adjust_method}{Multiple-testing correction passed to
+\code{\link[stats:p.adjust]{stats::p.adjust()}}: one of \code{"BH"} (default), \code{"BY"}, \code{"fdr"},
+\code{"holm"}, \code{"hochberg"}, \code{"hommel"} or \code{"bonferroni"}. \code{"none"} is not
+allowed: raw p-values are always returned in \code{pval_matrix}, and the plot
+always uses adjusted p-values.}
 }
 \value{
-A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
+A list with elements:
+\describe{
+\item{\code{cor_matrix}}{correlation (or multiple correlation R) per
+covariate x PC.}
+\item{\code{padj_matrix}}{adjusted p-values (\code{p_adjust_method}). These are
+the values used for the stars and the plot.}
+\item{\code{pval_matrix}}{unadjusted p-values, for reference.}
+\item{\code{stars}}{significance stars from \code{padj_matrix}.}
+\item{\code{p_adjust_method}}{the correction method used.}
+\item{\code{plot}}{the heatmap (\code{ggplot}).}
+}
 }
 \description{
 Calculate Eigen-correlations from a \code{geneda} object and plot a
 publication-quality heatmap using ggplot2 with numeric labels and
 significance stars. For continuous variables, Pearson correlation is used.
-P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
-one stars, respectively.
+
+Every PC x covariate cell is a separate test, so p-values are adjusted for
+multiple testing with \code{\link[stats:p.adjust]{stats::p.adjust()}} across all tested cells (method
+\code{p_adjust_method}, default Benjamini-Hochberg). The significance stars on
+the heatmap use the adjusted p-values: padj < 0.001, < 0.01, < 0.05 = three,
+two, one stars, respectively. With few samples (e.g. n = 6) these tests
+have little power, so treat the results as exploratory.
 
 Two-level categorical variables are coded by factor level order, so the sign
 of the correlation follows the level order. Categorical variables with more

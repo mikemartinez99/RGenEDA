@@ -15,8 +15,9 @@ GenSave(
 )
 }
 \arguments{
-\item{pheatmap_obj}{A \code{pheatmap} object returned by an RGenEDA or pheatmap
-function.}
+\item{pheatmap_obj}{A heatmap result from an RGenEDA function (a list
+with a \code{heatmap} element, e.g. from \code{PlotDistances()} or
+\code{PlotEigenHeatmap()}), or a \code{pheatmap} object.}
 
 \item{filename}{Character string specifying the path and filename where
 the heatmap should be saved.}

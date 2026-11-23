@@ -7,18 +7,29 @@
 extractEigen(object, component)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the
-\code{DimReduction} slot}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing PCA results in the \code{DimReduction}
+slot}
 
 \item{component}{Principal component to use (i.e., PC1)}
 }
 \value{
-A data-frame containing gene loading information and percent
-variation per gene
+A data.frame with columns \code{Gene}, \code{EigenVector} (the gene's
+loading on the PC) and \code{Contribution} (the gene's percent contribution
+to the PC; sums to 100)
 }
 \description{
-Extract gene-level Eigen-vectors for PCs of interest and
-calculate percent variance.
+Extract gene-level eigenvector loadings for a PC of interest
+and calculate each gene's contribution to that PC.
+}
+\details{
+The contribution of gene \eqn{i} to a PC with eigenvector
+\eqn{v} is \eqn{100 \cdot v_i^2 / \sum_j v_j^2}, i.e. the gene's share
+of the PC's squared loadings. Because eigenvectors have unit length this
+equals \eqn{100 \cdot v_i^2}, and contributions sum to 100 within each
+PC. This is not the percent of total variance explained by the gene;
+for the variance explained by the PC itself see the \code{percent_var} entry
+of the \code{DimReduction} slot.
 }
 \examples{
 data(Snail1KO)

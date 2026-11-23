@@ -1,11 +1,12 @@
 Package: RGenEDA
 Title: Genomic Exploratory Data Analysis
-Version: 0.99.0
+Version: 0.99.1
 Authors@R:
     person("Michael", "Martinez", , "f007qps@dartmouth.edu",
            role = c("aut", "cre"))
-Description: Provides a unified and reproducible framework for performing
-    genomic exploratory data analysis (EDA). Highly repetitive functions and
+Description: Provides a unified and reproducible framework for exploratory
+    data analysis (EDA) of bulk RNA-seq data, built around the DESeq2
+    workflow. Highly repetitive functions and
     analyses have been collated into an easy-to-use S4 object that produces
     quick results and customizable visualizations to assess variation in your
     data. See <https://github.com/mikemartinez99/RGenEDA>.
@@ -28,12 +29,13 @@ Imports:
     dplyr,
     ggplot2 (>= 3.4.0),
     ggrepel,
+    grDevices,
     grid,
     patchwork,
-    scales,
     tidyr,
-    vegan,
     stats,
+    MatrixGenerics,
+    S4Vectors,
     SummarizedExperiment,
     tools,
     utils
@@ -45,6 +47,7 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
+    vegan,
     withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr

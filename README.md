@@ -1,10 +1,10 @@
 # RGenEDA
-**Clean, unified, streamlined, and reproducible frameworks for genomic exploratory data analyses**
+**Clean, unified, streamlined, and reproducible frameworks for bulk RNA-seq exploratory data analyses**
 
 
  <!-- badges: start -->
  ![status](https://img.shields.io/badge/status-stable-green)
- ![Version](https://img.shields.io/badge/version-0.99.0-blue)
+ ![Version](https://img.shields.io/badge/version-0.99.1-blue)
   [![pkgdown documentation](https://img.shields.io/badge/docs-pkgdown-blue.svg)](https://mikemartinez99.github.io/RGenEDA/)
  ![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)
   [![R-CMD-check](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mikemartinez99/RGenEDA/actions/workflows/R-CMD-check.yaml)
@@ -45,7 +45,7 @@ For some background on why EDA is important, see [Compute and Conquer: The Basic
 **![Version](https://img.shields.io/badge/version-0.0.0.900-blue)** **![Release](https://img.shields.io/badge/Initial-grey)**
 *April 2025: "The poor-man's EDA"*<br>
   - Implemented core, standalone functions<br>
-    - Variance calculation, PCA calculation, and Eucliden distances, and Eigenvector correlations<br>
+    - Variance calculation, PCA calculation, and Euclidean distances, and Eigenvector correlations<br>
 
 **![Version](https://img.shields.io/badge/version-1.0.0-blue)** **![Release](https://img.shields.io/badge/Major-red)**
 *October 16th, 2025: "The GenEDA Object Update*<br>
@@ -106,7 +106,15 @@ For some background on why EDA is important, see [Compute and Conquer: The Basic
   - Added biocViews, URL, and BugReports to DESCRIPTION <br>
   - Added **as.geneda()** to create GenEDA objects directly from SummarizedExperiment, DESeqDataSet, and DESeqTransform objects <br>
   - Added runnable examples for all exported functions using the bundled Snail1KO data <br>
-E  - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br>
+  - Restyled code to Bioconductor style (4-space indents, 80-character lines) <br>
+
+**![Version](https://img.shields.io/badge/version-0.99.1-blue)** **![Release](https://img.shields.io/badge/Bioconductor-blue)**
+*Bioconductor review fixes*<br>
+  - **Breaking:** `extractEigen()` / `PlotEigenHeatmap()` report `Contribution` (was `PctVar`); `DimReduction$percent_var` is numeric; `vegan` moved to Suggests <br>
+  - `PlotEigenCorr()` and `PlotOrdCorr()` return and plot multiple-testing adjusted p-values (padj) <br>
+  - `geneda` objects convert to and from `SummarizedExperiment` without loss, and all main functions accept a `SummarizedExperiment`, `DESeqDataSet` or `DESeqTransform` directly <br>
+  - Fixed `PlotDistances()` ordering, `PlotMA()` `NA` handling, `GenSave()` device handling and `SetDEGs()` row-name check <br>
+  - Added `?RGenEDA`, `inst/CITATION` and a build script for the `Snail1KO` data; see NEWS.md for the full list <br>
 
 ## Citation
 If you use RGenEDA in your work, please cite: **dx.doi.org/10.17504/protocols.io.bp2l6z6rdgqe/v1**

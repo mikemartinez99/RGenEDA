@@ -1,10 +1,15 @@
 #' Set unfiltered DEGs on the object
 #'
-#' @param object A `geneda` object
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]).
 #' @param deg_table A data.frame of DESeq2-like results containing at least
-#'   columns `log2FoldChange` and `padj`
+#'   columns `log2FoldChange` and `padj`, with gene IDs as row names (as in
+#'   `as.data.frame(DESeq2::results(dds))`). Tables with automatic row names
+#'   (`1`, `2`, ...) are rejected.
 #' @param assay What to name the DEG slot
-#' @return Updated `geneda` object with `DEGs[[assay]]` set
+#' @return Updated `geneda` object with `DEGs[[assay]]` set.
+#'   If `object` is a `SummarizedExperiment`, the same object with the
+#'   results added (see [geneda-SummarizedExperiment]).
 #' @export
 #'
 #' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
@@ -24,7 +29,10 @@
 #' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
 #' obj
 SetDEGs <- function(object, deg_table, assay) {
-    stopifnot(methods::is(object, "geneda"))
+    if (methods::is(object, "SummarizedExperiment")) {
+        return(.seRoundTrip(object, SetDEGs, deg_table, assay))
+    }
+    object <- .toGeneda(object)
     stopifnot(is.data.frame(deg_table))
     req_cols <- c("log2FoldChange", "padj")
     missing_cols <- setdiff(req_cols, colnames(deg_table))
@@ -32,8 +40,15 @@ SetDEGs <- function(object, deg_table, assay) {
         req_str <- paste(req_cols, collapse = ", ")
         cli::cli_abort("DEG table must contain columns: {req_str}")
     }
-    if (is.null(rownames(deg_table))) {
-        cli::cli_abort("DEG table does not have genes as rownames!")
+    # A data.frame always has row names; automatic ones (1, 2, ...) are
+    # stored compactly and reported as negative by .row_names_info()
+    if (nrow(deg_table) > 0L && .row_names_info(deg_table, type = 1L) < 0L) {
+        cli::cli_abort(
+            paste0(
+                "DEG table does not have genes as rownames! Set ",
+                "rownames(deg_table) to the gene IDs."
+            )
+        )
     }
 
     if (assay %in% names(object@DEGs)) {
@@ -52,14 +67,17 @@ SetDEGs <- function(object, deg_table, assay) {
 #' in a new named slot `DEGs[[saveAssay]]`. Multiple filtered result sets can
 #' be stored with different assay names.
 #'
-#' @param object A `geneda` object with a DEG table set via `SetDEGs()`
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) with a DEG table set via `SetDEGs()`
 #' @param assay The DEG slot to filter
 #' @param alpha Adjusted p-value threshold (<=)
 #' @param l2fc Absolute log2 fold change threshold (>=)
 #' @param saveAssay Character name for the filtered result set (e.g.,
 #'   "padj05_lfc1")
 #' @return Updated `geneda` object with filtered results stored in
-#'   `DEGs[[saveAssay]]`
+#'   `DEGs[[saveAssay]]`.
+#'   If `object` is a `SummarizedExperiment`, the same object with the
+#'   results added (see [geneda-SummarizedExperiment]).
 #' @importFrom methods validObject
 #' @export
 #'
@@ -84,7 +102,13 @@ SetDEGs <- function(object, deg_table, assay) {
 #' )
 #' nrow(DEGs(obj, "KO_vs_WT_filtered"))
 FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
-    stopifnot(methods::is(object, "geneda"))
+    if (methods::is(object, "SummarizedExperiment")) {
+        return(.seRoundTrip(
+            object, FilterDEGs,
+            assay = assay, alpha = alpha, l2fc = l2fc, saveAssay = saveAssay
+        ))
+    }
+    object <- .toGeneda(object)
     if (is.null(object@DEGs[[assay]])) {
         cli::cli_abort("Assay {assay} is NULL. Use SetDEGs() first.")
     }
@@ -110,7 +134,8 @@ FilterDEGs <- function(object, assay, alpha = 0.05, l2fc = 1.0, saveAssay) {
 #'
 #' Looks for DEGs after filtering that overlap with HVGs.
 #'
-#' @param object A `geneda` object with a DEG table set via `SetDEGs()`
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) with a DEG table set via `SetDEGs()`
 #' @param assay The DEG slot to pull results from (typically a result of
 #'   `FilterDEGs`)
 #' @param direction One of positive, negative, or both (indicating the direction
@@ -145,7 +170,7 @@ FindHVDEGs <- function(
     object,
     assay,
     direction = c("positive", "negative", "both")) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     # Validate direction argument
     direction <- match.arg(direction)
@@ -215,7 +240,8 @@ FindHVDEGs <- function(
 #' values in
 #' other columns (e.g., gene annotations) are ignored.
 #'
-#' @param object A `geneda` object containing DEGs in its `DEGs` slot.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing DEGs in its `DEGs` slot.
 #' @param alpha Numeric; adjusted p-value threshold. Default is 0.05.
 #' @param lfc1 Numeric; lower log2 fold-change threshold. Default is 1.
 #' @param lfc2 Numeric; higher log2 fold-change threshold. Default is 2.
@@ -247,7 +273,7 @@ SummarizeDEGs <- function(
     lfc1 = 1,
     lfc2 = 2,
     assays = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
     if (length(object@DEGs) == 0) cli::cli_abort("No DEGs found in object.")
 
     # Use all assays if none are specified

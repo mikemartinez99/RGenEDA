@@ -10,8 +10,11 @@
 #' @param x A `SummarizedExperiment` (or subclass such as `DESeqDataSet` or
 #'   `DESeqTransform`) with features as rows and samples as columns.
 #' @param normalized Where the normalized values come from. One of:
-#'   * `NULL` (default): computed from the counts assay using `transform`.
-#'     If `x` is a `DESeqTransform`, its transformed values are used instead.
+#'   * `NULL` (default): the assay named `"normalized"` if `x` has one (for
+#'     example a `SummarizedExperiment` made with
+#'     `as(object, "SummarizedExperiment")`). Otherwise, if `x` is a
+#'     `DESeqTransform`, its transformed values; otherwise computed from the
+#'     counts assay using `transform`.
 #'   * A single assay name or index in `x`.
 #'   * A `SummarizedExperiment` with the same features and samples as `x`,
 #'     for example the output of `DESeq2::vst(x)`. Its first assay is used.
@@ -30,16 +33,25 @@
 #' @param ... Not used.
 #'
 #' @details
+#' If `x` holds RGenEDA results in `metadata(x)$RGenEDA` (HVGs, PCA, DEG
+#' tables; see [geneda-SummarizedExperiment]), they are restored, so
+#' `as.geneda(as(obj, "SummarizedExperiment"))` gives back `obj`. Results
+#' that no longer match `x` (for example after subsetting) are dropped with a
+#' warning.
+#'
 #' Sample metadata are taken from `colData(x)` and converted to a
 #' `data.frame`. Columns added by DESeq2, such as `sizeFactor`, are kept and
 #' can be tested with `PlotEigenCorr()` like any other covariate.
 #'
 #' Assays stored as sparse or delayed matrices are converted to base
-#' matrices with `as.matrix()`.
+#' matrices with `as.matrix()`, because PCA and the plots work on dense
+#' matrices. Only the counts assay and the normalized values are converted;
+#' other assays are not used.
 #'
 #' @return A `geneda` object.
 #'
-#' @seealso [GenEDA()] to build a `geneda` object from matrices.
+#' @seealso [GenEDA()] to build a `geneda` object from matrices, and
+#'   [geneda-SummarizedExperiment] for the reverse conversion.
 #'
 #' @importClassesFrom SummarizedExperiment SummarizedExperiment
 #' @importFrom SummarizedExperiment assay assayNames colData
@@ -93,15 +105,16 @@ setMethod("as.geneda", "SummarizedExperiment", function(
     countMat <- .seCounts(x, counts)
     normMat <- .resolveNormalized(x, normalized, countMat, transform)
 
-    metadata <- as.data.frame(colData(x))
+    metadata <- as.data.frame(colData(x), optional = TRUE)
     rownames(metadata) <- colnames(x)
 
-    GenEDA(
+    obj <- GenEDA(
         normalized = normMat,
         metadata = metadata,
-        counts = countMat,
-        DEGs = DEGs
+        counts = countMat
     )
+    obj <- .restoreGeneda(obj, S4Vectors::metadata(x)[["RGenEDA"]])
+    .addDEGList(obj, DEGs)
 })
 
 #' Choose or compute the normalized matrix for as.geneda()
@@ -110,6 +123,10 @@ setMethod("as.geneda", "SummarizedExperiment", function(
 .resolveNormalized <- function(x, normalized, countMat, transform) {
     if (!is.null(normalized)) {
         return(.seNormalized(x, normalized))
+    }
+    # An assay named "normalized" (e.g. written by RGenEDA) is used as is
+    if ("normalized" %in% assayNames(x)) {
+        return(.seNormalized(x, "normalized"))
     }
     # A DESeqTransform already holds normalized values in its first assay
     if (methods::is(x, "DESeqTransform")) {

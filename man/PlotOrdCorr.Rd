@@ -4,10 +4,17 @@
 \alias{PlotOrdCorr}
 \title{Plot Ordination Correlations With Metadata Heatmap}
 \usage{
-PlotOrdCorr(object, num_mds = 10, meta_cols = NULL, distance = "bray")
+PlotOrdCorr(
+  object,
+  num_mds = 10,
+  meta_cols = NULL,
+  distance = "bray",
+  p_adjust_method = "BH"
+)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing \code{normalized} and \code{metadata}.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing \code{normalized} and \code{metadata}.}
 
 \item{num_mds}{Number of NMDS axes to correlate. Default = 10}
 
@@ -15,21 +22,42 @@ PlotOrdCorr(object, num_mds = 10, meta_cols = NULL, distance = "bray")
 include.
 Defaults to all metadata columns.}
 
-\item{distance}{Distance metric for \code{vegdist} (default "bray").}
+\item{distance}{Distance metric for \code{vegan::vegdist()} (default "bray").}
+
+\item{p_adjust_method}{Multiple-testing correction passed to
+\code{\link[stats:p.adjust]{stats::p.adjust()}}: one of \code{"BH"} (default), \code{"BY"}, \code{"fdr"},
+\code{"holm"}, \code{"hochberg"}, \code{"hommel"} or \code{"bonferroni"}. \code{"none"} is not
+allowed: raw p-values are always returned in \code{pval_matrix}, and the plot
+always uses adjusted p-values.}
 }
 \value{
-A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot),
-and variance explained (squared correlations between ordination distances and
-observed dissimilarities.)
+A list with elements:
+\describe{
+\item{\code{cor_matrix}}{correlation (or multiple correlation R) per
+covariate x NMDS axis.}
+\item{\code{padj_matrix}}{adjusted p-values (\code{p_adjust_method}). These are
+the values used for the stars and the plot.}
+\item{\code{pval_matrix}}{unadjusted p-values, for reference.}
+\item{\code{stars}}{significance stars from \code{padj_matrix}.}
+\item{\code{p_adjust_method}}{the correction method used.}
+\item{\code{plot}}{the heatmap (\code{ggplot}).}
+\item{\code{variance_explained}}{squared correlations between ordination
+distances and observed dissimilarities, per NMDS axis.}
+}
 }
 \description{
-Calculate correlations between NMDS ordination axes (from beta
-diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
-labels and significance stars.
+Calculate correlations between NMDS ordination axes (from a
+sample dissimilarity matrix, Bray-Curtis by default) and metadata, and plot a
+ggplot2 heatmap with numeric labels and significance stars.
 
-For continuous variables, Pearson correlation is used. P values follow this
-convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
-respectively.
+For continuous variables, Pearson correlation is used.
+
+Every NMDS axis x covariate cell is a separate test, so p-values are
+adjusted for multiple testing with \code{\link[stats:p.adjust]{stats::p.adjust()}} across all tested
+cells (method \code{p_adjust_method}, default Benjamini-Hochberg). The
+significance stars on the heatmap use the adjusted p-values: padj < 0.001,
+< 0.01, < 0.05 = three, two, one stars, respectively. With few samples
+these tests have little power, so treat the results as exploratory.
 
 Two-level categorical variables are coded by factor level order, so the sign
 of the correlation follows the level order. Categorical variables with more
@@ -41,10 +69,13 @@ constant
 values, or no residual degrees of freedom, e.g. a sample ID column) are
 dropped.
 
+Requires the \code{vegan} package (in Suggests).
+
 Default num_mds is 10, but function will internally set max number of NMDS
 to be n-1 where n is your number of samples.
 }
 \examples{
+\dontshow{if (requireNamespace("vegan", quietly = TRUE)) withAutoprint(\{ # examplesIf}
 data(Snail1KO)
 counts <- as.matrix(Snail1KO$rawCounts)
 counts <- counts[rowSums(counts >= 10) >= 3, ]
@@ -55,4 +86,5 @@ obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
 set.seed(42)
 oc <- PlotOrdCorr(obj, num_mds = 3, meta_cols = "Genotype")
 oc$plot
+\dontshow{\}) # examplesIf}
 }

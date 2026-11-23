@@ -16,8 +16,9 @@ PlotPCA(
 )
 }
 \arguments{
-\item{object}{A \code{GenEDA} object containing PCA results in the
-\code{DimReduction} slot.}
+\item{object}{A \code{GenEDA} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing PCA results in the \code{DimReduction}
+slot.}
 
 \item{x}{Numeric or character. The principal component to plot on the
 x-axis (e.g., 1 or "PC1").}

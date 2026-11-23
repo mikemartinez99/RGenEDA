@@ -3,7 +3,7 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 
 #' geneda S4 class
 #'
-#' @description An S4 container for exploratory genomic data analysis.
+#' @description An S4 container for exploratory analysis of bulk RNA-seq data.
 #' Stores optional raw counts, normalized data, sample metadata,
 #' highly variable genes (HVGs), and PCA dimensionality reduction results.
 #'
@@ -11,8 +11,9 @@ setClassUnion("matrixOrNULL", c("matrix", "NULL"))
 #' @slot normalized Normalized expression matrix (features x samples).
 #' @slot metadata Sample-level metadata `data.frame` (rows = samples).
 #' @slot HVGs Character vector of selected highly variable gene IDs (row names).
-#' @slot DimReduction List for PCA results with `Scores`, `Eigenvectors`,
-#'   `percent_var`.
+#' @slot DimReduction List for PCA results with `Scores` (sample scores),
+#'   `Eigenvectors` (gene loadings, i.e. the rotation matrix) and
+#'   `percent_var` (numeric percent of variance explained per PC).
 #' @slot DEGs List container for differential expression results.
 #'
 #' @exportClass geneda
@@ -104,8 +105,16 @@ setClass(
             errors <- c(
                 errors,
                 paste0(
-                    "'DimReduction' must contain names: Loadings, ",
+                    "'DimReduction' must contain names: Scores, ",
                     "Eigenvectors, percent_var."
+                )
+            )
+        } else if (!is.numeric(object@DimReduction[["percent_var"]])) {
+            errors <- c(
+                errors,
+                paste0(
+                    "'DimReduction$percent_var' must be numeric. Re-run ",
+                    "RunPCA() on objects made with older versions."
                 )
             )
         }

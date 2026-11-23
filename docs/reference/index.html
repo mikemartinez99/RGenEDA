@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,19 +56,19 @@
           <code><a href="DEGs.html">DEGs()</a></code>
 
         </dt>
-        <dd>Access DEGs container</dd>
+        <dd>Access a stored DEG table</dd>
       </dl><dl><dt>
 
           <code><a href="DimReduction.html">DimReduction()</a></code>
 
         </dt>
-        <dd>Access dimensional reduction results list</dd>
+        <dd>Access the PCA results</dd>
       </dl><dl><dt>
 
           <code><a href="ExtractPCA.html">ExtractPCA()</a></code>
 
         </dt>
-        <dd>Extract PCA Loadings and Metadata</dd>
+        <dd>Extract PCA Scores and Metadata</dd>
       </dl><dl><dt>
 
           <code><a href="FilterDEGs.html">FilterDEGs()</a></code>
@@ -104,7 +104,7 @@
           <code><a href="HVGs.html">HVGs()</a></code>
 
         </dt>
-        <dd>Access HVG IDs</dd>
+        <dd>Access the highly variable gene IDs</dd>
       </dl><dl><dt>
 
           <code><a href="PlotCountDist.html">PlotCountDist()</a></code>
@@ -173,6 +173,12 @@
         <dd>PlotVolcano</dd>
       </dl><dl><dt>
 
+          <code><a href="RGenEDA-package.html">RGenEDA</a></code> <code><a href="RGenEDA-package.html">RGenEDA-package</a></code>
+
+        </dt>
+        <dd>RGenEDA: Genomic Exploratory Data Analysis</dd>
+      </dl><dl><dt>
+
           <code><a href="RunPCA.html">RunPCA()</a></code>
 
         </dt>
@@ -188,7 +194,7 @@
           <code><a href="Snail1KO.html">Snail1KO</a></code>
 
         </dt>
-        <dd>Snail1KO dataset</dd>
+        <dd>Snail1KO: RNA-seq counts from Snai1 knock-out HS578T cells</dd>
       </dl><dl><dt>
 
           <code><a href="SummarizeDEGs.html">SummarizeDEGs()</a></code>
@@ -209,6 +215,12 @@
         <dd>extractEigen</dd>
       </dl><dl><dt>
 
+          <code><a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a></code> <code><a href="geneda-SummarizedExperiment.html">coerce,geneda,SummarizedExperiment-method</a></code>
+
+        </dt>
+        <dd>Convert a geneda object to a SummarizedExperiment</dd>
+      </dl><dl><dt>
+
           <code><a href="geneda-class.html">geneda-class</a></code>
 
         </dt>
@@ -224,19 +236,19 @@
           <code><a href="getCounts.html">getCounts()</a></code>
 
         </dt>
-        <dd>Access counts matrix (avoid name clash with DESeq2::counts)</dd>
+        <dd>Access the raw counts matrix</dd>
       </dl><dl><dt>
 
           <code><a href="getMetadata.html">getMetadata()</a></code>
 
         </dt>
-        <dd>Access metadata (avoid name clash with S4 generics)</dd>
+        <dd>Access the sample metadata</dd>
       </dl><dl><dt>
 
           <code><a href="getNormalized.html">getNormalized()</a></code>
 
         </dt>
-        <dd>Access normalized matrix (avoid name clash with generics)</dd>
+        <dd>Access the normalized expression matrix</dd>
       </dl><dl><dt>
 
           <code><a href="show-geneda-method.html">show(<i>&lt;geneda&gt;</i>)</a></code>

@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{getNormalized}
 \alias{getNormalized}
-\title{Access normalized matrix (avoid name clash with generics)}
+\title{Access the normalized expression matrix}
 \usage{
 getNormalized(object)
 }
@@ -13,7 +13,7 @@ getNormalized(object)
 Matrix
 }
 \description{
-Access normalized matrix (avoid name clash with generics)
+Access the normalized expression matrix
 }
 \examples{
 data(Snail1KO)

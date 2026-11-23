@@ -5,9 +5,11 @@
 #' component from a `geneda` object. Genes are selected by absolute eigenvector
 #' loading for the chosen PC, and expression values are Z-score scaled per gene.
 #' Optionally annotate columns with metadata variables and add row annotations
-#' showing gene-level percent variance.
+#' showing each gene's percent contribution to the PC (see
+#' [extractEigen()]).
 #'
-#' @param object A `geneda` object containing normalized expression data and
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing normalized expression data and
 #'   PCA in `DimReduction`.
 #' @param pc Character. Principal component to visualize (e.g., "PC1").
 #' @param n Integer. Number of genes to select by absolute loading (default:
@@ -19,12 +21,12 @@
 #' @param return One of c("object","plot"). If "plot", draws the heatmap via
 #'   grid.
 #'
-#' @return A list with `topGenes` (data.frame with EigenVector and PctVar),
+#' @return A list with `topGenes` (data.frame with EigenVector and
+#'   Contribution),
 #'   `expression` (scaled matrix), and `heatmap` (pheatmap object)
 #'
 #' @importFrom pheatmap pheatmap
 #' @importFrom grDevices colorRampPalette
-#' @import grid
 #' @export
 #'
 #' @examples
@@ -53,7 +55,7 @@ PlotEigenHeatmap <- function(
     annotate_by = NULL,
     annotate_colors = NULL,
     return = c("object", "plot")) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
     return <- match.arg(return)
 
     if (
@@ -66,17 +68,17 @@ PlotEigenHeatmap <- function(
         cli::cli_abort(
             paste0(
                 "DimReduction is missing required entries 'Eigenvectors' ",
-                "and 'Loadings'. Run RunPCA()."
+                "and 'Scores'. Run RunPCA()."
             )
         )
     }
 
-    # Extract gene-level percent variance using extractEigen
+    # Extract gene loadings and contributions using extractEigen
     pc_df <- extractEigen(object, component = pc)
     pc_df$AbsLoading <- abs(pc_df$EigenVector)
     pc_df <- pc_df[order(pc_df$AbsLoading, decreasing = TRUE), ]
     pc_top <- pc_df[
-        seq_len(min(n, nrow(pc_df))), c("Gene", "EigenVector", "PctVar")
+        seq_len(min(n, nrow(pc_df))), c("Gene", "EigenVector", "Contribution")
     ]
     rownames(pc_top) <- pc_top$Gene
 
@@ -112,9 +114,12 @@ PlotEigenHeatmap <- function(
         }
     }
 
-    # Row annotations: Percent Variance
+    # Row annotations: percent contribution to the PC
     annotation_row <- data.frame(
-        PctVar = pc_top[rownames(top_ex), "PctVar", drop = TRUE]
+        Contribution = pc_top[
+            rownames(top_ex), "Contribution",
+            drop = TRUE
+        ]
     )
     rownames(annotation_row) <- rownames(top_ex)
 
@@ -125,8 +130,8 @@ PlotEigenHeatmap <- function(
 
     # Build annotation_colors list for column annotations (if provided)
     annotation_colors_list <- annotate_colors
-    # Note: PctVar is numeric/continuous, pheatmap will use default gradient for
-    # continuous annotations
+    # Note: Contribution is numeric/continuous, so pheatmap uses its default
+    # gradient for it
 
     ph <- pheatmap::pheatmap(
         mat = as.matrix(top_ex),

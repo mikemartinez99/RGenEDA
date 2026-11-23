@@ -30,7 +30,7 @@ test_that("PlotVolcano errors if object is not geneda", {
     dummy_obj <- list()
     expect_error(
         PlotVolcano(dummy_obj, "DEG", 0.05, 1, "Den", "Num"),
-        "methods::is\\(\\object, \\\"geneda\\\"\\) is not TRUE"
+        "must be a <geneda> object or a <SummarizedExperiment>"
     )
 })
 

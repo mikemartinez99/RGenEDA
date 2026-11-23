@@ -4,11 +4,8 @@
 #' `SetDEGs` on your object following differential expression in `DESeq2`.
 #'
 #'
-#' @import ggplot2
-#' @import ggrepel
-#' @import RColorBrewer
-#'
-#' @param object A `geneda` object containing `DEGs` from `SetDEGs` method
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing `DEGs` from `SetDEGs` method
 #' @param assay The DEG slot to use for visualization
 #' @param alpha Threshold for adjusted p-values (padj column from `DESeq2`)
 #' @param l2fc Absolute value log2Fold-change magnitude threshold
@@ -16,8 +13,10 @@
 #' @param title Optional character vector of what plot should be titled.
 #'
 #' @details Thresholds are inclusive (`padj <= alpha`, `|log2FoldChange| >=
-#'   l2fc`),
-#' matching `FilterDEGs()`.
+#'   l2fc`), matching `FilterDEGs()`. Genes with `NA` in `padj` (for example
+#'   genes removed by DESeq2 independent filtering or outlier detection) are
+#'   treated as not significant, drawn at the smallest point size, and never
+#'   labelled.
 #'
 #' @returns A `ggplot2` object
 #' @export
@@ -39,7 +38,7 @@
 #' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
 #' PlotMA(obj, assay = "KO_vs_WT", alpha = 0.05, l2fc = 1)
 PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     if (!assay %in% names(object@DEGs)) {
         cli::cli_abort("Assay {assay} was not found in DEGs slot!")
@@ -52,25 +51,31 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
         }
     }
 
-    requiredCols <- c("log2FoldChange", "baseMean")
-    if (!all(requiredCols %in% colnames(df))) {
-        cli::cli_abort(
-            "log2FoldChange or baseMean or both are missing from DEG table!"
-        )
+    requiredCols <- c("log2FoldChange", "baseMean", "padj")
+    missingCols <- setdiff(requiredCols, colnames(df))
+    if (length(missingCols) > 0L) {
+        missing_str <- paste(missingCols, collapse = ", ")
+        cli::cli_abort("Missing required column(s) in DEG table: {missing_str}")
     }
 
-    df$col <- NA
-    df$col[df$padj <= alpha & abs(df$log2FoldChange) >= l2fc] <- "red"
-    df$col[is.na(df$col)] <- "black"
-
     df$gene <- rownames(df)
+
+    # NA padj (independent filtering / outliers) counts as not significant
+    sigP <- !is.na(df$padj) & df$padj <= alpha
+    df$col <- ifelse(sigP & abs(df$log2FoldChange) >= l2fc, "red", "black")
+    df$col[is.na(df$col)] <- "black"
+    df$negLog10Padj <- -log10(df$padj)
+    df$negLog10Padj[is.na(df$negLog10Padj)] <- 0
+    sigUp <- df[df$col == "red" & df$log2FoldChange > 0, , drop = FALSE]
+    sigDown <- df[df$col == "red" & df$log2FoldChange < 0, , drop = FALSE]
+
 
     cap_pos_yvalue <- max(abs(df$log2FoldChange), na.rm = TRUE) + 0.4
     cap_neg_yvalue <- cap_pos_yvalue / -1
 
     resPlot <- ggplot(
         df,
-        aes(x = baseMean, y = log2FoldChange, fill = col, size = -log10(padj))
+        aes(x = baseMean, y = log2FoldChange, fill = col, size = negLog10Padj)
     ) +
         geom_point(alpha = 0.5, shape = 21) +
         theme_classic() +
@@ -83,20 +88,22 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
             linetype = "dashed",
             linewidth = 0.4
         ) +
-        labs(size = expression("-log"[10] * " adj. P-value)"), fill = "sig") +
-        scale_size(range = c(1, 12)) +
+        labs(fill = "sig") +
         scale_fill_manual(
             name = " ",
             values = c(black = "black", red = "indianred"),
             labels = c(
                 black = "Not. sig.",
-                red = paste0("Adj. P<", alpha, " & |LFC| > ", l2fc)
+                red = paste0("Adj. P <= ", alpha, " & |LFC| >= ", l2fc)
             )
         ) +
-        scale_size(name = "-log10 P-value", range = c(0.5, 12)) +
+        scale_size(
+            name = expression(-log[10] ~ "adj. P-value"),
+            range = c(0.5, 12)
+        ) +
         ylim(cap_neg_yvalue, cap_pos_yvalue) +
         geom_label_repel(
-            data = subset(df, log2FoldChange >= l2fc & padj <= alpha), aes(
+            data = sigUp, aes(
                 label = gene
             ),
             box.padding = 0.35,
@@ -109,7 +116,7 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
             segment.color = "grey50", size = 3.5
         ) +
         geom_label_repel(
-            data = subset(df, log2FoldChange <= -l2fc & padj <= alpha), aes(
+            data = sigDown, aes(
                 label = gene
             ),
             box.padding = 0.35,
@@ -152,6 +159,3 @@ PlotMA <- function(object, assay, alpha, l2fc, title = NULL) {
     return(resPlot)
 }
 
-
-# ggplot2
-# ggrepel

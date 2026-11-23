@@ -4,8 +4,9 @@
 #' formats
 #' including PNG, JPEG, TIFF, BMP, PDF, and SVG.
 #'
-#' @param pheatmap_obj A `pheatmap` object returned by an RGenEDA or pheatmap
-#'   function.
+#' @param pheatmap_obj A heatmap result from an RGenEDA function (a list
+#'   with a `heatmap` element, e.g. from `PlotDistances()` or
+#'   `PlotEigenHeatmap()`), or a `pheatmap` object.
 #' @param filename Character string specifying the path and filename where
 #'   the heatmap should be saved.
 #' @param width Numeric, the width of the output image. Default is 8.
@@ -45,11 +46,33 @@ GenSave <- function(
     units = "in",
     res = 300,
     ...) {
-    pheatmap_obj <- pheatmap_obj$heatmap
+    # Validate all inputs before opening a graphics device
+    if (inherits(pheatmap_obj, "pheatmap")) {
+        gt <- pheatmap_obj$gtable
+    } else if (is.list(pheatmap_obj) && !is.null(pheatmap_obj$heatmap)) {
+        gt <- pheatmap_obj$heatmap$gtable
+    } else {
+        gt <- NULL
+    }
+    if (!inherits(gt, "gtable")) {
+        cli::cli_abort(
+            paste0(
+                "pheatmap object does not contain a gtable. Did you use ",
+                "pheatmap(..., silent = TRUE)?"
+            )
+        )
+    }
 
     # Determine file extension
-    ext <- tools::file_ext(filename)
-    ext <- tolower(ext)
+    ext <- tolower(tools::file_ext(filename))
+    rasterDevices <- list(
+        png = grDevices::png, jpeg = grDevices::jpeg, jpg = grDevices::jpeg,
+        tiff = grDevices::tiff, tif = grDevices::tiff, bmp = grDevices::bmp
+    )
+    vectorDevices <- list(pdf = grDevices::pdf, svg = grDevices::svg)
+    if (!ext %in% c(names(rasterDevices), names(vectorDevices))) {
+        cli::cli_abort("Unsupported file format: {ext}")
+    }
 
     # Vector devices only take inches
     units <- match.arg(units, c("in", "cm", "mm", "px"))
@@ -60,9 +83,9 @@ GenSave <- function(
         "px" = 1 / res
     )
 
-    # Open graphics device based on extension
-    if (ext == "png") {
-        grDevices::png(
+    # Open the graphics device, and always close it again (even on error)
+    if (ext %in% names(rasterDevices)) {
+        rasterDevices[[ext]](
             filename,
             width = width,
             height = height,
@@ -70,66 +93,20 @@ GenSave <- function(
             res = res,
             ...
         )
-    } else if (ext %in% c("jpeg", "jpg")) {
-        grDevices::jpeg(
-            filename,
-            width = width,
-            height = height,
-            units = units,
-            res = res,
-            ...
-        )
-    } else if (ext %in% c("tiff", "tif")) {
-        grDevices::tiff(
-            filename,
-            width = width,
-            height = height,
-            units = units,
-            res = res,
-            ...
-        )
-    } else if (ext == "bmp") {
-        grDevices::bmp(
-            filename,
-            width = width,
-            height = height,
-            units = units,
-            res = res,
-            ...
-        )
-    } else if (ext %in% c("pdf")) {
-        grDevices::pdf(
+    } else {
+        vectorDevices[[ext]](
             filename,
             width = width * toInches,
             height = height * toInches,
             ...
         )
-    } else if (ext %in% c("svg")) {
-        grDevices::svg(
-            filename,
-            width = width * toInches,
-            height = height * toInches,
-            ...
-        )
-    } else {
-        cli::cli_abort("Unsupported file format: {ext}")
     }
+    dev <- grDevices::dev.cur()
+    on.exit(grDevices::dev.off(dev), add = TRUE)
 
-    # Draw the heatmap onto the current device
-    if ("gtable" %in% class(pheatmap_obj$gtable)) {
-        grid::grid.newpage()
-        grid::grid.draw(pheatmap_obj$gtable)
-    } else {
-        cli::cli_abort(
-            paste0(
-                "pheatmap object does not contain a gtable. Did you use ",
-                "pheatmap(..., silent = TRUE)?"
-            )
-        )
-    }
-
-    # Close the device
-    grDevices::dev.off()
+    # Draw the heatmap onto the device
+    grid::grid.newpage()
+    grid::grid.draw(gt)
 
     invisible(filename)
 }

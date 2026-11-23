@@ -14,30 +14,51 @@ PlotDistances(
 )
 }
 \arguments{
-\item{object}{A \code{geneda} object}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}).}
 
 \item{method}{Distance method for stats::dist (default "euclidean")}
 
-\item{reorder}{Logical; if TRUE, reorder rows/cols by hclust on the distance
-matrix. Default TRUE}
+\item{reorder}{Logical; if \code{TRUE} (default), order rows and columns by
+hierarchical clustering of the sample distances and draw dendrograms. If
+\code{FALSE}, keep the sample order of the normalized matrix.}
 
-\item{meta_cols}{Optional character vector of metadata columns to display in
-the title/subtitle for quick reference (no annotation strips are drawn).}
+\item{meta_cols}{Optional character vector of metadata columns to draw as
+column annotation strips above the heatmap.}
 
-\item{palettes}{Optional named list of color vectors that can be used
-downstream (returned) if the caller wants to annotate elsewhere.}
+\item{palettes}{Optional named list of color vectors for the annotation
+strips, one per \code{meta_cols} entry, each named by level (e.g.
+\code{list(Genotype = c(WT = "grey40", KO = "firebrick3"))}). Columns without
+a palette use pheatmap's default colors. Also returned unchanged.}
 
 \item{return}{One of c("object", "plot"). If "plot", draws the heatmap
 immediately via grid and still returns the result list. Default "object".}
 }
 \value{
-A list with elements: dist_matrix, order (character vector of sample
-names), heatmap (pheatmap object), palettes (as passed through)
+A list with elements:
+\describe{
+\item{\code{dist_matrix}}{sample x sample distance matrix, in the plotted
+order.}
+\item{\code{order}}{character vector of sample names in the plotted
+order.}
+\item{\code{heatmap}}{the \code{pheatmap} object.}
+\item{\code{palettes}}{\code{palettes}, as passed in.}
+}
 }
 \description{
 Compute a sample-by-sample distance matrix from a \code{geneda}
-object and plot a ggplot2 heatmap. Optionally subset metadata columns and
-reorder rows/columns by hierarchical clustering.
+object and plot it as a \code{pheatmap} heatmap. Optionally add metadata columns
+as column annotation strips, and order rows and columns by hierarchical
+clustering of the sample distances.
+}
+\details{
+When \code{reorder = TRUE}, samples are clustered once with
+\code{hclust(dist(t(normalized), method), method = "complete")}. The heatmap uses
+these same sample distances for its dendrograms
+(\code{clustering_distance_rows} / \code{clustering_distance_cols}), so the plotted
+order is the same as the returned \code{order}. When \code{reorder = FALSE}, no
+clustering is done, no dendrograms are drawn, and samples are shown in the
+column order of the normalized matrix.
 }
 \examples{
 data(Snail1KO)

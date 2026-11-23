@@ -7,13 +7,16 @@
 RunPCA(object, nfeatures = 2000)
 }
 \arguments{
-\item{object}{A \code{geneda} object}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}).}
 
 \item{nfeatures}{Number of features to use when HVGs are empty. Default =
 2000}
 }
 \value{
-Updated \code{geneda} object with \code{DimReduction} filled
+Updated \code{geneda} object with \code{DimReduction} filled.
+If \code{object} is a \code{SummarizedExperiment}, the same object with the
+results added (see \link{geneda-SummarizedExperiment}).
 }
 \description{
 Uses \code{generatePCs()} under the hood.

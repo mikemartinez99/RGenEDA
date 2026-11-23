@@ -34,7 +34,8 @@ test_that("PlotEigenCorr returns correct structure", {
 
     expect_type(res, "list")
     expect_true(
-        all(c("cor_matrix", "pval_matrix", "stars", "plot") %in% names(res))
+        all(c("cor_matrix", "padj_matrix", "pval_matrix", "stars",
+            "p_adjust_method", "plot") %in% names(res))
     )
     expect_equal(dim(res$cor_matrix), c(ncol(obj@metadata), 2))
     expect_equal(dim(res$pval_matrix), c(ncol(obj@metadata), 2))
@@ -166,4 +167,71 @@ test_that("PlotEigenCorr keeps Pearson correlation for two-level factors", {
         as.numeric(factor(obj@metadata$condition))
     )
     expect_equal(res$cor_matrix["condition", "PC1"], expected)
+})
+
+#----- Multiple-testing correction
+create_padj_geneda <- function() {
+    set.seed(7)
+    mat <- matrix(rnorm(8 * 5), nrow = 5)
+    colnames(mat) <- paste0("S", 1:8)
+    rownames(mat) <- paste0("Gene", 1:5)
+    meta <- data.frame(
+        x1 = c(1, 2, 3, 4, 5, 6, 7, 8),
+        x2 = c(2, 1, 4, 3, 6, 5, 8, 7),
+        x3 = c(5, 3, 8, 1, 7, 2, 6, 4),
+        row.names = colnames(mat)
+    )
+    obj <- GenEDA(normalized = mat, metadata = meta)
+    scores <- data.frame(
+        PC1 = c(1.1, 2.3, 2.9, 4.2, 5.1, 5.8, 7.2, 8.1),
+        PC2 = c(3, -1, 2, 0, -2, 1, 4, -3),
+        PC3 = c(0.5, 0.1, -0.2, 0.9, -1, 0.3, 0.2, -0.4),
+        row.names = colnames(mat)
+    )
+    obj@DimReduction <- list(Scores = scores)
+    obj
+}
+
+test_that("PlotEigenCorr adjusts p-values across all PC x covariate cells", {
+    obj <- create_padj_geneda()
+    res <- PlotEigenCorr(obj, num_pcs = 3)
+
+    expect_equal(res$p_adjust_method, "BH")
+    expect_equal(dim(res$padj_matrix), dim(res$pval_matrix))
+    expect_equal(dimnames(res$padj_matrix), dimnames(res$pval_matrix))
+    expect_equal(
+        as.vector(res$padj_matrix),
+        stats::p.adjust(as.vector(res$pval_matrix), method = "BH")
+    )
+    expect_true(all(res$padj_matrix >= res$pval_matrix))
+})
+
+test_that("PlotEigenCorr stars and plot use adjusted p-values", {
+    obj <- create_padj_geneda()
+    res <- PlotEigenCorr(obj, num_pcs = 3, p_adjust_method = "bonferroni")
+    expected <- ifelse(res$padj_matrix < 0.001, "***",
+        ifelse(res$padj_matrix < 0.01, "**",
+            ifelse(res$padj_matrix < 0.05, "*", "")))
+    expect_equal(res$stars, expected)
+
+    # x1 vs PC1 is significant before correction but the stars follow padj
+    expect_lt(res$pval_matrix["x1", "PC1"], 0.05)
+    pd <- res$plot$data
+    cell <- pd$Meta == "x1" & pd$PC == "PC1"
+    expect_equal(pd$PAdj[cell], res$padj_matrix[["x1", "PC1"]])
+    expect_equal(pd$Stars[cell], res$stars[["x1", "PC1"]])
+    expect_match(res$plot$labels$caption, "bonferroni")
+})
+
+test_that("PlotEigenCorr does not allow p_adjust_method = 'none'", {
+    expect_error(
+        PlotEigenCorr(create_padj_geneda(), p_adjust_method = "none"),
+        "must be one of"
+    )
+})
+
+test_that("PlotEigenCorr rejects unknown p_adjust_method", {
+    expect_error(
+        PlotEigenCorr(create_padj_geneda(), p_adjust_method = "magic")
+    )
 })

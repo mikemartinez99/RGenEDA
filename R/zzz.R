@@ -7,7 +7,7 @@ if (getRversion() >= "2.15.1") {
             "Gene", "Sample", "Count", "Index", "Variance", "x", "label",
             "PC", "Meta", "Stars", "Correlation", "Axis", "baseMean",
             "log2FoldChange", "padj", "gene", "Group", "pvalue", "p_group",
-            "bin", "mid"
+            "bin", "mid", "count", "negLog10Padj"
         )
     )
 }

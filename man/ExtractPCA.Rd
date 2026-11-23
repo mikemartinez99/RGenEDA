@@ -2,33 +2,32 @@
 % Please edit documentation in R/PCA_Functions.R
 \name{ExtractPCA}
 \alias{ExtractPCA}
-\title{Extract PCA Loadings and Metadata}
+\title{Extract PCA Scores and Metadata}
 \usage{
 ExtractPCA(object)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing PCA results in the
-\code{DimReduction} slot
-and sample-level metadata in the \code{metadata} slot.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing PCA results in the \code{DimReduction}
+slot and sample-level metadata in the \code{metadata} slot.}
 }
 \value{
-A \code{data.frame} combining PCA loadings and sample metadata, where rows
-correspond
-to samples and columns include principal component loadings and metadata
-fields.
+A \code{data.frame} combining PCA scores and sample metadata, where rows
+correspond to samples and columns include principal component scores and
+metadata fields.
 }
 \description{
-This function extracts PCA loadings stored in the \code{DimReduction} slot of a
+This function extracts the PCA sample scores (\code{DimReduction$Scores}) of a
 \code{geneda} object and combines them with the associated metadata. It ensures
-that the metadata has valid rownames and aligns the PCA loadings accordingly.
+that the metadata has valid rownames and aligns the PCA scores accordingly.
 }
 \details{
 The function performs several checks:
 \itemize{
 \item Ensures the input object is of class \code{geneda}.
-\item Verifies that the \code{DimReduction} slot contains PCA loadings.
+\item Verifies that the \code{DimReduction} slot contains PCA scores.
 \item Confirms that the metadata has valid rownames.
-\item Reorders the PCA loadings to match the order of metadata rows.
+\item Reorders the PCA scores to match the order of metadata rows.
 }
 
 If metadata rownames are missing or invalid, the function throws an error.

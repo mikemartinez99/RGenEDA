@@ -8,7 +8,8 @@
 #'   2. MA plot
 #'   3. Volcano plot
 #'
-#' @param object A `geneda` object containing DEGs in the DEGs slot.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing DEGs in the DEGs slot.
 #' @param assay Character. Name of the assay to visualize.
 #' @param alpha Numeric. Significance threshold for highlighting p-values and
 #'   DEGs (default 0.05).
@@ -20,8 +21,6 @@
 #'   If `NULL` (default), the legend uses "denominator".
 #'
 #' @return A `patchwork` object combining plots.
-#' @import ggplot2
-#' @import patchwork
 #' @export
 #'
 #' @examplesIf requireNamespace("DESeq2", quietly = TRUE)
@@ -53,7 +52,7 @@ DEDashboard <- function(
     l2fc = 1,
     num = NULL,
     den = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     if (!assay %in% names(object@DEGs)) {
         cli::cli_abort("Assay {assay} was not found in DEGs slot!")

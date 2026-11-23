@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{DEGs}
 \alias{DEGs}
-\title{Access DEGs container}
+\title{Access a stored DEG table}
 \usage{
 DEGs(object, assay)
 }
@@ -15,7 +15,7 @@ DEGs(object, assay)
 The DEG data.frame stored under \code{assay}, or NULL if it is not set
 }
 \description{
-Access DEGs container
+Access a stored DEG table
 }
 \examples{
 \dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}

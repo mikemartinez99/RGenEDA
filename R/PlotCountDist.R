@@ -5,17 +5,14 @@
 #' of normalized or VST-transformed RNA-Seq counts for each sample in a
 #' `geneda` object. Optionally, plots can be faceted by a metadata variable.
 #'
-#' @param object A `geneda` object containing normalized expression values in
-#'   `@normalized`
-#'               and sample metadata in `@metadata`.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing normalized expression values in
+#'   `@normalized` and sample metadata in `@metadata`.
 #' @param split_by Character. Optional column name from `object@metadata` used
 #'                 for faceting (default: NULL, no faceting).
 #'
 #' @return A ggplot2 object displaying the distribution of counts per sample.
 #'
-#' @import ggplot2
-#' @import dplyr
-#' @import tidyr
 #' @export
 #'
 #' @examples
@@ -29,7 +26,7 @@
 #' PlotCountDist(obj)
 #' PlotCountDist(obj, split_by = "Genotype")
 PlotCountDist <- function(object, split_by = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     # Convert normalized matrix to long format
     counts_long <- as.data.frame(object@normalized) |>

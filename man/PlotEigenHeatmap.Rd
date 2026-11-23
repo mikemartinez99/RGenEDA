@@ -14,7 +14,8 @@ PlotEigenHeatmap(
 )
 }
 \arguments{
-\item{object}{A \code{geneda} object containing normalized expression data and
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing normalized expression data and
 PCA in \code{DimReduction}.}
 
 \item{pc}{Character. Principal component to visualize (e.g., "PC1").}
@@ -32,7 +33,8 @@ Names should match \code{annotate_by}.}
 grid.}
 }
 \value{
-A list with \code{topGenes} (data.frame with EigenVector and PctVar),
+A list with \code{topGenes} (data.frame with EigenVector and
+Contribution),
 \code{expression} (scaled matrix), and \code{heatmap} (pheatmap object)
 }
 \description{
@@ -40,7 +42,8 @@ Generates a pheatmap of the top genes contributing to a specific principal
 component from a \code{geneda} object. Genes are selected by absolute eigenvector
 loading for the chosen PC, and expression values are Z-score scaled per gene.
 Optionally annotate columns with metadata variables and add row annotations
-showing gene-level percent variance.
+showing each gene's percent contribution to the PC (see
+\code{\link[=extractEigen]{extractEigen()}}).
 }
 \examples{
 data(Snail1KO)

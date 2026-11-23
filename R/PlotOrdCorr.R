@@ -1,12 +1,17 @@
 #' Plot Ordination Correlations With Metadata Heatmap
 #'
-#' @description Calculate correlations between NMDS ordination axes (from beta
-#' diversity distances) and metadata, and plot a ggplot2 heatmap with numeric
-#' labels and significance stars.
+#' @description Calculate correlations between NMDS ordination axes (from a
+#' sample dissimilarity matrix, Bray-Curtis by default) and metadata, and plot a
+#' ggplot2 heatmap with numeric labels and significance stars.
 #'
-#' For continuous variables, Pearson correlation is used. P values follow this
-#' convention: p < 0.001, p < 0.01, p < 0.05 = three, two, one stars,
-#' respectively.
+#' For continuous variables, Pearson correlation is used.
+#'
+#' Every NMDS axis x covariate cell is a separate test, so p-values are
+#' adjusted for multiple testing with [stats::p.adjust()] across all tested
+#' cells (method `p_adjust_method`, default Benjamini-Hochberg). The
+#' significance stars on the heatmap use the adjusted p-values: padj < 0.001,
+#' < 0.01, < 0.05 = three, two, one stars, respectively. With few samples
+#' these tests have little power, so treat the results as exploratory.
 #'
 #' Two-level categorical variables are coded by factor level order, so the sign
 #' of the correlation follows the level order. Categorical variables with more
@@ -18,28 +23,42 @@
 #' values, or no residual degrees of freedom, e.g. a sample ID column) are
 #' dropped.
 #'
+#' Requires the `vegan` package (in Suggests).
+#'
 #' Default num_mds is 10, but function will internally set max number of NMDS
 #' to be n-1 where n is your number of samples.
 #'
-#' @import ggplot2
-#' @import RColorBrewer
-#' @import grid
-#' @import vegan
 #' @importFrom stats as.dist cor dist
 #'
-#' @param object A `geneda` object containing `normalized` and `metadata`.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing `normalized` and `metadata`.
 #' @param num_mds Number of NMDS axes to correlate. Default = 10
 #' @param meta_cols Optional character vector of metadata column names to
 #'   include.
 #'   Defaults to all metadata columns.
-#' @param distance Distance metric for `vegdist` (default "bray").
+#' @param distance Distance metric for `vegan::vegdist()` (default "bray").
+#' @param p_adjust_method Multiple-testing correction passed to
+#'   [stats::p.adjust()]: one of `"BH"` (default), `"BY"`, `"fdr"`,
+#'   `"holm"`, `"hochberg"`, `"hommel"` or `"bonferroni"`. `"none"` is not
+#'   allowed: raw p-values are always returned in `pval_matrix`, and the plot
+#'   always uses adjusted p-values.
 #'
-#' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot),
-#' and variance explained (squared correlations between ordination distances and
-#' observed dissimilarities.)
+#' @returns A list with elements:
+#'   \describe{
+#'     \item{`cor_matrix`}{correlation (or multiple correlation R) per
+#'       covariate x NMDS axis.}
+#'     \item{`padj_matrix`}{adjusted p-values (`p_adjust_method`). These are
+#'       the values used for the stars and the plot.}
+#'     \item{`pval_matrix`}{unadjusted p-values, for reference.}
+#'     \item{`stars`}{significance stars from `padj_matrix`.}
+#'     \item{`p_adjust_method`}{the correction method used.}
+#'     \item{`plot`}{the heatmap (`ggplot`).}
+#'     \item{`variance_explained`}{squared correlations between ordination
+#'       distances and observed dissimilarities, per NMDS axis.}
+#'   }
 #' @export
 #'
-#' @examples
+#' @examplesIf requireNamespace("vegan", quietly = TRUE)
 #' data(Snail1KO)
 #' counts <- as.matrix(Snail1KO$rawCounts)
 #' counts <- counts[rowSums(counts >= 10) >= 3, ]
@@ -54,8 +73,19 @@ PlotOrdCorr <- function(
     object,
     num_mds = 10,
     meta_cols = NULL,
-    distance = "bray") {
-    stopifnot(methods::is(object, "geneda"))
+    distance = "bray",
+    p_adjust_method = "BH") {
+    object <- .toGeneda(object)
+    p_adjust_method <- .checkAdjustMethod(p_adjust_method)
+
+    if (!requireNamespace("vegan", quietly = TRUE)) {
+        cli::cli_abort(
+            paste0(
+                "PlotOrdCorr() needs the 'vegan' package. Install it with ",
+                "install.packages(\"vegan\")."
+            )
+        )
+    }
 
     MAT <- object@normalized
     META <- object@metadata
@@ -153,12 +183,11 @@ PlotOrdCorr <- function(
     cor_matrix <- cor_matrix[keep, , drop = FALSE]
     pval_matrix <- pval_matrix[keep, , drop = FALSE]
 
-    #----- Create significance stars based on p-value thresholds
-    stars <- ifelse(pval_matrix < 0.001, "***",
-        ifelse(pval_matrix < 0.01, "**",
-            ifelse(pval_matrix < 0.05, "*", "")
-        )
-    )
+    #----- Adjust p-values across all tested axis x covariate cells, and
+    #----- create significance stars from the adjusted values
+    adj <- .adjustAndStar(pval_matrix, p_adjust_method)
+    padj_matrix <- adj$padj
+    stars <- adj$stars
 
     #----- Prepare data for ggplot (long format)
     df <- expand.grid(
@@ -170,6 +199,7 @@ PlotOrdCorr <- function(
     col_idx <- match(df$Axis, colnames(cor_matrix))
     df$Correlation <- cor_matrix[cbind(row_idx, col_idx)]
     df$PValue <- pval_matrix[cbind(row_idx, col_idx)]
+    df$PAdj <- padj_matrix[cbind(row_idx, col_idx)]
     df$Stars <- stars[cbind(row_idx, col_idx)]
 
     #----- Set colors similar to RdBu reversed
@@ -193,13 +223,16 @@ PlotOrdCorr <- function(
             axis.text.y = element_text(face = "bold"),
             axis.title.x = element_blank(),
             axis.title.y = element_blank()
-        )
+        ) +
+        labs(caption = .starsCaption(p_adjust_method))
 
     #----- Return ord-correlation data and plot
     return(list(
         cor_matrix = cor_matrix,
+        padj_matrix = padj_matrix,
         pval_matrix = pval_matrix,
         stars = stars,
+        p_adjust_method = p_adjust_method,
         plot = p,
         variance_explained = var_explained
     ))

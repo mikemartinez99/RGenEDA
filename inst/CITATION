@@ -1,0 +1,28 @@
+citHeader("To cite RGenEDA in publications, please use:")
+
+bibentry(
+    bibtype = "Misc",
+    title = "RGenEDA (R package) v1",
+    author = person("Michael J.", "Martinez"),
+    year = "2025",
+    publisher = "protocols.io",
+    doi = "10.17504/protocols.io.bp2l6z6rdgqe/v1",
+    textVersion = paste0(
+        "Martinez MJ (2025). RGenEDA (R package) v1. protocols.io. ",
+        "doi:10.17504/protocols.io.bp2l6z6rdgqe/v1"
+    )
+)
+
+bibentry(
+    bibtype = "Manual",
+    title = "RGenEDA: Genomic Exploratory Data Analysis",
+    author = person("Michael", "Martinez"),
+    year = format(Sys.Date(), "%Y"),
+    note = paste("R package version", meta$Version),
+    url = "https://github.com/mikemartinez99/RGenEDA",
+    textVersion = paste0(
+        "Martinez M (", format(Sys.Date(), "%Y"), "). RGenEDA: Genomic ",
+        "Exploratory Data Analysis. R package version ", meta$Version, ". ",
+        "https://github.com/mikemartinez99/RGenEDA"
+    )
+)

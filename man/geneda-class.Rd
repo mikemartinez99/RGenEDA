@@ -5,7 +5,7 @@
 \alias{geneda-class}
 \title{geneda S4 class}
 \description{
-An S4 container for exploratory genomic data analysis.
+An S4 container for exploratory analysis of bulk RNA-seq data.
 Stores optional raw counts, normalized data, sample metadata,
 highly variable genes (HVGs), and PCA dimensionality reduction results.
 }
@@ -20,8 +20,9 @@ highly variable genes (HVGs), and PCA dimensionality reduction results.
 
 \item{\code{HVGs}}{Character vector of selected highly variable gene IDs (row names).}
 
-\item{\code{DimReduction}}{List for PCA results with \code{Scores}, \code{Eigenvectors},
-\code{percent_var}.}
+\item{\code{DimReduction}}{List for PCA results with \code{Scores} (sample scores),
+\code{Eigenvectors} (gene loadings, i.e. the rotation matrix) and
+\code{percent_var} (numeric percent of variance explained per PC).}
 
 \item{\code{DEGs}}{List container for differential expression results.}
 }}

@@ -7,7 +7,8 @@
 PlotHVGVariance(object, transform = NULL, dropTopN = 0)
 }
 \arguments{
-\item{object}{A \code{geneda} object created by \code{GenEDA()}.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) created by \code{GenEDA()}.}
 
 \item{transform}{One of c("log") to log-transform variance, or NULL for
 none. Default = NULL}

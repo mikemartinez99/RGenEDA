@@ -13,7 +13,7 @@ be stored with different assay names."><meta property="og:image" content="https:
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,7 +59,8 @@ be stored with different assay names.</p>
 
 
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
-<dd><p>A <code>geneda</code> object with a DEG table set via <code><a href="SetDEGs.html">SetDEGs()</a></code></p></dd>
+<dd><p>A <code>geneda</code> object (or a <code>SummarizedExperiment</code>; see
+<a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>) with a DEG table set via <code><a href="SetDEGs.html">SetDEGs()</a></code></p></dd>
 
 
 <dt id="arg-assay">assay<a class="anchor" aria-label="anchor" href="#arg-assay"></a></dt>
@@ -82,7 +83,9 @@ be stored with different assay names.</p>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Updated <code>geneda</code> object with filtered results stored in
-<code>DEGs[[saveAssay]]</code></p>
+<code>DEGs[[saveAssay]]</code>.
+If <code>object</code> is a <code>SummarizedExperiment</code>, the same object with the
+results added (see <a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>).</p>
     </div>
 
     <div class="section level2">

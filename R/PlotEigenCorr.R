@@ -3,8 +3,13 @@
 #' @description Calculate Eigen-correlations from a `geneda` object and plot a
 #' publication-quality heatmap using ggplot2 with numeric labels and
 #' significance stars. For continuous variables, Pearson correlation is used.
-#' P values follow this convention: p < 0.001, p < 0.01, p < 0.05 = three, two,
-#' one stars, respectively.
+#'
+#' Every PC x covariate cell is a separate test, so p-values are adjusted for
+#' multiple testing with [stats::p.adjust()] across all tested cells (method
+#' `p_adjust_method`, default Benjamini-Hochberg). The significance stars on
+#' the heatmap use the adjusted p-values: padj < 0.001, < 0.01, < 0.05 = three,
+#' two, one stars, respectively. With few samples (e.g. n = 6) these tests
+#' have little power, so treat the results as exploratory.
 #'
 #' Two-level categorical variables are coded by factor level order, so the sign
 #' of the correlation follows the level order. Categorical variables with more
@@ -18,19 +23,32 @@
 #'
 #' Requires PCA scores in `DimReduction(object)`; does not recompute PCA.
 #'
-#' @import ggplot2
-#' @import RColorBrewer
-#' @import grid
 #' @importFrom stats prcomp cor.test na.omit var as.formula
 #'
-#' @param object A `geneda` object containing `normalized` and `metadata`, and
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing `normalized` and `metadata`, and
 #'   optionally `DimReduction` scores.
 #' @param num_pcs Number of principal components to correlate.
 #' @param meta_cols Optional character vector of metadata column names to
 #'   include.
 #'   Defaults to all metadata columns.
+#' @param p_adjust_method Multiple-testing correction passed to
+#'   [stats::p.adjust()]: one of `"BH"` (default), `"BY"`, `"fdr"`,
+#'   `"holm"`, `"hochberg"`, `"hommel"` or `"bonferroni"`. `"none"` is not
+#'   allowed: raw p-values are always returned in `pval_matrix`, and the plot
+#'   always uses adjusted p-values.
 #'
-#' @returns A list with elements: cor_matrix, pval_matrix, stars, plot (ggplot)
+#' @returns A list with elements:
+#'   \describe{
+#'     \item{`cor_matrix`}{correlation (or multiple correlation R) per
+#'       covariate x PC.}
+#'     \item{`padj_matrix`}{adjusted p-values (`p_adjust_method`). These are
+#'       the values used for the stars and the plot.}
+#'     \item{`pval_matrix`}{unadjusted p-values, for reference.}
+#'     \item{`stars`}{significance stars from `padj_matrix`.}
+#'     \item{`p_adjust_method`}{the correction method used.}
+#'     \item{`plot`}{the heatmap (`ggplot`).}
+#'   }
 #' @export
 #'
 #' @examples
@@ -45,8 +63,13 @@
 #' obj <- RunPCA(obj)
 #' ec <- PlotEigenCorr(obj, num_pcs = 5, meta_cols = "Genotype")
 #' ec$plot
-PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+PlotEigenCorr <- function(
+    object,
+    num_pcs = 10,
+    meta_cols = NULL,
+    p_adjust_method = "BH") {
+    object <- .toGeneda(object)
+    p_adjust_method <- .checkAdjustMethod(p_adjust_method)
 
     MAT <- object@normalized
     META <- object@metadata
@@ -118,12 +141,11 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
     cor_matrix <- cor_matrix[keep, , drop = FALSE]
     pval_matrix <- pval_matrix[keep, , drop = FALSE]
 
-    #----- Create significance stars based on p-value thresholds
-    stars <- ifelse(pval_matrix < 0.001, "***",
-        ifelse(pval_matrix < 0.01, "**",
-            ifelse(pval_matrix < 0.05, "*", "")
-        )
-    )
+    #----- Adjust p-values across all tested PC x covariate cells, and
+    #----- create significance stars from the adjusted values
+    adj <- .adjustAndStar(pval_matrix, p_adjust_method)
+    padj_matrix <- adj$padj
+    stars <- adj$stars
 
     #----- Prepare data for ggplot (long format)
     df <- expand.grid(
@@ -137,6 +159,7 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
     col_idx <- match(df$PC, colnames(cor_matrix))
     df$Correlation <- cor_matrix[cbind(row_idx, col_idx)]
     df$PValue <- pval_matrix[cbind(row_idx, col_idx)]
+    df$PAdj <- padj_matrix[cbind(row_idx, col_idx)]
     df$Stars <- stars[cbind(row_idx, col_idx)]
 
     #----- Set colors similar to RdBu reversed
@@ -160,13 +183,16 @@ PlotEigenCorr <- function(object, num_pcs = 10, meta_cols = NULL) {
             axis.text.y = element_text(face = "bold"),
             axis.title.x = element_blank(),
             axis.title.y = element_blank(),
-        )
+        ) +
+        labs(caption = .starsCaption(p_adjust_method))
 
     #----- Return eigencorrelation data and plot
     return(list(
         cor_matrix = cor_matrix,
+        padj_matrix = padj_matrix,
         pval_matrix = pval_matrix,
         stars = stars,
+        p_adjust_method = p_adjust_method,
         plot = p
     ))
 }

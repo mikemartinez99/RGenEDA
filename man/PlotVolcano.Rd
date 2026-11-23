@@ -7,7 +7,8 @@
 PlotVolcano(object, assay, alpha, l2fc, den = NULL, num = NULL, title = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing \code{DEGs} from \code{SetDEGs} method}
 
 \item{assay}{The DEG slot to use for visualization}
 

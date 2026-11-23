@@ -21,7 +21,7 @@ create_test_geneda <- function() {
         PC2 = c(-0.3, 0.6, 0.2)
     )
     rownames(eigenvectors) <- rownames(mat)
-    percent_var <- c(PC1 = "50%", PC2 = "30%")
+    percent_var <- c(PC1 = 50, PC2 = 30)
 
     obj@DimReduction <- list(
         Eigenvectors = eigenvectors,
@@ -37,15 +37,29 @@ test_that("extractEigen returns a data.frame", {
     res <- extractEigen(obj, "PC1")
 
     expect_s3_class(res, "data.frame")
-    expect_true(all(c("Gene", "EigenVector", "PctVar") %in% colnames(res)))
+    expect_true(
+        all(c("Gene", "EigenVector", "Contribution") %in% colnames(res))
+    )
 })
 
-test_that("extractEigen computes PctVar correctly", {
+test_that("extractEigen computes Contribution correctly", {
     obj <- create_test_geneda()
 
     res <- extractEigen(obj, "PC1")
 
-    expect_equal(sum(res$PctVar), 100)
+    v <- obj@DimReduction$Eigenvectors$PC1
+    expect_equal(sum(res$Contribution), 100)
+    expect_equal(res$Contribution, 100 * v^2 / sum(v^2))
+    expect_false("PctVar" %in% colnames(res))
+})
+
+test_that("extractEigen Contribution does not depend on PC variance", {
+    obj <- create_test_geneda()
+    res1 <- extractEigen(obj, "PC1")
+    obj@DimReduction$percent_var <- c(PC1 = 5, PC2 = 30)
+    res2 <- extractEigen(obj, "PC1")
+
+    expect_equal(res1$Contribution, res2$Contribution)
 })
 
 test_that("extractEigen preserves gene names", {

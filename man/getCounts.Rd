@@ -2,7 +2,7 @@
 % Please edit documentation in R/accessors.R
 \name{getCounts}
 \alias{getCounts}
-\title{Access counts matrix (avoid name clash with DESeq2::counts)}
+\title{Access the raw counts matrix}
 \usage{
 getCounts(object)
 }
@@ -13,7 +13,7 @@ getCounts(object)
 Matrix or NULL
 }
 \description{
-Access counts matrix (avoid name clash with DESeq2::counts)
+Access the raw counts matrix
 }
 \examples{
 data(Snail1KO)

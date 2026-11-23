@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,6 +35,51 @@
       <small>Source: <a href="https://github.com/mikemartinez99/RGenEDA/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.99.1" id="rgeneda-0991">RGenEDA 0.99.1<a class="anchor" aria-label="anchor" href="#rgeneda-0991"></a></h2>
+<div class="section level3">
+<h3 id="breaking-changes-0-99-1">Breaking changes<a class="anchor" aria-label="anchor" href="#breaking-changes-0-99-1"></a></h3>
+<ul><li>
+<code><a href="../reference/extractEigen.html">extractEigen()</a></code> and <code><a href="../reference/PlotEigenHeatmap.html">PlotEigenHeatmap()</a></code>: the <code>PctVar</code> column and row annotation are renamed to <code>Contribution</code>. The value is each gene’s percent share of the PC’s squared loadings (<code>100 * v^2 / sum(v^2)</code>), not the percent of variance it explains. The values are unchanged.</li>
+<li>
+<code>DimReduction$percent_var</code> is now a named numeric vector of percents (e.g. <code>85.43</code>) instead of strings such as <code>"85.43 %"</code>. <code><a href="../reference/PlotPCA.html">PlotPCA()</a></code> and <code><a href="../reference/PlotScree.html">PlotScree()</a></code> use it directly, and the validity check rejects non-numeric values. Re-run <code><a href="../reference/RunPCA.html">RunPCA()</a></code> on objects saved with older versions.</li>
+<li>Imports use <code>importFrom()</code> only. <code>grDevices</code> was added to <code>Imports</code>, and <code>scales</code> was removed. <code>vegan</code> moved to <code>Suggests</code>: <code><a href="../reference/PlotOrdCorr.html">PlotOrdCorr()</a></code> needs it installed.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="behaviour-changes-0-99-1">Behaviour changes<a class="anchor" aria-label="anchor" href="#behaviour-changes-0-99-1"></a></h3>
+<ul><li>
+<code><a href="../reference/PlotEigenCorr.html">PlotEigenCorr()</a></code> adjusts p-values for multiple testing with <code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust()</a></code> (new argument <code>p_adjust_method</code>, default <code>"BH"</code>). It returns <code>padj_matrix</code> and uses it for the stars and the plot. Raw p-values are still in <code>pval_matrix</code>.</li>
+<li>
+<code><a href="../reference/PlotOrdCorr.html">PlotOrdCorr()</a></code> uses the same multiple-testing correction (<code>p_adjust_method</code>, default <code>"BH"</code>) and returns <code>padj_matrix</code>.</li>
+<li>
+<code>p_adjust_method</code> in <code><a href="../reference/PlotEigenCorr.html">PlotEigenCorr()</a></code> and <code><a href="../reference/PlotOrdCorr.html">PlotOrdCorr()</a></code> no longer accepts <code>"none"</code>. Raw p-values and padj are always both returned, and the plots always use padj.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-features-0-99-1">New features<a class="anchor" aria-label="anchor" href="#new-features-0-99-1"></a></h3>
+<ul><li>Added <code>as(object, "SummarizedExperiment")</code> to convert a <code>geneda</code> object (with its HVGs, PCA and DEG tables) to a <code>SummarizedExperiment</code>. <code><a href="../reference/as.geneda.html">as.geneda()</a></code> reads that layout back, so the round trip is lossless.</li>
+<li>All main functions accept a <code>SummarizedExperiment</code> (including <code>DESeqDataSet</code> and <code>DESeqTransform</code>) directly. <code><a href="../reference/FindVariableFeatures.html">FindVariableFeatures()</a></code>, <code><a href="../reference/RunPCA.html">RunPCA()</a></code>, <code><a href="../reference/SetDEGs.html">SetDEGs()</a></code> and <code><a href="../reference/FilterDEGs.html">FilterDEGs()</a></code> return the input object with the results added.</li>
+<li>
+<code><a href="../reference/as.geneda.html">as.geneda()</a></code> uses an assay named <code>"normalized"</code> when there is one.</li>
+<li>Added <code>inst/scripts/make-Snail1KO.R</code>, which rebuilds the <code>Snail1KO</code> dataset from Expression Atlas (E-MTAB-5244). <code><a href="../reference/Snail1KO.html">?Snail1KO</a></code> now gives the dimensions, organism and cell line, gene ID type, processing and licence (CC BY 4.0).</li>
+<li>Added a package man page (<code><a href="../reference/RGenEDA-package.html">?RGenEDA</a></code>) and <code>inst/CITATION</code> (<code>citation("RGenEDA")</code>). Cleaned up the accessor titles and removed references to functions that do not exist from the <code><a href="../reference/generatePCs.html">generatePCs()</a></code> and <code><a href="../reference/FindVariableFeatures.html">FindVariableFeatures()</a></code> docs.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-and-documentation-0-99-1">Bug fixes and documentation<a class="anchor" aria-label="anchor" href="#bug-fixes-and-documentation-0-99-1"></a></h3>
+<ul><li>Consistent PCA terms: “scores” for samples (<code>DimReduction$Scores</code>, <code><a href="../reference/ExtractPCA.html">ExtractPCA()</a></code>) and “loadings” (rotation) for genes (<code>DimReduction$Eigenvectors</code>). Fixed stale references to a <code>Loadings</code> element in the validity check, the <code><a href="../reference/PlotEigenHeatmap.html">PlotEigenHeatmap()</a></code> error and the <code><a href="../reference/DimReduction.html">DimReduction()</a></code> / <code><a href="../reference/generatePCs.html">generatePCs()</a></code> docs.</li>
+<li>
+<code><a href="../reference/PlotMA.html">PlotMA()</a></code>: <code>padj</code> is now a required column. <code>NA</code> values in <code>padj</code> are treated as not significant (smallest point, never labelled). The duplicate <code>scale_size()</code> was removed, and the legend now shows the inclusive thresholds.</li>
+<li>
+<code><a href="../reference/PlotPCA.html">PlotPCA()</a></code> no longer uses the deprecated <code>aes_string()</code>.</li>
+<li>
+<code><a href="../reference/GenSave.html">GenSave()</a></code> checks its input before it opens a graphics device, and always closes the device (even on error). It also accepts a plain <code>pheatmap</code> object.</li>
+<li>
+<code><a href="../reference/SetDEGs.html">SetDEGs()</a></code> now rejects DEG tables with automatic row names (<code>1</code>, <code>2</code>, …). The old <code>is.null(rownames())</code> check could never be true.</li>
+<li>Gene variances are computed with <code>MatrixGenerics::rowVars()</code> (<code>MatrixGenerics</code> added to Imports).</li>
+<li>
+<code><a href="../reference/PlotDistances.html">PlotDistances()</a></code>: the heatmap now clusters on the sample distances, so the plotted order matches the returned <code>order</code>. <code>reorder = FALSE</code> now turns off clustering in the plot. The docs are corrected: it is a pheatmap, and <code>meta_cols</code> are drawn as annotation strips.</li>
+<li>Documentation now states the scope as bulk RNA-seq (DESeq2 workflow) instead of “multiple omics data types”. Outdated vignette text and typos fixed.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.99.0" id="rgeneda-0990">RGenEDA 0.99.0<a class="anchor" aria-label="anchor" href="#rgeneda-0990"></a></h2>
 <ul><li>Renumbered to 0.99.0 for Bioconductor submission (continues from 2.1.0).</li>

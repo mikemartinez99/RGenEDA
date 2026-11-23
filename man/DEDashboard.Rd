@@ -7,7 +7,8 @@
 DEDashboard(object, assay, alpha = 0.05, l2fc = 1, num = NULL, den = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing DEGs in the DEGs slot.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing DEGs in the DEGs slot.}
 
 \item{assay}{Character. Name of the assay to visualize.}
 

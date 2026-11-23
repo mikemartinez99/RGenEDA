@@ -7,15 +7,18 @@
 FindVariableFeatures(object, nfeatures)
 }
 \arguments{
-\item{object}{A \code{geneda} object}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}).}
 
 \item{nfeatures}{Number of HVGs to store}
 }
 \value{
-Updated \code{geneda} object
+Updated \code{geneda} object.
+If \code{object} is a \code{SummarizedExperiment}, the same object with the
+results added (see \link{geneda-SummarizedExperiment}).
 }
 \description{
-Computes per-feature variance on \code{normalized(object)}, ranks genes by
+Computes per-feature variance on \code{getNormalized(object)}, ranks genes by
 decreasing variance, and stores the top \code{nfeatures} gene IDs into the \code{HVGs}
 slot. Returns the updated object.
 }

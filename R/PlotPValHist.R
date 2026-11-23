@@ -5,7 +5,8 @@
 #' This function uses raw p-values only and highlights p-values below a given
 #' threshold (default 0.05).
 #'
-#' @param object A `geneda` object containing DEGs in the DEGs slot.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing DEGs in the DEGs slot.
 #' @param assay The name of the DEG table to use (must contain a "pvalue"
 #'   column).
 #' @param bins Number of histogram bins (default 40).
@@ -33,7 +34,7 @@
 #' obj <- SetDEGs(obj, res, assay = "KO_vs_WT")
 #' PlotPValHist(obj, assay = "KO_vs_WT")
 PlotPValHist <- function(object, assay, bins = 40, alpha = 0.05, title = NULL) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     #----- Pull DEG table
     if (!assay %in% names(object@DEGs)) {

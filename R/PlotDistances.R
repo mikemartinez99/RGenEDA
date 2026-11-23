@@ -1,27 +1,42 @@
 #' Plot a Euclidean Distance Heatmap
 #'
 #' @description Compute a sample-by-sample distance matrix from a `geneda`
-#' object and plot a ggplot2 heatmap. Optionally subset metadata columns and
-#' reorder rows/columns by hierarchical clustering.
+#' object and plot it as a `pheatmap` heatmap. Optionally add metadata columns
+#' as column annotation strips, and order rows and columns by hierarchical
+#' clustering of the sample distances.
 #'
-#' @import ggplot2
-#' @import scales
-#' @import RColorBrewer
-#' @import grid
+#' @details When `reorder = TRUE`, samples are clustered once with
+#' `hclust(dist(t(normalized), method), method = "complete")`. The heatmap uses
+#' these same sample distances for its dendrograms
+#' (`clustering_distance_rows` / `clustering_distance_cols`), so the plotted
+#' order is the same as the returned `order`. When `reorder = FALSE`, no
+#' clustering is done, no dendrograms are drawn, and samples are shown in the
+#' column order of the normalized matrix.
 #'
-#' @param object A `geneda` object
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]).
 #' @param method Distance method for stats::dist (default "euclidean")
-#' @param reorder Logical; if TRUE, reorder rows/cols by hclust on the distance
-#'   matrix. Default TRUE
-#' @param meta_cols Optional character vector of metadata columns to display in
-#'   the title/subtitle for quick reference (no annotation strips are drawn).
-#' @param palettes Optional named list of color vectors that can be used
-#'   downstream (returned) if the caller wants to annotate elsewhere.
+#' @param reorder Logical; if `TRUE` (default), order rows and columns by
+#'   hierarchical clustering of the sample distances and draw dendrograms. If
+#'   `FALSE`, keep the sample order of the normalized matrix.
+#' @param meta_cols Optional character vector of metadata columns to draw as
+#'   column annotation strips above the heatmap.
+#' @param palettes Optional named list of color vectors for the annotation
+#'   strips, one per `meta_cols` entry, each named by level (e.g.
+#'   `list(Genotype = c(WT = "grey40", KO = "firebrick3"))`). Columns without
+#'   a palette use pheatmap's default colors. Also returned unchanged.
 #' @param return One of c("object", "plot"). If "plot", draws the heatmap
 #'   immediately via grid and still returns the result list. Default "object".
 #'
-#' @returns A list with elements: dist_matrix, order (character vector of sample
-#'   names), heatmap (pheatmap object), palettes (as passed through)
+#' @returns A list with elements:
+#'   \describe{
+#'     \item{`dist_matrix`}{sample x sample distance matrix, in the plotted
+#'       order.}
+#'     \item{`order`}{character vector of sample names in the plotted
+#'       order.}
+#'     \item{`heatmap`}{the `pheatmap` object.}
+#'     \item{`palettes`}{`palettes`, as passed in.}
+#'   }
 #' @export
 #'
 #' @examples
@@ -44,7 +59,7 @@ PlotDistances <- function(
     meta_cols = NULL,
     palettes = NULL,
     return = c("object", "plot")) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
     return <- match.arg(return)
 
     MAT <- object@normalized
@@ -73,12 +88,13 @@ PlotDistances <- function(
     distMat <- as.matrix(sampleDists)
     diag(distMat) <- 0
 
-    # Reorder by hierarchical clustering if requested
+    # Cluster the samples once on their distances (if requested). The heatmap
+    # below uses the same distances and linkage, so its order matches `ord`.
+    reorder <- isTRUE(reorder)
     ord <- colnames(MAT)
-    if (isTRUE(reorder)) {
+    if (reorder) {
         hc <- stats::hclust(sampleDists, method = "complete")
         ord <- hc$labels[hc$order]
-        distMat <- distMat[ord, ord, drop = FALSE]
     }
 
     # Optional annotations for columns using meta_cols and palettes
@@ -109,13 +125,19 @@ PlotDistances <- function(
         rev(RColorBrewer::brewer.pal(9, "Blues"))
     )(255)
 
-    # Build pheatmap (shows dendrograms by default)
+    # Build pheatmap. `distMat` is passed in the original sample order,
+    # because pheatmap applies the clustering order itself; it clusters on
+    # the sample distances, not on Euclidean distances between rows of
+    # `distMat`.
     ph <- pheatmap::pheatmap(
         mat = distMat,
         annotation_col = annotation_col,
         annotation_colors = annotation_colors,
-        cluster_rows = TRUE,
-        cluster_cols = TRUE,
+        cluster_rows = reorder,
+        cluster_cols = reorder,
+        clustering_distance_rows = sampleDists,
+        clustering_distance_cols = sampleDists,
+        clustering_method = "complete",
         color = heatmap_colors,
         legend = TRUE,
         silent = TRUE
@@ -127,7 +149,7 @@ PlotDistances <- function(
     }
 
     return(list(
-        dist_matrix = distMat,
+        dist_matrix = distMat[ord, ord, drop = FALSE],
         order = ord,
         heatmap = ph,
         palettes = palettes

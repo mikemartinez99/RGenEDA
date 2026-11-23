@@ -1,4 +1,4 @@
-#' Access counts matrix (avoid name clash with DESeq2::counts)
+#' Access the raw counts matrix
 #' @param object A `geneda` object
 #' @return Matrix or NULL
 #' @export
@@ -16,7 +16,7 @@ getCounts <- function(object) {
     object@counts
 }
 
-#' Access normalized matrix (avoid name clash with generics)
+#' Access the normalized expression matrix
 #' @param object A `geneda` object
 #' @return Matrix
 #' @export
@@ -34,7 +34,7 @@ getNormalized <- function(object) {
     object@normalized
 }
 
-#' Access metadata (avoid name clash with S4 generics)
+#' Access the sample metadata
 #' @param object A `geneda` object
 #' @return data.frame
 #' @export
@@ -52,7 +52,7 @@ getMetadata <- function(object) {
     object@metadata
 }
 
-#' Access HVG IDs
+#' Access the highly variable gene IDs
 #' @param object A `geneda` object
 #' @return Character vector
 #' @export
@@ -71,9 +71,11 @@ HVGs <- function(object) {
     object@HVGs
 }
 
-#' Access dimensional reduction results list
+#' Access the PCA results
 #' @param object A `geneda` object
-#' @return List with `Loadings`, `Eigenvectors`, `percent_var`
+#' @return List with `Scores` (sample scores), `Eigenvectors` (gene
+#'   loadings, i.e. the rotation matrix) and `percent_var` (numeric percent
+#'   of variance explained per PC). See [generatePCs()].
 #' @export
 #'
 #' @examples
@@ -93,7 +95,7 @@ DimReduction <- function(object) {
     object@DimReduction
 }
 
-#' Access DEGs container
+#' Access a stored DEG table
 #' @param object A `geneda` object
 #' @param assay The name of the DEGs slot to return
 #' @return The DEG data.frame stored under `assay`, or NULL if it is not set

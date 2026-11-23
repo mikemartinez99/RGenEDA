@@ -3,7 +3,8 @@
 #' @description Plot variance for all genes (features) on a `geneda` object
 #'   using ggplot2.
 #'
-#' @param object A `geneda` object created by `GenEDA()`.
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) created by `GenEDA()`.
 #' @param transform One of c("log") to log-transform variance, or NULL for
 #'   none. Default = NULL
 #' @param dropTopN Number of top-most variable genes to drop prior to
@@ -22,10 +23,10 @@
 #' obj <- GenEDA(normalized = norm, metadata = meta, counts = counts)
 #' PlotHVGVariance(obj, transform = "log")
 PlotHVGVariance <- function(object, transform = NULL, dropTopN = 0) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     mat <- getNormalized(object)
-    vars <- apply(mat, 1L, var)
+    vars <- MatrixGenerics::rowVars(mat)
     if (is.null(names(vars))) names(vars) <- rownames(mat)
     vars <- sort(vars, decreasing = TRUE)
 

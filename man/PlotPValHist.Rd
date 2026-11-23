@@ -7,7 +7,8 @@
 PlotPValHist(object, assay, bins = 40, alpha = 0.05, title = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing DEGs in the DEGs slot.}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing DEGs in the DEGs slot.}
 
 \item{assay}{The name of the DEG table to use (must contain a "pvalue"
 column).}

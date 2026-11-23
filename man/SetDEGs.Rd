@@ -7,15 +7,20 @@
 SetDEGs(object, deg_table, assay)
 }
 \arguments{
-\item{object}{A \code{geneda} object}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}).}
 
 \item{deg_table}{A data.frame of DESeq2-like results containing at least
-columns \code{log2FoldChange} and \code{padj}}
+columns \code{log2FoldChange} and \code{padj}, with gene IDs as row names (as in
+\code{as.data.frame(DESeq2::results(dds))}). Tables with automatic row names
+(\code{1}, \code{2}, ...) are rejected.}
 
 \item{assay}{What to name the DEG slot}
 }
 \value{
-Updated \code{geneda} object with \code{DEGs[[assay]]} set
+Updated \code{geneda} object with \code{DEGs[[assay]]} set.
+If \code{object} is a \code{SummarizedExperiment}, the same object with the
+results added (see \link{geneda-SummarizedExperiment}).
 }
 \description{
 Set unfiltered DEGs on the object

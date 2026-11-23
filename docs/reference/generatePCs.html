@@ -9,7 +9,7 @@ in downstream analyses."><meta property="og:image" content="https://mikemartinez
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,8 +57,10 @@ in downstream analyses.</p>
 
 
 <dt id="arg-vars">vars<a class="anchor" aria-label="anchor" href="#arg-vars"></a></dt>
-<dd><p>A vector of gene variances (can calculate using
-RGenEDA::plotVariance) or gene names</p></dd>
+<dd><p>Either a named numeric vector of gene variances (for example
+from <code>MatrixGenerics::rowVars(mat)</code>), from which the top <code>nFeatures</code>
+genes are used, or a character vector of gene names to use directly
+(for example <code>HVGs(object)</code>).</p></dd>
 
 
 <dt id="arg-nfeatures">nFeatures<a class="anchor" aria-label="anchor" href="#arg-nfeatures"></a></dt>
@@ -67,9 +69,20 @@ RGenEDA::plotVariance) or gene names</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A list consisting of 3 slots: Loadings, Eigenvectors, and
-percent_var</p>
-    </div>
+    <p>A list with three elements:</p><dl><dt><code>Scores</code></dt>
+<dd><p>data.frame of sample scores (samples x PCs), i.e.
+<code>prcomp()$x</code>.</p></dd>
+
+<dt><code>Eigenvectors</code></dt>
+<dd><p>data.frame of gene loadings (genes x PCs), i.e.
+the rotation matrix <code>prcomp()$rotation</code>.</p></dd>
+
+<dt><code>percent_var</code></dt>
+<dd><p>named numeric vector of the percent of total
+variance explained by each PC (0-100; sums to 100).</p></dd>
+
+
+</dl></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -80,18 +93,18 @@ percent_var</p>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">rownames</a></span><span class="op">(</span><span class="va">meta</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">meta</span><span class="op">$</span><span class="va">Sample</span></span></span>
 <span class="r-in"><span><span class="va">norm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Log.html" class="external-link">log2</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/colSums.html" class="external-link">colSums</a></span><span class="op">(</span><span class="va">counts</span><span class="op">)</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1e6</span> <span class="op">+</span> <span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">obj</span> <span class="op">&lt;-</span> <span class="fu"><a href="GenEDA.html">GenEDA</a></span><span class="op">(</span>normalized <span class="op">=</span> <span class="va">norm</span>, metadata <span class="op">=</span> <span class="va">meta</span>, counts <span class="op">=</span> <span class="va">counts</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/apply.html" class="external-link">apply</a></span><span class="op">(</span><span class="va">norm</span>, <span class="fl">1</span>, <span class="va">var</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">vars</span> <span class="op">&lt;-</span> <span class="fu">MatrixGenerics</span><span class="fu">::</span><span class="fu">rowVars</span><span class="op">(</span><span class="va">norm</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">pcs</span> <span class="op">&lt;-</span> <span class="fu">generatePCs</span><span class="op">(</span><span class="va">norm</span>, <span class="va">vars</span>, nFeatures <span class="op">=</span> <span class="fl">1000</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variations:</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.9 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08 %</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0 %</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Percent variance explained:</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC1: 88.56%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC2: 5.90%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC3: 2.91%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC4: 1.55%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC5: 1.08%</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> PC6: 0.00%</span>
 <span class="r-in"><span><span class="va">pcs</span><span class="op">$</span><span class="va">percent_var</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       PC1       PC2       PC3       PC4       PC5       PC6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "88.56 %"   "5.9 %"  "2.91 %"  "1.55 %"  "1.08 %"     "0 %" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          PC1          PC2          PC3          PC4          PC5          PC6 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8.856057e+01 5.897930e+00 2.912694e+00 1.549480e+00 1.079328e+00 1.330269e-29 </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

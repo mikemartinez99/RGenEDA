@@ -15,7 +15,7 @@ FindVariableFeatures(), RunPCA(), and the plotting functions."><meta property="o
 
     <a class="navbar-brand me-2" href="../index.html">RGenEDA</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.99.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -81,8 +81,11 @@ sample metadata (<code>colData</code>) are carried over, so the object is ready 
 
 
 <dt id="arg-normalized">normalized<a class="anchor" aria-label="anchor" href="#arg-normalized"></a></dt>
-<dd><p>Where the normalized values come from. One of:</p><ul><li><p><code>NULL</code> (default): computed from the counts assay using <code>transform</code>.
-If <code>x</code> is a <code>DESeqTransform</code>, its transformed values are used instead.</p></li>
+<dd><p>Where the normalized values come from. One of:</p><ul><li><p><code>NULL</code> (default): the assay named <code>"normalized"</code> if <code>x</code> has one (for
+example a <code>SummarizedExperiment</code> made with
+<code>as(object, "SummarizedExperiment")</code>). Otherwise, if <code>x</code> is a
+<code>DESeqTransform</code>, its transformed values; otherwise computed from the
+counts assay using <code>transform</code>.</p></li>
 <li><p>A single assay name or index in <code>x</code>.</p></li>
 <li><p>A <code>SummarizedExperiment</code> with the same features and samples as <code>x</code>,
 for example the output of <code>DESeq2::vst(x)</code>. Its first assay is used.</p></li>
@@ -116,15 +119,23 @@ names.</p></dd>
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>Sample metadata are taken from <code>colData(x)</code> and converted to a
+    <p>If <code>x</code> holds RGenEDA results in <code>metadata(x)$RGenEDA</code> (HVGs, PCA, DEG
+tables; see <a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a>), they are restored, so
+<code>as.geneda(as(obj, "SummarizedExperiment"))</code> gives back <code>obj</code>. Results
+that no longer match <code>x</code> (for example after subsetting) are dropped with a
+warning.</p>
+<p>Sample metadata are taken from <code>colData(x)</code> and converted to a
 <code>data.frame</code>. Columns added by DESeq2, such as <code>sizeFactor</code>, are kept and
 can be tested with <code><a href="PlotEigenCorr.html">PlotEigenCorr()</a></code> like any other covariate.</p>
 <p>Assays stored as sparse or delayed matrices are converted to base
-matrices with <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix()</a></code>.</p>
+matrices with <code><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix()</a></code>, because PCA and the plots work on dense
+matrices. Only the counts assay and the normalized values are converted;
+other assays are not used.</p>
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p><code><a href="GenEDA.html">GenEDA()</a></code> to build a <code>geneda</code> object from matrices.</p></div>
+    <div class="dont-index"><p><code><a href="GenEDA.html">GenEDA()</a></code> to build a <code>geneda</code> object from matrices, and
+<a href="geneda-SummarizedExperiment.html">geneda-SummarizedExperiment</a> for the reverse conversion.</p></div>
     </div>
 
     <div class="section level2">

@@ -24,8 +24,11 @@ as.geneda(x, ...)
 
 \item{normalized}{Where the normalized values come from. One of:
 \itemize{
-\item \code{NULL} (default): computed from the counts assay using \code{transform}.
-If \code{x} is a \code{DESeqTransform}, its transformed values are used instead.
+\item \code{NULL} (default): the assay named \code{"normalized"} if \code{x} has one (for
+example a \code{SummarizedExperiment} made with
+\code{as(object, "SummarizedExperiment")}). Otherwise, if \code{x} is a
+\code{DESeqTransform}, its transformed values; otherwise computed from the
+counts assay using \code{transform}.
 \item A single assay name or index in \code{x}.
 \item A \code{SummarizedExperiment} with the same features and samples as \code{x},
 for example the output of \code{DESeq2::vst(x)}. Its first assay is used.
@@ -57,12 +60,20 @@ sample metadata (\code{colData}) are carried over, so the object is ready for
 \code{FindVariableFeatures()}, \code{RunPCA()}, and the plotting functions.
 }
 \details{
+If \code{x} holds RGenEDA results in \code{metadata(x)$RGenEDA} (HVGs, PCA, DEG
+tables; see \link{geneda-SummarizedExperiment}), they are restored, so
+\code{as.geneda(as(obj, "SummarizedExperiment"))} gives back \code{obj}. Results
+that no longer match \code{x} (for example after subsetting) are dropped with a
+warning.
+
 Sample metadata are taken from \code{colData(x)} and converted to a
 \code{data.frame}. Columns added by DESeq2, such as \code{sizeFactor}, are kept and
 can be tested with \code{PlotEigenCorr()} like any other covariate.
 
 Assays stored as sparse or delayed matrices are converted to base
-matrices with \code{as.matrix()}.
+matrices with \code{as.matrix()}, because PCA and the plots work on dense
+matrices. Only the counts assay and the normalized values are converted;
+other assays are not used.
 }
 \examples{
 data(Snail1KO)
@@ -91,5 +102,6 @@ if (requireNamespace("DESeq2", quietly = TRUE)) {
 }
 }
 \seealso{
-\code{\link[=GenEDA]{GenEDA()}} to build a \code{geneda} object from matrices.
+\code{\link[=GenEDA]{GenEDA()}} to build a \code{geneda} object from matrices, and
+\link{geneda-SummarizedExperiment} for the reverse conversion.
 }

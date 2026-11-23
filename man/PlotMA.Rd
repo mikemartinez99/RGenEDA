@@ -7,7 +7,8 @@
 PlotMA(object, assay, alpha, l2fc, title = NULL)
 }
 \arguments{
-\item{object}{A \code{geneda} object containing \code{DEGs} from \code{SetDEGs} method}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) containing \code{DEGs} from \code{SetDEGs} method}
 
 \item{assay}{The DEG slot to use for visualization}
 
@@ -26,8 +27,10 @@ Plot MA plot from a \code{geneda} object. Requires that you have ran
 \code{SetDEGs} on your object following differential expression in \code{DESeq2}.
 }
 \details{
-Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}),
-matching \code{FilterDEGs()}.
+Thresholds are inclusive (\code{padj <= alpha}, \verb{|log2FoldChange| >= l2fc}), matching \code{FilterDEGs()}. Genes with \code{NA} in \code{padj} (for example
+genes removed by DESeq2 independent filtering or outlier detection) are
+treated as not significant, drawn at the smallest point size, and never
+labelled.
 }
 \examples{
 \dontshow{if (requireNamespace("DESeq2", quietly = TRUE)) withAutoprint(\{ # examplesIf}

@@ -2,7 +2,8 @@
 #'
 #' @description Generate a scree plot
 #'
-#' @param object A `geneda` object containing PCA results in the DimReduction
+#' @param object A `geneda` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing PCA results in the DimReduction
 #'   slot.
 #'
 #' @return A ggplot2 object
@@ -20,7 +21,7 @@
 #' obj <- RunPCA(obj)
 #' PlotScree(obj)
 PlotScree <- function(object) {
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     #----- Pull PCA results
     if (length(object@DimReduction) == 0) {
@@ -33,9 +34,7 @@ PlotScree <- function(object) {
             names(object@DimReduction$percent_var),
             levels = names(object@DimReduction$percent_var)
         ),
-        Variance = as.numeric(
-            gsub(" %", "", object@DimReduction$percent_var)
-        )
+        Variance = unname(object@DimReduction$percent_var)
     )
 
     #----- Plot

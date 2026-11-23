@@ -5,8 +5,9 @@
 #' `GenEDA` object. This function extracts PCA data via \code{\link{ExtractPCA}}
 #' and provides a flexible ggplot2-based visualization interface.
 #'
-#' @param object A `GenEDA` object containing PCA results in the
-#'   `DimReduction` slot.
+#' @param object A `GenEDA` object (or a `SummarizedExperiment`; see
+#'   [geneda-SummarizedExperiment]) containing PCA results in the `DimReduction`
+#'   slot.
 #' @param x Numeric or character. The principal component to plot on the
 #'   x-axis (e.g., 1 or "PC1").
 #' @param y Numeric or character. The principal component to plot on the
@@ -47,7 +48,7 @@ PlotPCA <- function(object,
                     shape_by = NULL,
                     return_data = FALSE) {
     # Check input type
-    stopifnot(methods::is(object, "geneda"))
+    object <- .toGeneda(object)
 
     # Extract PCA data
     pca_df <- ExtractPCA(object)
@@ -69,10 +70,8 @@ PlotPCA <- function(object,
 
     # Retrieve variance explained
     percent_var <- object@DimReduction$percent_var
-    xlab <- percent_var[[x]]
-    xlab <- gsub(" ", "", xlab)
-    ylab <- percent_var[[y]]
-    ylab <- gsub(" ", "", ylab)
+    xlab <- .formatPercent(percent_var[[x]])
+    ylab <- .formatPercent(percent_var[[y]])
 
     # Check color_by
     if (!(color_by %in% colnames(pca_df))) {
@@ -105,7 +104,9 @@ PlotPCA <- function(object,
     }
 
     # Construct ggplot
-    p <- ggplot(pca_df, aes_string(x = x, y = y, color = color_by)) +
+    p <- ggplot(pca_df, aes(
+        x = .data[[x]], y = .data[[y]], color = .data[[color_by]]
+    )) +
         geom_point(size = 3, alpha = 0.8) +
         theme_classic(base_size = 16) +
         theme(
@@ -114,7 +115,7 @@ PlotPCA <- function(object,
         ) +
         labs(
             x = paste0(x, ": ", xlab),
-            y = paste0(y, ": ", ylab), ,
+            y = paste0(y, ": ", ylab),
             color = color_by
         )
 
@@ -130,7 +131,7 @@ PlotPCA <- function(object,
                 "Column {shape_by} not found in PCA data."
             )
         }
-        p <- p + aes_string(shape = shape_by)
+        p <- p + aes(shape = .data[[shape_by]])
     }
 
     # Add faceting if requested

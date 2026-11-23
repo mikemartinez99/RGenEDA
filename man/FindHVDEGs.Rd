@@ -7,7 +7,8 @@
 FindHVDEGs(object, assay, direction = c("positive", "negative", "both"))
 }
 \arguments{
-\item{object}{A \code{geneda} object with a DEG table set via \code{SetDEGs()}}
+\item{object}{A \code{geneda} object (or a \code{SummarizedExperiment}; see
+\link{geneda-SummarizedExperiment}) with a DEG table set via \code{SetDEGs()}}
 
 \item{assay}{The DEG slot to pull results from (typically a result of
 \code{FilterDEGs})}

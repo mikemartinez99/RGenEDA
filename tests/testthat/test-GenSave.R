@@ -60,3 +60,30 @@ test_that("GenSave errors on unsupported file formats", {
         "Unsupported file format: xyz"
     )
 })
+
+#----- Bad input does not leave a graphics device open
+test_that("GenSave leaves no device open when input is invalid", {
+    before <- grDevices::dev.list()
+    f <- file.path(withr::local_tempdir(), "hm.png")
+    expect_error(GenSave(list(heatmap = list()), f), "does not contain a gtable")
+    expect_error(GenSave(create_test_heatmap(), sub("png$", "xyz", f)),
+        "Unsupported file format")
+    expect_identical(grDevices::dev.list(), before)
+    expect_false(file.exists(f))
+})
+
+test_that("GenSave closes the device when drawing fails", {
+    before <- grDevices::dev.list()
+    hm <- create_test_heatmap()
+    f <- file.path(withr::local_tempdir(), "hm.png")
+    expect_error(GenSave(hm, f, notAnArg = TRUE))
+    expect_identical(grDevices::dev.list(), before)
+})
+
+#----- A plain pheatmap object is accepted
+test_that("GenSave accepts a pheatmap object directly", {
+    hm <- create_test_heatmap()$heatmap
+    f <- file.path(withr::local_tempdir(), "hm.png")
+    expect_invisible(GenSave(hm, f, width = 2, height = 2))
+    expect_true(file.exists(f))
+})

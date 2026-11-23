@@ -1,16 +1,18 @@
 # Overview
 
 `RGenEDA` is designed to provide a streamlined, unified and reproducible
-framework for exploratory data analysis across multiple omics data
-types. This vignette introduces the key components of the `RGenEDA`
-package using bulk RNA-seq data from the paper [Genomewide binding of
-transcription factor Snail1 in triple-negative breast cancer
+framework for exploratory data analysis of bulk RNA-seq data. It works
+on a normalized expression matrix with sample metadata, and is built
+around the `DESeq2` workflow (`DESeqDataSet`, `vst()` / `rlog()` output
+and `results()` tables). This vignette introduces the key components of
+the `RGenEDA` package using bulk RNA-seq data from the paper [Genomewide
+binding of transcription factor Snail1 in triple-negative breast cancer
 cell](https://pubmed.ncbi.nlm.nih.gov/29729076/) (Maturi, et al. 2018).
 Raw counts and metadata were obtained from [The Gene Expression
 Atlas](https://www.ebi.ac.uk/gxa/experiments/E-MTAB-5244/Downloads)
 under ENA:ERP019920, E-MTAB-5244.
 
-The data has be pre-wrangled but the standard [deseq2
+The data have been pre-wrangled, but the standard [deseq2
 framework](https://www.bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html)
 will be applied here to demonstrate the functionality of `RGenEDA`.
 
@@ -24,9 +26,10 @@ these with wild-type (WT) HS578T cells.
 - [Define metadata](#define-metadata)
 - [Processing and normalization](#processing-and-normalization)
 - [Create a GenEDA object](#create-a-geneda-object)
-- [Count distrubutions across
+- [Why a separate class?](#why-a-separate-class)
+- [Count distributions across
   samples](#count-distributions-across-samples)
-- [Sample Eucliden distances with hierarchical
+- [Sample Euclidean distances with hierarchical
   clustering](#sample-euclidean-distances-with-hierarchical-clustering)
 - [Identify highly variable genes](#identify-highly-variable-genes)
 - [Principal component analysis](#principal-component-analysis)
@@ -36,6 +39,8 @@ these with wild-type (WT) HS578T cells.
   PCs](#explore-eigen-vectors-of-individual-pcs)
 - [Correlate PCs with metadata](#correlate-pcs-with-metadata)
 - [Explore DEGs](#explore-degs)
+- [Moving results back to a
+  SummarizedExperiment](#moving-results-back-to-a-summarizedexperiment)
 
 ## Load and inspect the data
 
@@ -44,7 +49,6 @@ easily accessed using the following commands. Here, we have one key
 variable of interest (Genotype) for simplicity sake (though your
 experiment may have many. `RGenEDA` can handle any number of
 covariates.)
-
 
     # Load the counts and metadata and extract
     data("Snail1KO")
@@ -73,10 +77,10 @@ It is helpful to establish color palettes early on in an exploratory
 analysis to keep figures consistent. `RGenEDA` uses the list of named
 vectors convention for creating color vectors for plotting functions.
 
-
     # Color palettes for plotting
     colorList <- list(
-      Genotype = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3"))
+        Genotype = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3")
+    )
 
 ## Processing and normalization
 
@@ -84,25 +88,24 @@ The standard DESeq2 workflow can now be applied. The end goal is to
 obtain normalized counts and differential expression results. Lowly
 expressed genes are filtered out before running `DESeq2.`
 
-
     # Ensure tables are not scrambled
     all(colnames(counts) == rownames(metadata))
     #> [1] TRUE
 
     dds <- DESeqDataSetFromMatrix(
-      countData = counts,
-      colData = metadata,
-      design = ~ Genotype
+        countData = counts,
+        colData = metadata,
+        design = ~Genotype
     )
-    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in design
-    #> formula are characters, converting to factors
+    #> Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in
+    #> design formula are characters, converting to factors
 
     # Set reference levels
     dds$Genotype <- relevel(dds$Genotype, ref = "WT")
 
     # Pre-filter: keep genes with at least 10 counts in  at least 3 samples
     keep <- rowSums(counts(dds) >= 10) >= 3
-    dds <- dds[keep,]
+    dds <- dds[keep, ]
 
     # Run DESeq2
     dds <- DESeq(dds)
@@ -117,14 +120,14 @@ With the normalized counts and metadata prepared, a `GenEDA` object can
 be initialized. This object will store all components of your analysis,
 starting with normalized data and metadata (bare minimum requirements).
 
-
     # Factor metadata
     metadata$Genotype <- factor(metadata$Genotype, levels = c("WT", "Snai1_KO"))
 
     # Initialize GenEDA object with normalized counts and metadata
     obj <- GenEDA(
-      normalized = mat,
-      metadata = metadata)
+        normalized = mat,
+        metadata = metadata
+    )
 
     # View object summary
     obj
@@ -134,11 +137,133 @@ starting with normalized data and metadata (bare minimum requirements).
     #>   HVGs: 0
     #>   DimReduction: 0
     #>   counts: NULL
-    #>   DEGs: DEG
+    #>   DEGs: none
 
 You will see that the object also contains slots for Highly Variable
 Genes (HVGs), DimReduction (PCA, etc..) and Differentially Expressed
 Genes (DEGs). These will be populated shortly with `RGenEDA`
+
+### Creating a GenEDA object from DESeq2 or SummarizedExperiment
+
+If your data are already in a `SummarizedExperiment` or `DESeqDataSet`,
+use `as.geneda()` instead. It carries over the raw counts, normalized
+values, and `colData` in one step. Here, the `rlog` values computed
+above are used as the normalized data. If `normalized` is not supplied,
+`as.geneda()` computes a variance stabilizing transformation
+(`transform = "vst"`) or log2 CPM (`transform = "logcpm"`) from the
+counts.
+
+    obj_from_dds <- as.geneda(dds, normalized = rld)
+    obj_from_dds
+    #> geneda object
+    #>   features: 11247
+    #>   samples:  6
+    #>   HVGs: 0
+    #>   DimReduction: 0
+    #>   counts: present
+    #>   DEGs: none
+
+### Why a separate class?
+
+A `geneda` object holds the same kinds of data as a
+`SummarizedExperiment`. Each slot maps to a standard place:
+
+<table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 77%" />
+</colgroup>
+<thead>
+<tr>
+<th><code>geneda</code> slot</th>
+<th><code>SummarizedExperiment</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>counts</code></td>
+<td><code>assay(se, "counts")</code></td>
+</tr>
+<tr>
+<td><code>normalized</code></td>
+<td><code>assay(se, "normalized")</code></td>
+</tr>
+<tr>
+<td><code>metadata</code></td>
+<td><code>colData(se)</code></td>
+</tr>
+<tr>
+<td><code>HVGs</code></td>
+<td><code>rowData(se)$isHVG</code>,
+<code>rowData(se)$hvgRank</code></td>
+</tr>
+<tr>
+<td><code>DimReduction</code></td>
+<td><code>metadata(se)$RGenEDA$DimReduction</code></td>
+</tr>
+<tr>
+<td><code>DEGs</code></td>
+<td><code>metadata(se)$RGenEDA$DEGs</code></td>
+</tr>
+</tbody>
+</table>
+
+`RGenEDA` still uses its own small class because every function needs
+the same few things, and needs them to agree with each other:
+
+- **One normalized matrix.** All plots, HVG selection and PCA use the
+  same normalized values. In a `SummarizedExperiment` each function
+  would need an assay-name argument, and two plots could use different
+  assays by mistake.
+- **Checked links between the parts.** The `geneda` validity check makes
+  sure that the metadata rows match the samples, that the HVGs are genes
+  in the matrix, that the PCA results have scores, loadings and numeric
+  percent variance, and that every DEG table is a `data.frame`.
+  `metadata()` in a `SummarizedExperiment` is an unchecked list.
+- **DEG tables of any size.** Filtered DEG tables have fewer genes than
+  the assays, so they cannot be stored as `rowData` columns.
+- **Bulk RNA-seq scale.** `RGenEDA` is built for bulk experiments, where
+  a dense matrix is small. PCA (`prcomp()`) and the plots need dense
+  values, so `as.geneda()` converts only the counts and normalized
+  assays with `as.matrix()` and does not touch the other assays.
+
+You do not have to choose one class. Every main function also accepts a
+`SummarizedExperiment` (including a `DESeqDataSet` or `DESeqTransform`)
+directly. Functions that add results (`FindVariableFeatures()`,
+`RunPCA()`, `SetDEGs()`, `FilterDEGs()`) return your own object, of the
+same class, with the results added in the layout above. Normalized
+values are taken from an assay named `"normalized"` if there is one; a
+`DESeqTransform` uses its own values; otherwise they are computed from
+the counts, as in `as.geneda()`.
+
+    # Run PCA directly on the rlog DESeqTransform: the result is still a
+    # DESeqTransform, now with RGenEDA results stored in it
+    rld_pca <- RunPCA(rld, nfeatures = 2000)
+    #> HVG slot is empty. Running FindVariableFeatures with top 2000 genes
+    #> Calculating principal components from top 2000 HVGs
+    #> Percent variance explained:
+    #> PC1: 85.43%
+    #> PC2: 7.07%
+    #> PC3: 3.89%
+    #> PC4: 2.28%
+    #> PC5: 1.33%
+    #> PC6: 0.00%
+    class(rld_pca)
+    #> [1] "DESeqTransform"
+    #> attr(,"package")
+    #> [1] "DESeq2"
+    names(S4Vectors::metadata(rld_pca)$RGenEDA)
+    #> [1] "HVGs"         "DimReduction" "DEGs"         "counts"       "version"
+
+    # Plotting and extraction functions work on it the same way
+    head(ExtractPCA(rld_pca)[, c("PC1", "PC2", "Genotype")])
+    #>                  PC1       PC2 Genotype
+    #> ERR1736465 -12.26994  4.841985       WT
+    #> ERR1736466 -14.27872 -2.406553       WT
+    #> ERR1736467 -13.35504 -1.694899       WT
+    #> ERR1736468  12.70944 -4.145799 Snai1_KO
+    #> ERR1736469  12.51669 -2.370634 Snai1_KO
+    #> ERR1736470  14.67757  5.775900 Snai1_KO
 
 ## Count distributions across samples
 
@@ -150,12 +275,11 @@ very high overall counts compared to others might indicate problematic
 samples, technical artifacts, or batch effect. This function returns a
 `ggplot2` object to facilitate any additional customization.
 
-
     PlotCountDist(obj, split_by = "Genotype")
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/count-dist-1.png" style="display: block; margin: auto;" />
 
-## Sample Eucliden distances with hierarchical clustering
+## Sample Euclidean distances with hierarchical clustering
 
 To visualize replicate similarity, Euclidean distances between samples
 can be calculated and plotted as a `pheatmap` heatmap using the
@@ -165,16 +289,15 @@ assessment of replicate quality and metadata features that drive
 clustering. To save `pheatmap` objects within `RGenEDA`, we can use the
 `GenSave()` function, which is similar in function to `ggsave()`.
 
-
     hm <- PlotDistances(
-      obj,
-      meta_cols = c("Genotype"),
-      palettes = colorList,
-      return = "plot"
+        obj,
+        meta_cols = c("Genotype"),
+        palettes = colorList,
+        return = "plot"
     )
     hm$heatmap
 
-    # GenSave(hm, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+    # GenSave(hm, "/path/to/EuclideanDistance_Heatmap.png", width = 6, height = 8)
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/clustering-1.png" width="60%" style="display: block; margin: auto;" />
 
@@ -182,10 +305,9 @@ clustering. To save `pheatmap` objects within `RGenEDA`, we can use the
 
 Next, genes are ranked by decreasing variance to find highly variable
 genes (HVGs) which most-likely drive biological differences. The full
-variance profile curve for all genes profiled with `plotHVGVariance()`
-as a means to pick a meaningful number of HVGs to retain for calculating
-principal components in the next section.
-
+variance profile curve for all genes can be plotted with
+`PlotHVGVariance()` as a means to pick a meaningful number of HVGs to
+retain for calculating principal components in the next section.
 
     #----- Plot variance profile
     PlotHVGVariance(obj)
@@ -195,17 +317,12 @@ Based on the curve, 2,000 genes seems sufficient in capturing the
 majority of variation. These genes can be extracted and retained in the
 HVGs slot with `FindVariableFeatures()`
 
-
     #----- Add HVGs to object
     obj <- FindVariableFeatures(obj, 2000)
 
-    #== Access HVGs (2 methods)
-    # 1: Accessor function
+    # == Access HVGs with the accessor function
     head(HVGs(obj))
     #> [1] "THY1"   "CCL2"   "SSX1"   "AKR1C2" "GPX1"   "MYL12B"
-
-    # 2: Call the slot directly
-    #head(obj@HVGs)
 
 ## Principal component analysis
 
@@ -213,46 +330,63 @@ Using the identified HVGs, principal components can be calculated using
 `RunPCA()` This function stores PCA results in the DimReduction slot,
 including:
 
-• `$Scores` (sample scores)
+- `$Scores` (sample scores: one row per sample, one column per PC)
 
-• `$Eigenvectors` (gene contributions)
+- `$Eigenvectors` (gene loadings, i.e. the rotation matrix: one row per
+  gene, one column per PC)
 
-• `$percent_var` (Percent variance explained per component, up to PC5)
+- `$percent_var` (numeric percent of total variance explained by each
+  PC)
 
-If `FindVariableFeatures()` was not ran beforehand, `RunPCA` will
+If `FindVariableFeatures()` was not run beforehand, `RunPCA` will
 calculate HVGs by default with 2000 features. This argument can be
-overriden directly using the `nfeatures` argument.
-
+overridden directly using the `nfeatures` argument.
 
     obj <- RunPCA(obj)
     #> Calculating principal components from top 2000 HVGs
-    #> Percent variations:
-    #>       PC1       PC2       PC3       PC4       PC5       PC6 
-    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"
+    #> Percent variance explained:
+    #> PC1: 85.43%
+    #> PC2: 7.07%
+    #> PC3: 3.89%
+    #> PC4: 2.28%
+    #> PC5: 1.33%
+    #> PC6: 0.00%
 
-    # DimReductions can be accessed with accessor function
-    # head(DimReduction(obj))
-
-    # Inspect PCA outputs
-    head(obj@DimReduction$Scores)
-    #>                  PC1       PC2       PC3        PC4        PC5          PC6
-    #> ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14
-    #> ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14
-    #> ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14
-    #> ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14
-    #> ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14
-    #> ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14
-    head(obj@DimReduction$Eigenvectors)
-    #>                  PC1         PC2           PC3          PC4          PC5          PC6
-    #> CENPI    0.003588589 -0.02172881 -0.0196200153 -0.015192540 -0.005752305  0.028620033
-    #> TULP3    0.021586498 -0.02096203  0.0134327078 -0.016091133  0.033236356  0.029272845
-    #> MAP3K14  0.021846399  0.04358180 -0.0447224066 -0.022827314 -0.064475180 -0.007776757
-    #> AP3D1    0.026800954  0.02836574 -0.0380992712 -0.006296689  0.006278297  0.052602611
-    #> DIP2B   -0.002712758 -0.01559409 -0.0310157471 -0.028917713  0.008953505 -0.023714858
-    #> TAZ      0.003357044  0.01302154 -0.0009023767 -0.003193418 -0.005208482  0.028888142
-    head(obj@DimReduction$percent_var)
-    #>       PC1       PC2       PC3       PC4       PC5       PC6 
-    #> "77.87 %" "11.93 %"  "4.52 %"  "3.36 %"  "2.32 %"     "0 %"
+    # Inspect PCA outputs with the DimReduction() accessor
+    pca <- DimReduction(obj)
+    head(pca$Scores)
+    #>                  PC1       PC2         PC3         PC4          PC5
+    #> ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259
+    #> ERR1736466 -14.27872 -2.406553 -5.26248029 -0.01697393  0.313289330
+    #> ERR1736467 -13.35504 -1.694899  3.44737576 -3.03463682 -1.042987566
+    #> ERR1736468  12.70944 -4.145799  1.47958222  0.20911815  2.703775110
+    #> ERR1736469  12.51669 -2.370634  0.09842185  2.20330061 -2.739470641
+    #> ERR1736470  14.67757  5.775900 -1.71551858 -2.34392774 -0.005150492
+    #>                     PC6
+    #> ERR1736465 3.993043e-14
+    #> ERR1736466 4.093910e-14
+    #> ERR1736467 3.968706e-14
+    #> ERR1736468 3.303503e-14
+    #> ERR1736469 3.173788e-14
+    #> ERR1736470 3.630529e-14
+    head(pca$Eigenvectors)
+    #>                 PC1          PC2           PC3          PC4          PC5
+    #> THY1    0.150266440 -0.022809065  0.0000110537 -0.006329718 -0.028030018
+    #> CCL2    0.135706807 -0.025658201  0.0070373490  0.003838021 -0.040018651
+    #> SSX1   -0.130106138  0.036993763  0.0189472965 -0.007723523  0.001874006
+    #> AKR1C2 -0.116614608  0.003828601  0.0030343526 -0.019723927 -0.002551927
+    #> GPX1    0.111588141  0.002460421 -0.0335286040 -0.039545468 -0.007872470
+    #> MYL12B  0.005002684  0.178455620 -0.2807259755  0.269866847 -0.311091450
+    #>                PC6
+    #> THY1   -0.13041073
+    #> CCL2    0.12077408
+    #> SSX1    0.04077754
+    #> AKR1C2  0.06171997
+    #> GPX1   -0.01918598
+    #> MYL12B -0.00531372
+    round(head(pca$percent_var), 2)
+    #>   PC1   PC2   PC3   PC4   PC5   PC6 
+    #> 85.43  7.07  3.89  2.28  1.33  0.00
 
 
     # Visualize a scree plot
@@ -267,98 +401,125 @@ PCA results merged with metadata can easily be extracted using
 `PlotPCA()` allows a quick visualization which can also be further
 customized with `ggplot2`.
 
-
     pcaDF <- ExtractPCA(obj)
     head(pcaDF)
-    #>                  PC1       PC2       PC3        PC4        PC5          PC6
-    #> ERR1736465 -5.845179  3.716576  1.620623 -1.0955893  0.1772979 3.594429e-14
-    #> ERR1736466 -6.433351 -1.186487  0.465169  2.4753119  0.2414526 3.577988e-14
-    #> ERR1736467 -6.592484 -2.136361 -2.110072 -1.3682232 -0.3897501 3.589042e-14
-    #> ERR1736468  6.063171 -2.271587  0.822507 -0.6827020  1.7746208 3.570818e-14
-    #> ERR1736469  6.007254 -1.272494  1.265257 -0.0950531 -1.9236799 3.560521e-14
-    #> ERR1736470  6.800590  3.150352 -2.063484  0.7662558  0.1200585 3.591129e-14
-    #>                Sample          Disease Genotype        CellLine_CellType
-    #> ERR1736465 ERR1736465 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736466 ERR1736466 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736467 ERR1736467 breast carcinoma       WT HS578T - epithelial cell
-    #> ERR1736468 ERR1736468 breast carcinoma Snai1_KO HS578T - epithelial cell
-    #> ERR1736469 ERR1736469 breast carcinoma Snai1_KO HS578T - epithelial cell
-    #> ERR1736470 ERR1736470 breast carcinoma Snai1_KO HS578T - epithelial cell
+    #>                  PC1       PC2         PC3         PC4          PC5
+    #> ERR1736465 -12.26994  4.841985  1.95261904  2.98311973  0.770544259
+    #> ERR1736466 -14.27872 -2.406553 -5.26248029 -0.01697393  0.313289330
+    #> ERR1736467 -13.35504 -1.694899  3.44737576 -3.03463682 -1.042987566
+    #> ERR1736468  12.70944 -4.145799  1.47958222  0.20911815  2.703775110
+    #> ERR1736469  12.51669 -2.370634  0.09842185  2.20330061 -2.739470641
+    #> ERR1736470  14.67757  5.775900 -1.71551858 -2.34392774 -0.005150492
+    #>                     PC6     Sample          Disease Genotype
+    #> ERR1736465 3.993043e-14 ERR1736465 breast carcinoma       WT
+    #> ERR1736466 4.093910e-14 ERR1736466 breast carcinoma       WT
+    #> ERR1736467 3.968706e-14 ERR1736467 breast carcinoma       WT
+    #> ERR1736468 3.303503e-14 ERR1736468 breast carcinoma Snai1_KO
+    #> ERR1736469 3.173788e-14 ERR1736469 breast carcinoma Snai1_KO
+    #> ERR1736470 3.630529e-14 ERR1736470 breast carcinoma Snai1_KO
+    #>                   CellLine_CellType
+    #> ERR1736465 HS578T - epithelial cell
+    #> ERR1736466 HS578T - epithelial cell
+    #> ERR1736467 HS578T - epithelial cell
+    #> ERR1736468 HS578T - epithelial cell
+    #> ERR1736469 HS578T - epithelial cell
+    #> ERR1736470 HS578T - epithelial cell
 
     # Plot PCA
-    PlotPCA(object = obj,
-            x = 1,
-            y = 2,
-            color_by = "Genotype",
-            colors = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3"))
+    PlotPCA(
+        object = obj,
+        x = 1,
+        y = 2,
+        color_by = "Genotype",
+        colors = c("WT" = "steelblue3", "Snai1_KO" = "firebrick3")
+    )
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/extract-pca-1.png" width="70%" style="display: block; margin: auto;" />
 
 ## Explore Eigen vectors of individual PCs
 
 The individual Eigenvectors (genes) that comprise a particular component
-of interest can be extracted and their Z-scaled normalized expression
-visualized as a heatmap annotated by the percent variation explained
-using `extractEigen()` and `PlotEigenHeatmap()`. This can again identify
-sample-to-sample differences.
+of interest can be extracted with `extractEigen()`, which returns each
+gene’s loading (`EigenVector`) and its percent contribution to the PC
+(`Contribution`). The contribution is the gene’s share of the PC’s
+squared loadings,
+100 ⋅ *v*<sub>*i*</sub><sup>2</sup>/∑<sub>*j*</sub>*v*<sub>*j*</sub><sup>2</sup>,
+so contributions sum to 100 within a PC. It is not the percent of total
+variance explained by the gene. `PlotEigenHeatmap()` shows the Z-scaled
+normalized expression of the top genes as a heatmap, with `Contribution`
+as a row annotation. This can again identify sample-to-sample
+differences.
 
-
-    pc1_eigen <- extractEigen(object = obj,
-                              component = "PC1")
+    pc1_eigen <- extractEigen(
+        object = obj,
+        component = "PC1"
+    )
     head(pc1_eigen)
-    #>      Gene  EigenVector       PctVar
-    #> 1   CENPI  0.003588589 0.0012877974
-    #> 2   TULP3  0.021586498 0.0465976905
-    #> 3 MAP3K14  0.021846399 0.0477265145
-    #> 4   AP3D1  0.026800954 0.0718291147
-    #> 5   DIP2B -0.002712758 0.0007359055
-    #> 6     TAZ  0.003357044 0.0011269741
+    #>     Gene  EigenVector Contribution
+    #> 1   THY1  0.150266440  2.258000304
+    #> 2   CCL2  0.135706807  1.841633753
+    #> 3   SSX1 -0.130106138  1.692760703
+    #> 4 AKR1C2 -0.116614608  1.359896690
+    #> 5   GPX1  0.111588141  1.245191327
+    #> 6 MYL12B  0.005002684  0.002502684
 
 
     hm2 <- PlotEigenHeatmap(obj,
-                     pc = "PC1",
-                     n = 25,
-                     annotate_by = "Genotype",
-                     annotate_colors = colorList)
+        pc = "PC1",
+        n = 25,
+        annotate_by = "Genotype",
+        annotate_colors = colorList
+    )
     hm2$heatmap
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/eigenvecs-1.png" style="display: block; margin: auto;" />
 
 
-    # GenSave(hm2, "/path/to/EuclidenDistance_Heatmap.png", width = 6, height = 8)
+    # GenSave(hm2, "/path/to/EuclideanDistance_Heatmap.png", width = 6, height = 8)
 
 ## Correlate PCs with metadata
 
 To interpret principal components, individual PCs can be correlated with
 sample metadata using `PlotEigenCorr()`. This function computes Pearson
 correlations and displays them as a heatmap, helping to reveal which
-metadata features are most associated with major axes of variation. This
-function returns a list of 4 elements:
+metadata features are most associated with major axes of variation.
+Categorical variables with two levels (such as Genotype) use Pearson
+correlation; categorical variables with more than two levels (such as
+batch) are summarized by the unsigned multiple correlation R from a
+one-way linear model, so results do not depend on how levels are
+labelled. Variables that cannot be tested, such as columns with a single
+value or a unique value per sample (here, Disease, CellLine\_CellType,
+and Sample), are dropped.
 
-• `$cor_matrix` (Pearson correlation values)
+Each PC x covariate cell is a separate test, so the p-values are
+adjusted for multiple testing with `p.adjust()` (Benjamini-Hochberg by
+default; set with `p_adjust_method`). The stars on the heatmap use the
+adjusted p-values. With only 6 samples here, these tests have very
+little power, so read the heatmap as exploratory. This function returns
+a list of 6 elements:
 
-• `$pval_matrix` (Associated correlation p-values)
+- `$cor_matrix` (Pearson correlation values, or multiple correlation R
+  for variables with more than two levels)
 
-• `$stars` (asterisk representations of p-values)
+- `$padj_matrix` (adjusted p-values, used for the stars and the plot)
 
-• `$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved
-with `ggsave`)
+- `$pval_matrix` (unadjusted p-values, for reference)
 
-**Note:** `PlotOrdCorr()` can be used for microbiome data as it
-correlates metadata features with NMDS beta values rather than PCs.
+- `$stars` (asterisk representations of the adjusted p-values)
 
+- `$p_adjust_method` (the correction method used)
+
+- `$plot` (Eigencorr plot, as a `ggplot2` object, which can be saved
+  with `ggsave`)
+
+**Note:** `PlotOrdCorr()` works like `PlotEigenCorr()`, but correlates
+metadata features with non-metric multidimensional scaling (NMDS) axes
+of a sample dissimilarity matrix (Bray-Curtis by default) instead of
+PCs. It applies the same multiple-testing correction (`p_adjust_method`)
+and returns the same `$padj_matrix`, `$pval_matrix` and `$stars`
+elements.
 
     ec <- PlotEigenCorr(obj, num_pcs = 5)
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
-    #> Warning in cor(x, y): the standard deviation is zero
     ec$plot
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/eigencorr-1.png" width="70%" style="display: block; margin: auto;" />
@@ -378,19 +539,21 @@ and Shrunk DESeq2 results.)
 To get a quick diagnosis of the differential expression results, a
 histogram of un-corrected pvalues can be plotted using `PlotPValHist()`.
 
-
-    res <- results(dds) |> 
-      as.data.frame()
+    res <- results(dds) |>
+        as.data.frame()
 
     # Set a new DEG assay
-    obj <- SetDEGs(object = obj, 
-                   deg_table = res,
-                   assay = "unfiltered")
+    obj <- SetDEGs(
+        object = obj,
+        deg_table = res,
+        assay = "unfiltered"
+    )
 
     # P value histogram
-    PlotPValHist(obj, 
-                 assay = "unfiltered",
-                 alpha = 0.05)
+    PlotPValHist(obj,
+        assay = "unfiltered",
+        alpha = 0.05
+    )
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/PValHist-1.png" width="70%" style="display: block; margin: auto;" />
 
@@ -401,24 +564,26 @@ outputs results in a tabular format.
 DEG assays can be filtered and directly saved as a new assay in the DEGs
 slot using `FilterDEGs()`
 
-
     # Summarize DEGs
     SummarizeDEGs(obj,
-                  alpha = 0.05,
-                  lfc1 = 1,
-                  lfc2 = 2)
-    #>                               DEG unfiltered
-    #> padj<0.05 & log2FC >1 (Up)      0        656
-    #> padj<0.05 & log2FC <-1 (Down)   0        542
-    #> padj<0.05 & log2FC >2 (Up)      0        228
-    #> padj<0.05 & log2FC <-2 (Down)   0        181
+        alpha = 0.05,
+        lfc1 = 1,
+        lfc2 = 2
+    )
+    #>                                 unfiltered
+    #> padj<=0.05 & log2FC >=1 (Up)           656
+    #> padj<=0.05 & log2FC <=-1 (Down)        542
+    #> padj<=0.05 & log2FC >=2 (Up)           228
+    #> padj<=0.05 & log2FC <=-2 (Down)        181
 
     # Filter the DEG assay and save as a new one
-    obj <- FilterDEGs(object = obj,
-                      assay = "unfiltered",
-                      alpha = 0.05,
-                      l2fc = 1,
-                      saveAssay = "padj05_lfc1")
+    obj <- FilterDEGs(
+        object = obj,
+        assay = "unfiltered",
+        alpha = 0.05,
+        l2fc = 1,
+        saveAssay = "padj05_lfc1"
+    )
 
     # Grab results with accessor function
     nrow(DEGs(object = obj, assay = "unfiltered"))
@@ -432,54 +597,29 @@ refer to numerator level and denominator level (reference level of
 experiment, in our case, “WT”)
 
     PlotMA(obj,
-           assay = "unfiltered",
-           alpha = 0.05,
-           l2fc = 1)
-    #> Scale for size is already present.
-    #> Adding another scale for size, which will replace the existing scale.
-    #> Warning: Removed 5 rows containing missing values or values outside the scale range
-    #> (`geom_point()`).
-    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-    #> Warning: ggrepel: 542 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
+        assay = "unfiltered",
+        alpha = 0.05,
+        l2fc = 1
+    )
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/MA-1.png" width="70%" style="display: block; margin: auto;" />
 
 Or a volcano plot by specifying numerator and denominator (denominator
 is your comparison reference level).
 
-
     PlotVolcano(obj,
-           assay = "unfiltered", 
-           alpha = 0.05,
-           l2fc = 1,
-           den = "WT",
-           num = "Snai1_KO",
-           title = "Example Volcano")
-    #> Warning: ggrepel: 653 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-    #> Warning: ggrepel: 538 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
+        assay = "unfiltered",
+        alpha = 0.05,
+        l2fc = 1,
+        den = "WT",
+        num = "Snai1_KO",
+        title = "Example Volcano"
+    )
 
 <img src="Snail1_Vignette_files/figure-markdown_strict/Volcano-1.png" width="70%" style="display: block; margin: auto;" />
 
 To get a glance at everything at once, we can plot a differential
 expression dashboard with `DEDashboard()`
-
-    #> Scale for size is already present.
-    #> Adding another scale for size, which will replace the existing scale.
-    #> Warning: Removed 5 rows containing missing values or values outside the scale range
-    #> (`geom_point()`).
-    #> Warning: ggrepel: 640 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-    #> Warning: ggrepel: 530 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-    #> Warning: ggrepel: 643 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-    #> Warning: ggrepel: 527 unlabeled data points (too many overlaps). Consider increasing
-    #> max.overlaps
-
 <img src="Snail1_Vignette_files/figure-markdown_strict/test-1.png" style="display: block; margin: auto;" />
 
 To explore whether a differentially expressed gene (DEG) is also a
@@ -491,10 +631,10 @@ intersect with HVGs can be either “positive”, or “negative”, which
 returns a vector of genes, or “both” which contains a list with
 `$positive`, `$negative`, and `$both` slots.
 
-
-    FindHVDEGs(obj, 
-               assay = "padj05_lfc1",
-               direction = "negative")
+    FindHVDEGs(obj,
+        assay = "padj05_lfc1",
+        direction = "negative"
+    )
     #> 332 -log2FC hvDEGs found.
     #>   [1] "CAMKK1"       "ACSM3"        "TMEM98"       "DLX6"         "MAP3K9"      
     #>   [6] "PRSS21"       "FUZ"          "CEP68"        "ERCC1"        "BID"         
@@ -563,3 +703,101 @@ returns a vector of genes, or “both” which contains a list with
     #> [321] "GNAO1-AS1"    "SH3GL1P1"     "LIN37"        "NCBP2AS2"     "CAHM"        
     #> [326] "ZNF595"       "FAM106A"      "H2BC3"        "H2AC16"       "H4C1"        
     #> [331] "OR51B2"       "H3C3"
+
+## Moving results back to a SummarizedExperiment
+
+Use `as(obj, "SummarizedExperiment")` to move a `geneda` object, with
+its HVGs, PCA and DEG tables, into a `SummarizedExperiment` for other
+Bioconductor tools. `as.geneda()` reads the same layout back, so no
+information is lost.
+
+    se <- as(obj, "SummarizedExperiment")
+    se
+    #> class: SummarizedExperiment 
+    #> dim: 11247 6 
+    #> metadata(1): RGenEDA
+    #> assays(1): normalized
+    #> rownames(11247): TSPAN6 DPM1 ... PRRC2B F8A1
+    #> rowData names(2): isHVG hvgRank
+    #> colnames(6): ERR1736465 ERR1736466 ... ERR1736469 ERR1736470
+    #> colData names(4): Sample Disease Genotype CellLine_CellType
+
+    # HVGs are flagged in rowData; PCA and DEG tables are in metadata()
+    table(SummarizedExperiment::rowData(se)$isHVG)
+    #> 
+    #> FALSE  TRUE 
+    #>  9247  2000
+    names(S4Vectors::metadata(se)$RGenEDA$DEGs)
+    #> [1] "unfiltered"  "padj05_lfc1"
+
+    # Round trip back to a geneda object
+    identical(as.geneda(se), obj)
+    #> [1] TRUE
+
+# Session information
+
+    sessionInfo()
+    #> R version 4.4.1 (2024-06-14)
+    #> Platform: aarch64-apple-darwin20
+    #> Running under: macOS Sonoma 14.6
+    #> 
+    #> Matrix products: default
+    #> BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
+    #> LAPACK: /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.12.0
+    #> 
+    #> locale:
+    #> [1] C
+    #> 
+    #> time zone: America/New_York
+    #> tzcode source: internal
+    #> 
+    #> attached base packages:
+    #> [1] stats4    stats     graphics  grDevices utils     datasets  methods  
+    #> [8] base     
+    #> 
+    #> other attached packages:
+    #>  [1] ggtext_0.1.2                lubridate_1.9.4            
+    #>  [3] forcats_1.0.0               stringr_1.6.0              
+    #>  [5] dplyr_1.2.0                 purrr_1.2.1                
+    #>  [7] readr_2.1.5                 tidyr_1.3.2                
+    #>  [9] tibble_3.3.1                ggplot2_4.0.2              
+    #> [11] tidyverse_2.0.0             pasilla_1.32.0             
+    #> [13] DEXSeq_1.50.0               RColorBrewer_1.1-3         
+    #> [15] AnnotationDbi_1.68.0        DESeq2_1.44.0              
+    #> [17] SummarizedExperiment_1.36.0 GenomicRanges_1.58.0       
+    #> [19] GenomeInfoDb_1.42.3         IRanges_2.40.1             
+    #> [21] S4Vectors_0.44.0            MatrixGenerics_1.18.1      
+    #> [23] matrixStats_1.5.0           Biobase_2.66.0             
+    #> [25] BiocGenerics_0.52.0         BiocParallel_1.40.2        
+    #> [27] RGenEDA_0.99.1             
+    #> 
+    #> loaded via a namespace (and not attached):
+    #>  [1] DBI_1.2.3               bitops_1.0-9            httr2_1.2.1            
+    #>  [4] biomaRt_2.60.1          rlang_1.1.7             magrittr_2.0.4         
+    #>  [7] compiler_4.4.1          RSQLite_2.4.2           png_0.1-8              
+    #> [10] vctrs_0.7.2             pkgconfig_2.0.3         crayon_1.5.3           
+    #> [13] fastmap_1.2.0           dbplyr_2.5.1            XVector_0.46.0         
+    #> [16] labeling_0.4.3          Rsamtools_2.22.0        rmarkdown_2.29         
+    #> [19] tzdb_0.5.0              UCSC.utils_1.2.0        bit_4.6.0              
+    #> [22] xfun_0.53               zlibbioc_1.52.0         cachem_1.1.0           
+    #> [25] jsonlite_2.0.0          progress_1.2.3          blob_1.2.4             
+    #> [28] DelayedArray_0.32.0     parallel_4.4.1          prettyunits_1.2.0      
+    #> [31] R6_2.6.1                stringi_1.8.7           genefilter_1.86.0      
+    #> [34] Rcpp_1.1.1              knitr_1.50              timechange_0.3.0       
+    #> [37] Matrix_1.7-3            splines_4.4.1           tidyselect_1.2.1       
+    #> [40] dichromat_2.0-0.1       abind_1.4-8             yaml_2.3.10            
+    #> [43] codetools_0.2-20        hwriter_1.3.2.1         curl_7.0.0             
+    #> [46] lattice_0.22-7          withr_3.0.2             KEGGREST_1.44.1        
+    #> [49] S7_0.2.1                evaluate_1.0.5          survival_3.8-3         
+    #> [52] BiocFileCache_2.12.0    xml2_1.4.0              Biostrings_2.74.1      
+    #> [55] pillar_1.11.1           filelock_1.0.3          generics_0.1.4         
+    #> [58] hms_1.1.3               scales_1.4.0            xtable_1.8-4           
+    #> [61] glue_1.8.0              pheatmap_1.0.13         tools_4.4.1            
+    #> [64] annotate_1.82.0         locfit_1.5-9.12         XML_3.99-0.19          
+    #> [67] grid_4.4.1              colorspace_2.1-2        GenomeInfoDbData_1.2.13
+    #> [70] patchwork_1.3.2         cli_3.6.5               rappdirs_0.3.3         
+    #> [73] S4Arrays_1.6.0          gtable_0.3.6            digest_0.6.37          
+    #> [76] SparseArray_1.6.2       ggrepel_0.9.8           geneplotter_1.82.0     
+    #> [79] farver_2.1.2            memoise_2.0.1           htmltools_0.5.8.1      
+    #> [82] lifecycle_1.0.5         httr_1.4.7              statmod_1.5.0          
+    #> [85] gridtext_0.1.5          bit64_4.6.0-1
